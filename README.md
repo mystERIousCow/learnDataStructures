@@ -9,7 +9,7 @@ I believe that we understand only as much as we can teach, and by explaining con
 
 Thank you for visiting. Whether you are using this as a textbook, reference, or a last-minute study guide, I hope you found this resource useful.
 
-**Live Site**: [https://learndatastructures.org](https://learndatastructures.org)
+**Live Site**: [https://learndatastructures.org](https://www.learndatastructures.org)
 
 ---
 
