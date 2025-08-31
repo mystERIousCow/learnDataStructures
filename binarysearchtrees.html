@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Binary Search Tree · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/binarysearchtrees.html" />
+<meta name="description" content="Interactive Binary Search Tree (BST) tutorial and simulator: insert/search/delete (0/1/2-child), inorder/pre/post/level traversals, min/max, and k-th smallest—plus reference code in C++, Java, and Python." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Binary Search Tree · learnDataStructures" />
+<meta property="og:description" content="Learn BSTs with an interactive visualizer. Practice insert/search/delete, run traversals, and compute k-th smallest with animated highlights." />
+<meta property="og:url" content="https://learndatastructures.org/binarysearchtrees.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="BST with nodes and edges, highlighting an inorder traversal" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Binary Search Tree · learnDataStructures" />
+<meta name="twitter:description" content="Hands-on BST simulator: operations, traversals, min/max, k-th smallest, and complexity notes." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:120px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0; flex-wrap:wrap}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    svg{display:block; width:100%; height:460px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .node{cursor:pointer}
+    .node text{font-size:12px; fill:#001523; pointer-events:none}
+    .found circle{stroke:#ffd166; stroke-width:3}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Binary Search Tree (BST)</h2></div>
+      <div class="bd">
+        <h3>What is a BST?</h3>
+        <p>A <strong>Binary Search Tree</strong> stores <em>distinct integers</em> (here we enforce <code>0..10000</code>) in a binary tree so that search is fast. It obeys one rule—the <strong>BST invariant</strong>:</p>
+        <ul>
+          <li>For any node with key <code>k</code>, every key in its <strong>left</strong> subtree is <code>&lt; k</code>, and every key in its <strong>right</strong> subtree is <code>&gt; k</code>. The rule holds <em>recursively</em> for all subtrees.</li>
+        </ul>
+
+        <h3>How insert/search/delete work (high level)</h3>
+        <ul>
+          <li><strong>Search</strong>: compare with current node; go left if smaller, right if larger, stop if equal.</li>
+          <li><strong>Insert</strong>: perform a search; when you fall off a null child, attach a new node there (we <em>reject duplicates</em>).</li>
+          <li><strong>Delete</strong>:
+            <ul>
+              <li>0 children: remove the node.</li>
+              <li>1 child: splice the child up.</li>
+              <li>2 children: swap with the <em>successor</em> (minimum in right subtree), then delete that successor.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>Traversals (how to visit every node)</h3>
+        <ul>
+          <li><strong>Inorder</strong> (Left, Node, Right): on a BST, this yields <em>sorted ascending order</em>.</li>
+          <li><strong>Preorder</strong> (Node, Left, Right): root first—useful for copying or prefix expressions.</li>
+          <li><strong>Postorder</strong> (Left, Right, Node): children first—useful for deletes/evaluations.</li>
+          <li><strong>Level-order</strong> (BFS): layer by layer using a queue.</li>
+        </ul>
+
+        <h3>What is the <em>k-th smallest</em>?</h3>
+        <p>It means “the element at rank <code>k</code> in sorted order”, with <code>k=1</code> being the smallest. We compute this by an <em>iterative inorder</em> walk (our baseline is <code>O(k+h)</code>)—with an augmentation that stores <code>subtree_size</code> at each node you can do it in <code>O(h)</code> (≈<code>O(log n)</code> on balanced trees).</p>
+
+        <h3>Balanced vs perfectly balanced</h3>
+        <ul>
+          <li><strong>Perfectly balanced</strong>: all leaves are at the same level.</li>
+          <li><strong>Balanced (informally)</strong>: no path is much longer than another; height is <code>O(log n)</code>.</li>
+          <li>Plain BSTs can <em>degenerate</em> to a chain (height <code>n</code>) if you insert sorted data. Balancing schemes (AVL, Red–Black) prevent this; we intentionally use an <em>unbalanced</em> BST here.</li>
+          <li>“Root is the median” is true only if you <em>build</em> the tree by repeatedly choosing medians (e.g., from a sorted array); normal insert order does not guarantee that.</li>
+        </ul>
+
+        <h3>Complexities (unbalanced BST)</h3>
+        <table>
+          <thead><tr><th>Operation</th><th>Average</th><th>Worst</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>search / insert / delete</td><td>O(log n)</td><td>O(n)</td><td>Height <code>h</code> dominates</td></tr>
+            <tr><td>min / max</td><td>O(h)</td><td>O(n)</td><td>Follow extreme left/right</td></tr>
+            <tr><td>k-th smallest</td><td>O(k+h)</td><td>O(n)</td><td>With subtree sizes: <code>O(h)</code></td></tr>
+            <tr><td>traversals</td><td colspan="2">O(n)</td><td>Visit each node once</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>BST — reference & pseudocode</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Pseudocode (insert, search, delete, min/max, k-th, traversals)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          <span class="badgePill">No duplicates</span>
+          <span class="badgePill">Inorder = sorted order</span>
+          <span class="badgePill">Delete handles 0/1/2-child cases</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive BST simulator</h2>
+        <div class="tiny">nodes: <span id="kNodes">0</span> · height: <span id="kHeight">0</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 460" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="nodeGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="overlay"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <input id="valInput" type="number" min="0" max="10000" placeholder="value (0..10000)" />
+          <button class="btn primary" id="insertBtn">insert</button>
+          <button class="btn" id="searchBtn">search</button>
+          <button class="btn danger" id="deleteBtn">delete</button>
+          <button class="btn" id="randomBtn">random 8</button>
+          <button class="btn" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <select id="travSel">
+            <option value="in">Inorder</option>
+            <option value="pre">Preorder</option>
+            <option value="post">Postorder</option>
+            <option value="level">Level-order</option>
+          </select>
+          <button class="btn" id="runTrav">run</button>
+          <button class="btn" id="stepTrav">step</button>
+          <button class="btn" id="stopTrav">stop</button>
+          <span class="tiny" id="travOut"></span>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <button class="btn" id="minBtn">min</button>
+          <button class="btn" id="maxBtn">max</button>
+          <input id="kInput" type="number" min="1" value="1" style="width:80px" />
+          <label class="tiny">k-th smallest</label>
+          <button class="btn" id="kthBtn">find</button>
+        </div>
+        <div>
+          <label class="tiny">traversal delay</label>
+          <input id="speed" type="range" min="150" max="1200" step="50" value="500" /> 
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Complexity</h2></div>
+      <div class="bd">
+        <h3>Implementations by Language (choose a variant)</h3>
+
+        <h4>Python</h4>
+        <details open>
+          <summary>BST (recursive)</summary>
+<pre>
+class Node:
+    __slots__ = ("key","left","right")
+    def __init__(self, key): self.key=key; self.left=None; self.right=None
+
+def search(u, x):
+    if not u: return None
+    if x == u.key: return u
+    return search(u.left, x) if x &lt; u.key else search(u.right, x)
+
+def insert(u, x):
+    if not u: return Node(x)
+    if x == u.key: return u
+    if x &lt; u.key: u.left = insert(u.left, x)
+    else:         u.right = insert(u.right, x)
+    return u
+
+def delete(u, x):
+    if not u: return None
+    if x &lt; u.key: u.left = delete(u.left, x)
+    elif x &gt; u.key: u.right = delete(u.right, x)
+    else:
+        if not u.left: return u.right
+        if not u.right: return u.left
+        s = u.right
+        while s.left: s = s.left
+        u.key = s.key
+        u.right = delete(u.right, s.key)
+    return u
+</pre>
+        </details>
+        <details>
+          <summary>BST (iterative)</summary>
+<pre>
+def search_it(u, x):
+    while u:
+        if x == u.key: return u
+        u = u.left if x &lt; u.key else u.right
+    return None
+
+def insert_it(root, x):
+    if not root: return Node(x)
+    p = None; u = root
+    while u:
+        p = u
+        if x == u.key: return root
+        u = u.left if x &lt; u.key else u.right
+    if x &lt; p.key: p.left = Node(x)
+    else: p.right = Node(x)
+    return root
+
+def delete_it(root, x):
+    p = None; u = root
+    while u and u.key != x:
+        p = u; u = u.left if x &lt; u.key else u.right
+    if not u: return root
+    if u.left and u.right:
+        ps = u; s = u.right
+        while s.left: ps, s = s, s.left
+        u.key, s.key = s.key, u.key
+        p, u = ps, s
+    child = u.left or u.right
+    if not p: return child
+    if p.left is u: p.left = child
+    else: p.right = child
+    return root
+</pre>
+        </details>
+        <details>
+          <summary>Ordered list + <code>bisect</code> (library)</summary>
+<pre>
+from bisect import bisect_left
+
+class OrderedSet:
+    def __init__(self): self.a = []     # sorted list
+    def has(self, x):
+        i = bisect_left(self.a, x)
+        return i &lt; len(self.a) and self.a[i] == x    # O(log n)
+    def insert(self, x):
+        i = bisect_left(self.a, x)
+        if i == len(self.a) or self.a[i] != x:
+            self.a.insert(i, x)                      # O(n) shift
+    def delete(self, x):
+        i = bisect_left(self.a, x)
+        if i &lt; len(self.a) and self.a[i] == x:
+            self.a.pop(i)                            # O(n) shift
+    def kth(self, k): return self.a[k-1]             # O(1)
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>BST (recursive)</summary>
+<pre>
+class Node { int key; Node left, right; Node(int k){key=k;} }
+
+static Node search(Node u, int x){
+  if(u==null) return null;
+  if(x==u.key) return u;
+  return x&lt;u.key ? search(u.left,x) : search(u.right,x);
+}
+static Node insert(Node u, int x){
+  if(u==null) return new Node(x);
+  if(x==u.key) return u;
+  if(x&lt;u.key) u.left = insert(u.left,x);
+  else u.right = insert(u.right,x);
+  return u;
+}
+static Node delete(Node u, int x){
+  if(u==null) return null;
+  if(x&lt;u.key) u.left = delete(u.left,x);
+  else if(x&gt;u.key) u.right = delete(u.right,x);
+  else {
+    if(u.left==null) return u.right;
+    if(u.right==null) return u.left;
+    Node s=u.right;
+    while(s.left!=null) s=s.left;
+    u.key=s.key;
+    u.right=delete(u.right,s.key);
+  }
+  return u;
+}
+</pre>
+        </details>
+        <details>
+          <summary>BST (iterative)</summary>
+<pre>
+static Node searchIt(Node u, int x){
+  while(u!=null){
+    if(x==u.key) return u;
+    u = (x&lt;u.key)?u.left:u.right;
+  }
+  return null;
+}
+static Node insertIt(Node root, int x){
+  if(root==null) return new Node(x);
+  Node p=null, u=root;
+  while(u!=null){
+    p=u;
+    if(x==u.key) return root;
+    u = (x&lt;u.key)?u.left:u.right;
+  }
+  if(x&lt;p.key) p.left=new Node(x); else p.right=new Node(x);
+  return root;
+}
+static Node deleteIt(Node root, int x){
+  Node p=null, u=root;
+  while(u!=null && u.key!=x){ p=u; u=(x&lt;u.key)?u.left:u.right; }
+  if(u==null) return root;
+  if(u.left!=null && u.right!=null){
+    Node ps=u, s=u.right;
+    while(s.left!=null){ ps=s; s=s.left; }
+    int tmp=u.key; u.key=s.key; s.key=tmp; p=ps; u=s;
+  }
+  Node child=(u.left!=null)?u.left:u.right;
+  if(p==null) return child;
+  if(p.left==u) p.left=child; else p.right=child;
+  return root;
+}
+</pre>
+        </details>
+        <details>
+          <summary><code>ArrayList</code> + <code>Collections.binarySearch</code> (library)</summary>
+<pre>
+import java.util.*;
+
+class OrderedSet {
+  private final ArrayList&lt;Integer&gt; a = new ArrayList&lt;&gt;();
+  boolean has(int x){
+    int i = Collections.binarySearch(a, x);
+    return i &gt;= 0;                         // O(log n)
+  }
+  void insert(int x){
+    int i = Collections.binarySearch(a, x);
+    if(i &lt; 0) a.add(-i-1, x);              // O(n) shift
+  }
+  void delete(int x){
+    int i = Collections.binarySearch(a, x);
+    if(i &gt;= 0) a.remove(i);                // O(n) shift
+  }
+  int kth(int k){ return a.get(k-1); }     // O(1)
+}
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>BST (recursive)</summary>
+<pre>
+struct Node{ int key; Node* left=nullptr; Node* right=nullptr; Node(int k):key(k){} };
+
+Node* search(Node* u, int x){
+  if(!u) return nullptr;
+  if(x==u-&gt;key) return u;
+  return (x&lt;u-&gt;key) ? search(u-&gt;left,x) : search(u-&gt;right,x);
+}
+Node* insert(Node* u, int x){
+  if(!u) return new Node(x);
+  if(x==u-&gt;key) return u;
+  if(x&lt;u-&gt;key) u-&gt;left = insert(u-&gt;left,x);
+  else          u-&gt;right = insert(u-&gt;right,x);
+  return u;
+}
+Node* deleteNode(Node* u, int x){
+  if(!u) return nullptr;
+  if(x&lt;u-&gt;key) u-&gt;left = deleteNode(u-&gt;left,x);
+  else if(x&gt;u-&gt;key) u-&gt;right = deleteNode(u-&gt;right,x);
+  else{
+    if(!u-&gt;left){ Node* r=u-&gt;right; delete u; return r; }
+    if(!u-&gt;right){ Node* l=u-&gt;left;  delete u; return l; }
+    Node* s=u-&gt;right; while(s-&gt;left) s=s-&gt;left;
+    u-&gt;key=s-&gt;key; u-&gt;right=deleteNode(u-&gt;right,s-&gt;key);
+  }
+  return u;
+}
+</pre>
+        </details>
+        <details>
+          <summary>BST (iterative)</summary>
+<pre>
+Node* searchIt(Node* u, int x){
+  while(u){
+    if(x==u-&gt;key) return u;
+    u = (x&lt;u-&gt;key)?u-&gt;left:u-&gt;right;
+  }
+  return nullptr;
+}
+Node* insertIt(Node* root, int x){
+  if(!root) return new Node(x);
+  Node *p=nullptr, *u=root;
+  while(u){
+    p=u;
+    if(x==u-&gt;key) return root;
+    u = (x&lt;u-&gt;key)?u-&gt;left:u-&gt;right;
+  }
+  if(x&lt;p-&gt;key) p-&gt;left=new Node(x); else p-&gt;right=new Node(x);
+  return root;
+}
+Node* deleteIt(Node* root, int x){
+  Node *p=nullptr, *u=root;
+  while(u && u-&gt;key!=x){ p=u; u=(x&lt;u-&gt;key)?u-&gt;left:u-&gt;right; }
+  if(!u) return root;
+  if(u-&gt;left && u-&gt;right){
+    Node *ps=u, *s=u-&gt;right;
+    while(s-&gt;left){ ps=s; s=s-&gt;left; }
+    std::swap(u-&gt;key, s-&gt;key); p=ps; u=s;
+  }
+  Node* child = u-&gt;left ? u-&gt;left : u-&gt;right;
+  if(!p){ delete u; return child; }
+  if(p-&gt;left==u) p-&gt;left=child; else p-&gt;right=child;
+  delete u; return root;
+}
+</pre>
+        </details>
+        <details>
+          <summary><code>std::vector</code> + <code>std::lower_bound</code> (library)</summary>
+<pre>
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+struct OrderedSet {
+  std::vector&lt;int&gt; a;                     
+  bool has(int x) const {
+    auto it = std::lower_bound(a.begin(), a.end(), x);
+    return it != a.end() &amp;&amp; *it == x;     // O(log n)
+  }
+  void insert(int x){
+    auto it = std::lower_bound(a.begin(), a.end(), x);
+    if(it==a.end() || *it!=x) a.insert(it, x);  // O(n) shift
+  }
+  void erase(int x){
+    auto it = std::lower_bound(a.begin(), a.end(), x);
+    if(it!=a.end() &amp;&amp; *it==x) a.erase(it);     // O(n) shift
+  }
+  int kth(int k) const { return a[k-1]; }       // O(1)
+};
+</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Concept Checks</h2></div>
+      <div class="bd">
+        <ol>
+          <li>State and use the BST invariant to justify each step of insert/search.</li>
+          <li>Delete nodes in the three cases (0/1/2 children) and show the invariant remains true.</li>
+          <li>Run inorder on your tree. Why is the output sorted?</li>
+          <li>Give an insertion order that creates a chain of height <code>n-1</code> (e.g., sorted ascending).</li>
+          <li>Implement k-th smallest via iterative inorder; how would subtree sizes change the complexity?</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// Minimal BST API (recursive variants)
+struct Node{ int key; Node* left=nullptr; 
+   Node* right=nullptr; 
+   Node(int k):key(k){} };
+Node* search(Node* u,int x);
+Node* insert(Node* u,int x);
+Node* deleteNode(Node* u,int x);
+void inorder(Node* u, auto visit);`,
+java:`// Minimal BST API (recursive variants)
+class Node { int key; Node left, right; Node(int k){key=k;} }
+static Node search(Node u,int x);
+static Node insert(Node u,int x);
+static Node delete(Node u,int x);
+static void inorder(Node u, java.util.function.IntConsumer visit);`,
+py:`# Minimal BST API (recursive variants)
+class Node:
+    def __init__(self, key): self.key=key; self.left=None; self.right=None
+def search(u,x): ...
+def insert(u,x): ...
+def delete(u,x): ...
+def inorder(u,visit): ...`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue|Node)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const ps = [
+'// BST invariant: left < node < right (recursively on all subtrees)',
+'search(u, x): while u != null:',
+'  if x == u.key: return u',
+'  u = (x < u.key) ? u.left : u.right',
+'',
+'insert(u, x): if u == null: return new Node(x)',
+'  if x == u.key: return u  // ignore duplicates',
+'  if x < u.key: u.left = insert(u.left, x)',
+'  else:         u.right = insert(u.right, x)',
+'  return u',
+'',
+'delete(u, x): if u == null: return null',
+'  if x < u.key: u.left = delete(u.left, x)',
+'  else if x > u.key: u.right = delete(u.right, x)',
+'  else: // found',
+'    if u.left == null: return u.right',
+'    if u.right == null: return u.left',
+'    s = min(u.right)  // successor',
+'    u.key = s.key',
+'    u.right = delete(u.right, s.key)',
+'  return u',
+'',
+'min(u): while u.left != null: u = u.left; return u',
+'max(u): while u.right != null: u = u.right; return u',
+'',
+'// k-th smallest (1-indexed): iterative inorder',
+'kth(root, k):',
+'  stack = empty; u = root',
+'  while stack not empty or u != null:',
+'    if u != null: push u; u = u.left',
+'    else: u = pop(); k--',
+'          if k == 0: return u',
+'          u = u.right',
+'',
+'// Traversals: inorder, preorder, postorder, level-order'
+  ];
+  function renderPseudo(){ pseudoEl.innerHTML = ps.map(ln=>`<div>${ln}</div>`).join(''); }
+  renderPseudo();
+
+  const edgesG = document.querySelector('#edges');
+  const nodesG = document.querySelector('#nodes');
+  const overlayG = document.querySelector('#overlay');
+  const VIEW_W=760, VIEW_H=460, NODE_R=16, LEVEL_H=86;
+
+  const kNodes=document.querySelector('#kNodes');
+  const kHeight=document.querySelector('#kHeight');
+  const kOps=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+
+  const valInput=document.querySelector('#valInput');
+  const insertBtn=document.querySelector('#insertBtn');
+  const searchBtn=document.querySelector('#searchBtn');
+  const deleteBtn=document.querySelector('#deleteBtn');
+  const randomBtn=document.querySelector('#randomBtn');
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+
+  const travSel=document.querySelector('#travSel');
+  const runTrav=document.querySelector('#runTrav');
+  const stepTrav=document.querySelector('#stepTrav');
+  const stopTrav=document.querySelector('#stopTrav');
+  const travOut=document.querySelector('#travOut');
+
+  const minBtn=document.querySelector('#minBtn');
+  const maxBtn=document.querySelector('#maxBtn');
+  const kInput=document.querySelector('#kInput');
+  const kthBtn=document.querySelector('#kthBtn');
+  const speed=document.querySelector('#speed');
+
+  let ops=0, root=null, hist=[]; 
+  let anim = { list:[], i:0, timer:null };
+  let q=[], busy=false;         
+
+  function mkNode(key){ return {key, left:null, right:null, id: (mkNode._id=(mkNode._id||0)+1)}; }
+  function serialize(u){ if(!u) return null; return [u.key, serialize(u.left), serialize(u.right)]; }
+  function deserialize(s){ if(!s) return null; const n=mkNode(s[0]); n.left=deserialize(s[1]); n.right=deserialize(s[2]); return n; }
+  function saveSnap(){ hist.push(serialize(root)); if(hist.length>30) hist.shift(); }
+  function undo(){ const s=hist.pop(); if(s===undefined) return false; root=deserialize(s); draw(); return true; }
+
+  function height(u){ if(!u) return 0; return 1+Math.max(height(u.left),height(u.right)); }
+  function count(u){ return u ? 1+count(u.left)+count(u.right) : 0; }
+
+  function search(u,x){ while(u){ if(x===u.key) return u; u = (x<u.key)?u.left:u.right; } return null; }
+  function insert(root,x){
+    if(!root) return mkNode(x);
+    let p=null,u=root;
+    while(u){
+      p=u;
+      if(x===u.key) return root; 
+      u = (x<u.key)?u.left:u.right;
+    }
+    if(x<p.key) p.left=mkNode(x); else p.right=mkNode(x);
+    return root;
+  }
+  function deleteVal(root,x){
+    let p=null,u=root;
+    while(u && u.key!==x){ p=u; u=(x<u.key)?u.left:u.right; }
+    if(!u) return root; 
+    if(u.left && u.right){
+      let ps=u, s=u.right;
+      while(s.left){ ps=s; s=s.left; }
+      const tmp=u.key; u.key=s.key; s.key=tmp;
+      p=ps; u=s;
+    }
+    const child = u.left || u.right;
+    if(!p){ return child; }
+    if(p.left===u) p.left=child; else p.right=child;
+    return root;
+  }
+  function minNode(u){ if(!u) return null; while(u.left) u=u.left; return u; }
+  function maxNode(u){ if(!u) return null; while(u.right) u=u.right; return u; }
+
+  function inorderList(u, out){ if(!u) return; inorderList(u.left,out); out.push(u); inorderList(u.right,out); }
+  function preorderList(u,out){ if(!u) return; out.push(u); preorderList(u.left,out); preorderList(u.right,out); }
+  function postorderList(u,out){ if(!u) return; postorderList(u.left,out); postorderList(u.right,out); out.push(u); }
+  function levelorderList(u,out){ if(!u) return; const q=[u]; while(q.length){ const x=q.shift(); out.push(x); if(x.left) q.push(x.left); if(x.right) q.push(x.right); } }
+
+  function kthSmallest(u,k){
+    const st=[];
+    let cur=u;
+    while(st.length || cur){
+      if(cur){ st.push(cur); cur=cur.left; }
+      else { cur=st.pop(); if(--k===0) return cur; cur=cur.right; }
+    }
+    return null;
+  }
+
+  function layout(){
+    const pos=new Map(); let x=0, maxX=0, maxY=0;
+    (function dfs(u,d){
+      if(!u) return;
+      dfs(u.left,d+1);
+      const px = 40 + (x++) * 40;
+      const py = 30 + d * 86;
+      pos.set(u,{x:px,y:py}); maxX=Math.max(maxX,px); maxY=Math.max(maxY,py);
+      dfs(u.right,d+1);
+    })(root,0);
+    return {pos, maxX, maxY, h:height(root)};
+  }
+
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+  function draw(){
+    edgesG.innerHTML=''; nodesG.innerHTML=''; overlayG.innerHTML='';
+    edgesG.removeAttribute('transform'); nodesG.removeAttribute('transform'); overlayG.removeAttribute('transform');
+
+    kNodes.textContent=String(count(root));
+    kHeight.textContent=String(Math.max(0, height(root)-1));
+    kOps.textContent=String(ops);
+
+    if(!root){ setStatus('empty tree — insert numbers (0..10000) or press “random 8”'); return; }
+
+    const L=layout();
+    const margin=20;
+    const needW=L.maxX + NODE_R + margin;
+    const needH=L.maxY + NODE_R + margin;
+    const scaleX=Math.min(1,(VIEW_W-margin)/Math.max(margin,needW));
+    const scaleY=Math.min(1,(VIEW_H-margin)/Math.max(margin,needH));
+    const S=Math.min(scaleX,scaleY);
+    edgesG.setAttribute('transform',`scale(${S})`);
+    nodesG.setAttribute('transform',`scale(${S})`);
+    overlayG.setAttribute('transform',`scale(${S})`);
+
+
+    (function walk(u){
+      if(!u) return;
+      const p=L.pos.get(u);
+      if(u.left){
+        const c=L.pos.get(u.left);
+        const path=mk('path',{d:`M ${p.x} ${p.y+NODE_R} C ${p.x} ${(p.y+c.y)/2} ${c.x} ${(p.y+c.y)/2} ${c.x} ${c.y-NODE_R}`, stroke:'#37507f', fill:'none'});
+        edgesG.appendChild(path);
+      }
+      if(u.right){
+        const c=L.pos.get(u.right);
+        const path=mk('path',{d:`M ${p.x} ${p.y+NODE_R} C ${p.x} ${(p.y+c.y)/2} ${c.x} ${(p.y+c.y)/2} ${c.x} ${c.y-NODE_R}`, stroke:'#37507f', fill:'none'});
+        edgesG.appendChild(path);
+      }
+      walk(u.left); walk(u.right);
+    })(root);
+
+    (function walk(u){
+      if(!u) return;
+      const p=L.pos.get(u);
+      const g=mk('g',{class:'node', transform:`translate(${p.x},${p.y})`});
+      const c=mk('circle',{r:NODE_R, fill:'url(#nodeGrad)', stroke:'#214064'});
+      const t=mk('text',{y:4, 'text-anchor':'middle'}); t.textContent=String(u.key);
+      g.appendChild(c); g.appendChild(t);
+      nodesG.appendChild(g);
+      walk(u.left); walk(u.right);
+    })(root);
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+  function pulseNode(u, color='var(--pulse)'){
+    const L=layout(); const p=L.pos.get(u); if(!p) return;
+    const r=mk('circle',{cx:p.x, cy:p.y, r:9, fill:color, opacity:.95, stroke:'#222','stroke-width':1});
+    overlayG.appendChild(r);
+    setTimeout(()=>{ r.remove(); }, Math.max(180, +speed.value-150));
+  }
+
+  function runTraversal(kind){
+    if(!root){ setStatus('build a tree first'); return; }
+    const arr=[];
+    if(kind==='in') inorderList(root,arr);
+    else if(kind==='pre') preorderList(root,arr);
+    else if(kind==='post') postorderList(root,arr);
+    else if(kind==='level') levelorderList(root,arr);
+    anim.list=arr; anim.i=0;
+    travOut.textContent='order: '+arr.map(x=>x.key).join(' → ');
+    stepOnce(true);
+    if(anim.timer) clearInterval(anim.timer);
+    anim.timer=setInterval(()=>{ if(!stepOnce(false)) stopAnim(); }, +speed.value);
+  }
+  function stepOnce(reset){
+    if(reset) overlayG.innerHTML='';
+    if(anim.i>=anim.list.length) return false;
+    const u=anim.list[anim.i++]; pulseNode(u); return true;
+  }
+  function stopAnim(){ if(anim.timer){ clearInterval(anim.timer); anim.timer=null; } }
+
+  function enqueue(fn){ q.push(fn); drain(); }
+  function drain(){
+    if(busy) return;
+    busy=true;
+    (function loop(){
+      const fn=q.shift();
+      if(!fn){ busy=false; return; }
+      try{ fn(); } catch(e){ console.error(e); setStatus('error: '+e.message); }
+      setTimeout(loop, 0);
+    })();
+  }
+
+  function getVal(){
+    const v = Number(valInput.value);
+    if(!Number.isInteger(v) || v<0 || v>10000){ setStatus('enter integer 0..10000'); return null; }
+    return v;
+  }
+
+  insertBtn.onclick = ()=>enqueue(()=>{
+    const x=getVal(); if(x===null) return;
+    if(search(root,x)){ setStatus('duplicate not allowed'); return; }
+    saveSnap(); root = insert(root,x); ops++; draw(); pulseNode(search(root,x)); setStatus('inserted '+x);
+  });
+
+  searchBtn.onclick = ()=>enqueue(()=>{
+    const x=getVal(); if(x===null) return;
+    const u=search(root,x);
+    overlayG.innerHTML='';
+    if(u){ pulseNode(u); setStatus('found '+x); }
+    else setStatus('not found: '+x);
+  });
+
+  deleteBtn.onclick = ()=>enqueue(()=>{
+    const x=getVal(); if(x===null) return;
+    if(!root){ setStatus('empty'); return; }
+    if(!search(root,x)){ setStatus('not found: '+x); return; }
+    saveSnap(); root = deleteVal(root,x); ops++; draw(); setStatus('deleted '+x);
+  });
+
+  randomBtn.onclick = ()=>enqueue(()=>{
+    saveSnap(); root=null;
+    const n=8, used=new Set();
+    for(let i=0;i<n;i++){
+      const x = Math.floor(Math.random()*10001);
+      if(used.has(x)) { i--; continue; }
+      used.add(x);
+      root = insert(root,x);
+    }
+    ops++; draw(); setStatus('random 8 inserted');
+  });
+
+  clearBtn.onclick = ()=>enqueue(()=>{ saveSnap(); root=null; ops++; draw(); setStatus('cleared'); overlayG.innerHTML=''; travOut.textContent=''; });
+
+  undoBtn.onclick = ()=>enqueue(()=>{
+    if(undo()){ ops++; setStatus('undid last change'); }
+    else setStatus('nothing to undo');
+  });
+
+  runTrav.onclick = ()=>enqueue(()=>{ stopAnim(); runTraversal(travSel.value); });
+  stepTrav.onclick = ()=>enqueue(()=>{ if(!anim.list.length) runTraversal(travSel.value); else stepOnce(false); });
+  stopTrav.onclick = ()=>enqueue(()=>{ stopAnim(); overlayG.innerHTML=''; });
+
+  minBtn.onclick = ()=>enqueue(()=>{
+    if(!root){ setStatus('empty'); return; }
+    const m=minNode(root); pulseNode(m); setStatus('min = '+m.key);
+  });
+  maxBtn.onclick = ()=>enqueue(()=>{
+    if(!root){ setStatus('empty'); return; }
+    const m=maxNode(root); pulseNode(m); setStatus('max = '+m.key);
+  });
+  kthBtn.onclick = ()=>enqueue(()=>{
+    const k = Math.floor(Number(kInput.value));
+    const n = count(root);
+    if(!root){ setStatus('empty'); return; }
+    if(!(k>=1 && k<=n)){ setStatus(`k must be 1..${n}`); return; }
+    const u=kthSmallest(root,k); pulseNode(u); setStatus(`${k}-th smallest = ${u.key}`);
+  });
+
+  valInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') insertBtn.click(); });
+
+  (function loadDefault(){
+    const defaults=[32,8,4,16,128,64,256];
+    root=null;
+    for(const x of defaults) root = insert(root, x);
+    draw();
+    setStatus('loaded default: 2,4,8,16,32,64,128,256');
+  })();
+})();
+</script>
+</body>
+</html>

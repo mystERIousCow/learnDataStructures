@@ -1,0 +1,1296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shortest Path Visualizer Lab — learnDataStructures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0d1020; --panel:#131733; --panel-2:#161c3f;
+      --ink:#e9ecf4; --muted:#aeb7cf;
+      --accent:#7dd3fc; --accent-2:#a78bfa; --accent-3:#34d399; --accent-4:#f472b6;
+      --amber:#fbbf24; --danger:#fb7185; --ok:#4ade80;
+      --shadow:0 18px 60px rgba(0,0,0,.35); --r:16px;
+    }
+.helpList{
+  margin:8px 0 0;
+  padding-left:18px;
+  color:var(--ink);
+  opacity:.9;
+  font-size:13px;
+  line-height:1.5;
+}
+.helpList li{ margin:6px 0; }
+
+.dot{
+  display:inline-block;
+  width:10px; height:10px; border-radius:50%;
+  margin-right:6px; vertical-align:-1px;
+}
+.dot.start{  background:rgba(74,222,128,.9); box-shadow:0 0 0 2px rgba(74,222,128,.18); }
+.dot.target{ background:rgba(244,114,182,.95); box-shadow:0 0 0 2px rgba(244,114,182,.20); }
+
+@media (max-width: 980px){
+  #helpCard{ grid-column: 1 / -1; }
+}
+
+    .graphRow{display:flex;gap:12px;align-items:flex-start}
+#graphCanvas{flex:1;min-height:420px}
+.sidePanel{width:260px;min-width:240px;display:flex;flex-direction:column;gap:12px}
+.pseudoPanel{background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px}
+.pseudoPanel h3{margin:0 0 8px;font-size:14px;color:var(--muted)}
+.pre-halo{background:#0e1233;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px;font-family:"JetBrains Mono",monospace;font-size:12px;white-space:pre-wrap}
+
+    *{box-sizing:border-box} html,body{height:100%}
+  body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+
+    h1,h2,h3{margin:0 0 .6rem}
+    h1{font-size:clamp(22px,2.8vw,32px);font-weight:800}
+    h2{font-size:18px;color:var(--muted);font-weight:700}
+    a{color:var(--accent);text-decoration:none}
+
+    .topbar{background:linear-gradient(180deg,var(--panel),var(--panel-2));border-bottom:1px solid rgba(255,255,255,.08);}
+    .wrap{max-width:1200px;margin:18px auto;padding:0 16px;display:grid;gap:14px;grid-template-columns:1.05fr 2fr}
+    .full{grid-column:1/-1}
+
+    .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;position:relative}
+
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+    .ctl{display:flex;flex-direction:column;gap:6px;min-width:160px}
+    label{font-size:12px;color:var(--muted)}
+
+    .btn{height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#101430;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:.2s filter,.2s transform}
+    .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px) scale(.98)}
+    .btn.primary{background:linear-gradient(180deg,#1b2a5b,#16214b);border-color:rgba(80,130,255,.35)}
+    .btn.ghost{background:#0f1330;border-color:rgba(255,255,255,.08)}
+
+    input[type="number"], select {
+      height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+      background:#101430;color:var(--ink);padding:0 10px;min-width:120px
+    }
+    input[type="range"]{ -webkit-appearance:none;height:28px;background:transparent;min-width:180px }
+    input[type="range"]::-webkit-slider-runnable-track{height:6px;background:#232a5a;border-radius:100px}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);margin-top:-6px;box-shadow:0 0 0 4px rgba(125,211,252,.15)}
+
+    #graphCanvas{width:100%;height:420px;background:#0a0e2b;border:1px solid rgba(255,255,255,.07);border-radius:12px;display:block}
+
+    .pqPanel{margin-top:12px;background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px}
+    .pqPanel h3{margin:0 0 8px;font-size:14px;color:var(--muted)}
+    .pqItem{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.06);font-family:"JetBrains Mono",monospace}
+    .pqItem:last-child{border-bottom:none}
+
+    pre{background:#0e1233;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;overflow:auto}
+    code{font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12.5px}
+
+    table{border-collapse:collapse;width:100%;background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;margin-top:10px}
+    th,td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left} th{color:var(--muted);font-weight:600}
+
+    .tabs{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+    .tab{padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);cursor:pointer;background:#0f1330}
+    .tab.active{background:linear-gradient(180deg,#1b2a5b,#16214b);border-color:rgba(80,130,255,.35)}
+
+    #bigOChart{width:100%;height:240px;background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px}
+
+    .legend{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+    .legendItem{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+    .swatch{width:16px;height:3px;border-radius:2px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+      <a href="index.html" class="btn" style="text-decoration:none;padding:6px 10px;border-radius:10px">⬅ Home</a>
+      <a href="about.html" class="btn" style="text-decoration:none;padding:6px 10px;border-radius:10px">About</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <h2>Controls</h2>
+      <div class="controls" style="margin-top:8px">
+        <div class="ctl">
+          <label>Algorithm</label>
+          <select id="algoSelect">
+            <option>Dijkstra</option>
+            <option>Bellman-Ford</option>
+            <option>A*</option>
+            <option>BFS</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <label>Graph Type</label>
+          <select id="graphType">
+            <option>Undirected</option>
+            <option>Directed</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <label for="n">Nodes (≤ 50)</label>
+          <input id="n" type="number" min="2" max="50" value="12" />
+        </div>
+        <div class="ctl">
+          <label>&nbsp;</label>
+          <button class="btn" id="genGraph">Generate Graph</button>
+        </div>
+        <div class="ctl">
+            <label>&nbsp;</label>
+            <button class="btn" id="loadPreset">Load Preset</button>
+        </div>
+
+        <div class="ctl">
+          <label>&nbsp;</label>
+          <button class="btn primary" id="play">▶ Run</button>
+        </div>
+        <div class="ctl">
+          <label>&nbsp;</label>
+          <button class="btn ghost" id="pause">⏸ Pause</button>
+        </div>
+        <div class="ctl" id="negWeightsCtl" style="display:none">
+          <label>Allow Negative Weights</label>
+          <input type="checkbox" id="allowNeg" />
+        </div>
+        <div class="ctl wide"><label for="speed">Speed</label><input id="speed" type="range" min="0" max="1000" value="700" /></div>
+      </div>
+    </div>
+
+    <div class="card" id="helpCard">
+  <h2>Instructions</h2>
+  <ul class="helpList">
+    <li><span class="dot start"></span>Click a node to set <b>Start</b> (green ring).</li>
+    <li><span class="dot target"></span><b>Shift</b>+click a node to set <b>Target</b> (A* only).</li>
+    <li>Drag a node to move it.</li>
+    <li><b>Generate Graph</b> makes a random graph (it won't be very neat); <b>Load Preset</b> (default) loads a neat layout.</li>
+    <li><b>Run</b> steps the algorithm; <b>Speed</b> controls pacing; <b>Pause</b> stops.</li>
+    <li>Completion: green edges = <b>shortest-path tree</b> from Start.  
+        With A*, you’ll also see the best path to Target.</li>
+    <li><b>Priority Queue</b> shows the frontier (Dijkstra by <b>dist</b>, A* by <b>f=g+h</b>).</li>
+  </ul>
+</div>
+
+    <div class="card full">
+  <div class="header"><h2>Graph Visualization</h2></div>
+  <div class="graphRow">
+    <canvas id="graphCanvas"></canvas>
+    <div class="sidePanel">
+      <div class="pqPanel">
+        <h3>Priority Queue</h3>
+        <div id="pqList"></div>
+      </div>
+      <div class="pseudoPanel">
+        <h3>Live step</h3>
+        <div id="livePseudo" class="pre-halo">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <div class="card full">
+      <div class="header"><h2 id="sectionTitle">About: Dijkstra</h2></div>
+      <p id="explain" style="color:var(--ink);opacity:.9"></p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="flex:1">
+          <h3>Pseudocode</h3>
+          <pre><code id="pseudocodeBlock"></code></pre>
+        </div>
+        <div style="flex:1">
+          <h3>Complexity</h3>
+          <table>
+            <thead><tr><th>Case</th><th>Time</th><th>Space</th><th>Stable</th></tr></thead>
+            <tbody id="complexRows"></tbody>
+          </table>
+          <canvas id="bigOChart"></canvas>
+          <div class="legend" id="chartLegend"></div>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-lang="cpp">C++</div>
+        <div class="tab" data-lang="java">Java</div>
+        <div class="tab" data-lang="py">Python</div>
+      </div>
+      <pre><code id="codeBlock" class="language-cpp"></code></pre>
+    </div>
+  </div>
+<script>
+/* -----------------------------
+   GRAPH DATA STRUCTURES
+------------------------------*/
+let nodes = [];
+let edges = [];
+let directed = false;
+let draggingNode = null;
+let startNode = 0;
+let targetNode = null; 
+const canvas = document.getElementById("graphCanvas");
+const ctx = canvas.getContext("2d");
+
+
+function resizeCanvas() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w; canvas.height = h;
+  }
+}
+
+function randomGraph(n) {
+  nodes = [];
+  edges = [];
+
+  for (let i = 0; i < n; i++) {
+    nodes.push({
+      id: i,
+      x: Math.random() * (canvas.clientWidth - 140) + 70,
+      y: Math.random() * (canvas.clientHeight - 140) + 70,
+    });
+  }
+  for (let iter = 0; iter < 120; iter++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = i+1; j < n; j++) {
+        let dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
+        let d2 = dx*dx + dy*dy + 1e-3, d = Math.sqrt(d2);
+        if (d < 80) {
+          let push = (80 - d) * 0.03;
+          let ux = dx/d, uy = dy/d;
+          nodes[j].x += ux*push; nodes[j].y += uy*push;
+          nodes[i].x -= ux*push; nodes[i].y -= uy*push;
+        }
+      }
+    }
+  }
+  for (let p of nodes) {
+    p.x = Math.max(40, Math.min(canvas.clientWidth-40, p.x));
+    p.y = Math.max(40, Math.min(canvas.clientHeight-40, p.y));
+  }
+
+  const seen = new Set();
+  function addEdge(u,v,w){
+    const key = directed ? `${u}->${v}` : [Math.min(u,v),Math.max(u,v)].join("-");
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({u, v, w});
+    if (directed) return;
+  }
+
+  for (let i = 1; i < n; i++) {
+    const j = Math.floor(Math.random()*i);
+    const w = Math.floor(Math.random()*9)+1;
+    addEdge(i, j, w);
+  }
+  const extra = Math.min(n*2, 3*n);
+  for (let k=0;k<extra;k++){
+    const u = Math.floor(Math.random()*n), v = Math.floor(Math.random()*n);
+    if (u===v) continue;
+    const w = Math.floor(Math.random()*9)+1;
+    addEdge(u,v,w);
+  }
+  startNode = 0;
+targetNode = (currentAlgo === "A*") ? nodes.length - 1 : null;
+
+
+}
+
+let showingPreset = false; 
+
+function loadPresetGraph() {
+  resizeCanvas();
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+
+  const padX = 50, padY = 50;
+
+  const P = [
+    [0.43, 0.10], 
+    [0.33, 0.74], 
+    [0.20, 0.75], 
+    [0.18, 0.26], 
+    [0.36, 0.46], 
+    [0.50, 0.54], 
+    [0.93, 0.80], 
+    [0.64, 0.40], 
+    [0.10, 0.58], 
+    [0.90, 0.20], 
+    [0.47, 0.86], 
+    [0.62, 0.82], 
+  ];
+
+  nodes = P.map((p, i) => ({
+    id: i,
+    x: padX + p[0] * (w - 2 * padX),
+    y: padY + p[1] * (h - 2 * padY)
+  }));
+
+  edges = [
+    {u:0, v:3,  w:9},
+    {u:0, v:4,  w:8},
+    {u:0, v:7,  w:6},
+    {u:0, v:9,  w:13},
+
+    {u:3, v:8,  w:8},
+    {u:8, v:2,  w:8},
+    {u:2, v:1,  w:7},
+
+    {u:1, v:10, w:7},
+    {u:10,v:4,  w:5},
+    {u:10,v:5,  w:8},
+    {u:10,v:11, w:7},
+
+    {u:4, v:7,  w:6},
+    {u:7, v:11, w:1},
+    {u:7, v:6,  w:4},
+
+    {u:11,v:6,  w:4},
+    {u:11,v:9,  w:8},
+    {u:9, v:6,  w:9}
+  ];
+
+  startNode = 0;
+  targetNode = (currentAlgo === "A*") ? nodes.length - 1 : null;
+
+
+  showingPreset = true;
+}
+
+
+document.getElementById("loadPreset").addEventListener("click", () => {
+  loadPresetGraph();
+  drawGraph();
+});
+
+
+document.getElementById("graphType").addEventListener("change", e => {
+  directed = e.target.value === "Directed";
+  loadPresetGraph();
+  drawGraph();
+});
+
+window.addEventListener("resize", () => {
+  if (showingPreset) {
+    loadPresetGraph(); 
+  }
+  drawGraph();
+});
+
+
+
+function drawGraph(highlightEdge = null, pathEdges = []) {
+  resizeCanvas();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 2;
+
+const pathSet = new Set();
+for (const e of (pathEdges || [])) {
+  pathSet.add(`${e.u}->${e.v}`);
+  if (!directed) pathSet.add(`${e.v}->${e.u}`); 
+}
+
+
+  for (let e of edges) {
+    const u = nodes[e.u], v = nodes[e.v];
+    ctx.beginPath();
+    ctx.moveTo(u.x, u.y);
+    ctx.lineTo(v.x, v.y);
+
+    let color = "rgba(255,255,255,.28)";
+    if (highlightEdge && highlightEdge.u===e.u && highlightEdge.v===e.v) color = "#fbbf24";
+    if (pathSet.has(`${e.u}->${e.v}`)) color = "#34d399";
+
+    ctx.strokeStyle = color;
+    ctx.stroke();
+
+    const dx = v.x - u.x, dy = v.y - u.y;
+    const len = Math.hypot(dx,dy) || 1;
+    const nx = -dy/len, ny = dx/len; 
+    const midx = (u.x + v.x)/2 + nx*10;
+    const midy = (u.y + v.y)/2 + ny*10;
+
+    ctx.fillStyle = "rgba(14,18,51,.9)";
+    const text = String(e.w);
+    ctx.font = "12px Inter";
+    const tw = ctx.measureText(text).width + 6;
+    ctx.fillRect(midx - tw/2, midy - 9, tw, 16);
+    ctx.strokeStyle = "rgba(255,255,255,.12)";
+    ctx.strokeRect(midx - tw/2, midy - 9, tw, 16);
+
+    ctx.fillStyle = "#e9ecf4";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, midx, midy);
+    
+    if (directed) {
+      const ux = dx/len, uy = dy/len;
+      const px = v.x - ux*18, py = v.y - uy*18;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - uy*6 - ux*6, py + ux*6 - uy*6);
+      ctx.lineTo(px + uy*6 - ux*6, py - ux*6 - uy*6);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+  }
+
+  
+  for (let node of nodes) {
+
+if (node.id === startNode) drawRing(node.x, node.y, 20, "#34d399", 3.2);
+
+if (currentAlgo === "A*" && targetNode !== null && node.id === targetNode) {
+  drawRing(node.x, node.y, 23, "#f472b6", 3.2);
+}
+
+
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 18, 0, 2*Math.PI);
+    ctx.fillStyle = "#1f294f";
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = "#7dd3fc";
+    ctx.stroke();
+
+    const txt = String(node.id);
+    ctx.font = "bold 13px Inter";
+    const tw = ctx.measureText(txt).width + 10;
+    ctx.fillStyle = "rgba(15,19,48,.95)";
+    ctx.fillRect(node.x - tw/2, node.y - 10, tw, 18);
+    ctx.strokeStyle = "rgba(255,255,255,.12)";
+    ctx.strokeRect(node.x - tw/2, node.y - 10, tw, 18);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(txt, node.x, node.y);
+  }
+}
+
+
+/* -----------------------------
+   NODE DRAGGING
+------------------------------*/
+canvas.addEventListener("mousedown", e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  for (let node of nodes) {
+    if (Math.hypot(mx - node.x, my - node.y) < 18) {
+      draggingNode = node;
+    }
+  }
+});
+canvas.addEventListener("mousemove", e => {
+  if (!draggingNode) return;
+  const rect = canvas.getBoundingClientRect();
+  draggingNode.x = e.clientX - rect.left;
+  draggingNode.y = e.clientY - rect.top;
+  drawGraph();
+});
+canvas.addEventListener("mouseup", e => {
+  draggingNode = null;
+});
+
+canvas.addEventListener("click", e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const idx = hitNode(mx, my);
+  if (idx === -1) return;
+
+  if (e.shiftKey && currentAlgo === "A*") {
+    targetNode = nodes[idx].id;
+  } else {
+    startNode = nodes[idx].id;
+    if (currentAlgo !== "A*") targetNode = null;
+  }
+  drawGraph();
+});
+
+
+function hitNode(mx, my) {
+  let best = -1, bestD = 1e9;
+  for (let i = 0; i < nodes.length; i++) {
+    const d = Math.hypot(mx - nodes[i].x, my - nodes[i].y);
+    if (d <= 20 && d < bestD) { best = i; bestD = d; }
+  }
+  return best;
+}
+function drawRing(x, y, r, color, width=3) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+}
+
+
+/* -----------------------------
+   PRIORITY QUEUE PANEL
+------------------------------*/
+function updatePQList(items) {
+  const div = document.getElementById("pqList");
+  div.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    const row = document.createElement("div");
+    row.className = "pqItem";
+    row.style.opacity = ".6";
+    row.textContent = "(empty)";
+    div.appendChild(row);
+    return;
+  }
+
+  const isNumberList = typeof items[0] === "number";
+
+  for (const it of items) {
+    const row = document.createElement("div");
+    row.className = "pqItem";
+
+    if (isNumberList) {
+      row.textContent = `(${it})`;
+    } else if (typeof it.f === "number") {            
+      row.textContent = `(${it.node}, f=${it.f.toFixed(2)})`;
+    } else if (typeof it.node !== "undefined") {      
+      row.textContent = `(${it.node}, dist=${it.dist ?? "?"})`;
+    } else {
+      row.textContent = String(it);                   
+    }
+    div.appendChild(row);
+  }
+}
+
+
+
+/* -----------------------------
+   HOOK UP CONTROLS
+------------------------------*/
+document.getElementById("graphType").addEventListener("change", e => {
+  directed = e.target.value === "Directed";
+  randomGraph(nodes.length || 10);
+  drawGraph();
+});
+
+document.getElementById("genGraph").addEventListener("click", () => {
+  const n = parseInt(document.getElementById("n").value) || 10;
+  randomGraph(n);
+  drawGraph();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  directed     = document.getElementById('graphType').value === 'Directed';
+  currentAlgo  = document.getElementById('algoSelect').value || 'Dijkstra';
+  setAlgo(currentAlgo);                   
+
+  loadPresetGraph();                     
+  drawGraph();                            
+});
+
+
+</script>
+<script>
+/* -----------------------------
+   ALGORITHMS (as generators)
+   Each yields {type, ...} events
+------------------------------*/
+
+function buildAdj() {
+  const adj = Array.from({ length: nodes.length }, () => []);
+  for (let e of edges) {
+    adj[e.u].push({ v: e.v, w: e.w });
+    if (!directed) adj[e.v].push({ v: e.u, w: e.w }); 
+  }
+  return adj;
+}
+
+
+
+function* dijkstra(source=0) {
+  const adj = buildAdj();
+  const dist = Array(nodes.length).fill(Infinity);
+  dist[source] = 0;
+  let pq = [{node:source, dist:0}];
+
+  while (pq.length > 0) {
+    pq.sort((a,b)=>a.dist-b.dist);
+    let u = pq.shift();
+    yield {type:"visit", node:u.node, dist:u.dist, pq:[...pq]};
+    for (let edge of adj[u.node]) {
+      yield {type:"relax", u:u.node, v:edge.v, w:edge.w};
+        if (dist[edge.v] > u.dist + edge.w) {
+            dist[edge.v] = u.dist + edge.w;
+            pq.push({ node: edge.v, dist: dist[edge.v] });
+            yield { type:"update", node: edge.v, newDist: dist[edge.v], parent: u.node, pq: [...pq] };
+        }
+
+    }
+  }
+  return dist;
+}
+
+function* bellmanFord(source=0) {
+  const dist = Array(nodes.length).fill(Infinity);
+  dist[source] = 0;
+  for (let i=0; i<nodes.length-1; i++) {
+    let updated = false;
+    for (let e of edges) {
+      yield {type:"relax", u:e.u, v:e.v, w:e.w};
+      if (dist[e.u] + e.w < dist[e.v]) {
+        dist[e.v] = dist[e.u] + e.w;
+        updated = true;
+        yield { type:"update", node: e.v, newDist: dist[e.v], parent: e.u };
+    }
+
+    }
+    if (!updated) break;
+  }
+  for (let e of edges) {
+    if (dist[e.u] + e.w < dist[e.v]) {
+      yield {type:"negCycle", u:e.u, v:e.v};
+    }
+  }
+  return dist;
+}
+
+function* bfs(source = 0) {
+  const adj = buildAdj();
+  const dist = Array(nodes.length).fill(Infinity);
+  dist[source] = 0;
+
+  const q = [source];
+
+  const qView = () => q.map(v => ({ node: v, dist: (dist[v] === Infinity ? null : dist[v]) }));
+
+  while (q.length > 0) {
+    const u = q.shift();
+    yield { type: "visit", node: u, dist: dist[u], queue: qView() };
+
+    for (const edge of adj[u]) {
+      const v = edge.v;
+      yield { type: "relax", u, v, w: 1 };
+      if (dist[v] === Infinity) {
+        dist[v] = dist[u] + 1;
+        q.push(v);
+        yield { type: "update", node: v, newDist: dist[v], parent: u, queue: qView() };
+      }
+    }
+  }
+  return dist;
+}
+
+
+
+function* aStar(source=0, target=nodes.length-1) {
+  const adj = buildAdj();
+  const h = (a,b) => Math.hypot(nodes[a].x - nodes[b].x, nodes[a].y - nodes[b].y)/50; 
+  const dist = Array(nodes.length).fill(Infinity);
+  const f = Array(nodes.length).fill(Infinity);
+  dist[source]=0; f[source]=h(source,target);
+  let pq=[{node:source, f:f[source]}];
+
+  while (pq.length>0) {
+    pq.sort((a,b)=>a.f-b.f);
+    let u=pq.shift();
+    yield {type:"visit", node:u.node, dist:dist[u.node], pq:[...pq]};
+    if (u.node===target) break;
+    for (let edge of adj[u.node]) {
+      yield {type:"relax", u:u.node, v:edge.v, w:edge.w};
+      if (dist[edge.v] > dist[u.node] + edge.w) {
+        dist[edge.v] = dist[u.node] + edge.w;
+        f[edge.v] = dist[edge.v] + h(edge.v, target);
+        pq.push({ node: edge.v, f: f[edge.v] });
+        yield { type:"update", node: edge.v, newDist: dist[edge.v], parent: u.node, pq: [...pq] };
+    }
+
+    }
+  }
+  return dist;
+}
+
+/* -----------------------------
+   ALGO DISPATCH
+------------------------------*/
+const Algo = {
+  "Dijkstra": dijkstra,
+  "Bellman-Ford": bellmanFord,
+  "BFS": bfs,
+  "A*": aStar
+};
+</script>
+<script>
+/* -----------------------------
+   CONTENT (explanations, code, pseudocode, complexity)
+------------------------------*/
+const CONTENT = {
+  "Dijkstra": {
+    explain: `
+<p>Dijkstra’s algorithm finds the <b>cheapest path from one start node to every other node</b> when all edge weights are <b>non-negative</b>. You can picture a wave expanding from the start: at any moment we permanently “lock in” the closest not-yet-final node and try to improve its neighbors. The result is a distance table and a parent tree you can use to rebuild shortest routes.</p>
+
+<p>The procedure is simple. Give the start a distance of 0 and all other nodes a distance of ∞. Put the start in a priority queue ordered by current best distance. Repeatedly take out the node with the <b>smallest</b> distance, then try to improve (relax) each outgoing edge through it. If going through this node makes a neighbor cheaper, update that neighbor’s distance and parent and put it back in the queue. When the queue becomes empty, all reachable nodes have their final best cost. If you care about one target only, you can stop as soon as that target is removed from the queue.</p>
+
+<ul>
+  <li><b>Initialize:</b> <code>dist[start]=0</code>, others <code>∞</code>; push <code>(start,0)</code> to the priority queue. Keep a <code>parent[]</code> array for path reconstruction.</li>
+  <li><b>Expand:</b> pop the node <code>u</code> with minimal distance; this distance is final because weights are non-negative.</li>
+  <li><b>Relax:</b> for each edge <code>u → v</code> with weight <code>w</code>, if <code>dist[v] &gt; dist[u] + w</code>, set <code>dist[v]=dist[u]+w</code>, <code>parent[v]=u</code>, and push <code>v</code> to the queue.</li>
+  <li><b>Finish:</b> the <code>dist[]</code> table holds shortest costs; unreachable nodes remain at ∞ and have no parent. Rebuild a path by following parents backward from a destination to the start.</li>
+</ul>
+
+<p>Why this works: with <b>non-negative</b> edges, once a node is the smallest in the queue, no unseen path can make it cheaper later. Each relaxation only decreases a neighbor’s tentative cost, and the algorithm never needs to revisit already-final nodes.</p>
+
+<ul>
+  <li><b>What you get:</b> shortest cost to every reachable node and a tree of parents that spells out the routes.</li>
+  <li><b>Typical uses:</b> road routing and GPS, weighted grid paths, least-latency networking, scheduling with positive costs, game maps without negative penalties.</li>
+  <li><b>Complexity (adjacency lists + binary heap):</b> <code>O((V+E) log V)</code> time and <code>O(V)</code> space. On dense graphs (<code>E = Θ(V²)</code>) this is ≤ <code>O(V² log V)</code>. With a Fibonacci heap it can be written as <code>O(E + V log V)</code>; with a simple array “priority queue” it degrades to <code>O(V² + E)</code>.</li>
+  <li><b>Common mistakes:</b> using negative edges (breaks correctness), marking “visited” when pushing instead of when popping, not ignoring stale queue entries, integer overflow when adding weights, and using an adjacency matrix unintentionally forcing <code>O(V²)</code>.</li>
+  <li><b>Good to know for exams:</b> early exit when the target is popped; multi-source by pushing all sources with distance 0; 0/1 weights → use <i>0-1 BFS</i> (deque); small non-negative integers → bucketed queues (Dial’s algorithm); if you need all-pairs and have no negative edges, run Dijkstra from every source or use Johnson’s algorithm when negatives exist but no negative cycles.</li>
+</ul>
+`,
+    pseudocode: 
+`function Dijkstra(Graph, source):
+  for each vertex v in Graph:
+    dist[v] ← ∞
+  dist[source] ← 0
+  PQ ← priority queue with (source,0)
+  while PQ not empty:
+    u ← extract-min(PQ)
+    for each edge (u,v,w):
+      if dist[v] > dist[u] + w:
+        dist[v] ← dist[u] + w
+        PQ.insert_or_update(v, dist[v])`,
+complexity: {
+    best:  "O((V+E) log V)",
+    avg:   "O((V+E) log V)",
+    worst: "O((V+E) log V)",
+    space: "O(V)",
+    stable:"N/A"
+  },    code: {
+cpp:`// Dijkstra using priority_queue
+void dijkstra(int n, vector<vector<pair<int,int>>> &adj, int src) {
+  vector<int> dist(n, 1e9);
+  dist[src] = 0;
+  using P=pair<int,int>;
+  priority_queue<P, vector<P>, greater<P>> pq;
+  pq.push({0,src});
+  while(!pq.empty()){
+    auto [d,u] = pq.top(); pq.pop();
+    if(d!=dist[u]) continue;
+    for(auto [v,w]: adj[u]){
+      if(dist[v] > d+w){
+        dist[v]=d+w;
+        pq.push({dist[v],v});
+      }
+    }
+  }
+}`,
+java:`// Dijkstra using PriorityQueue
+static void dijkstra(List<List<int[]>> adj, int src){
+  int n=adj.size();
+  int[] dist=new int[n];
+  Arrays.fill(dist,1_000_000_000);
+  dist[src]=0;
+  PriorityQueue<int[]> pq=new PriorityQueue<>(Comparator.comparingInt(a->a[0]));
+  pq.add(new int[]{0,src});
+  while(!pq.isEmpty()){
+    int[] cur=pq.poll(); int d=cur[0], u=cur[1];
+    if(d!=dist[u]) continue;
+    for(int[] e:adj.get(u)){
+      int v=e[0], w=e[1];
+      if(dist[v]>d+w){
+        dist[v]=d+w;
+        pq.add(new int[]{dist[v],v});
+      }
+    }
+  }
+}`,
+py:`# Dijkstra using heapq
+import heapq
+def dijkstra(adj, src):
+    n=len(adj)
+    dist=[10**9]*n
+    dist[src]=0
+    pq=[(0,src)]
+    while pq:
+        d,u=heapq.heappop(pq)
+        if d!=dist[u]: continue
+        for v,w in adj[u]:
+            if dist[v]>d+w:
+                dist[v]=d+w
+                heapq.heappush(pq,(dist[v],v))`
+    },
+    curves:{best:"nlogn",avg:"nlogn",worst:"nlogn"}
+  },
+
+  "Bellman-Ford": {
+    explain:`
+<p>Bellman–Ford finds single-source shortest paths even when some edges are negative. It also detects when a <b>negative cycle</b> is reachable from the start, in which case true shortest paths do not exist because costs can be driven down forever. When no negative cycle is reachable, the algorithm returns a distance table and a parent tree you can use to rebuild routes.</p>
+
+<p>The idea is to relax every edge repeatedly. After one full pass, all shortest paths that use at most one edge are correct; after two passes, all with at most two edges, and so on. Any simple shortest path has at most <code>V−1</code> edges, so <code>V−1</code> passes suffice. A final extra pass tells you whether a negative cycle exists: if any distance can still be improved, a cycle with negative total weight is reachable.</p>
+
+<ul>
+  <li>Set <code>dist[start]=0</code> and others to <code>∞</code>; set <code>parent[]=null</code>.</li>
+  <li>Repeat <code>V−1</code> times: for each edge <code>(u→v,w)</code>, if <code>dist[u]+w &lt; dist[v]</code>, update <code>dist[v]</code> and set <code>parent[v]=u</code>.</li>
+  <li>Run one more pass over all edges; if any update still happens, report a reachable negative cycle (paths are undefined beyond it).</li>
+  <li>Unreachable nodes remain at <code>∞</code> and have no parent; otherwise, reconstruct paths by following parents backward from a node to the start.</li>
+  <li><b>Complexity:</b> worst/average <code>O(V·E)</code> time and <code>O(V)</code> space. With an early-exit optimization (stop when a pass makes no changes), best case can be <code>O(E)</code>.</li>
+  <li><b>Good use cases:</b> graphs with negative costs, negative-cycle detection (e.g., currency arbitrage), as a subroutine in Johnson’s algorithm for all-pairs shortest paths.</li>
+  <li><b>Common mistakes:</b> assuming distances are meaningful when a reachable negative cycle exists; forgetting that undirected edges should be modeled as two directed edges; integer overflow when adding weights; mixing “current” and “next” pass updates incorrectly in an in-place DP variant.</li>
+  <li><b>Exam tips:</b> why <code>V−1</code> passes (paths have ≤ <code>V−1</code> edges); how the extra pass proves a cycle; queue-based variants (SPFA) may be faster in practice but still have worst case <code>O(V·E)</code>.</li>
+</ul>
+`,
+    pseudocode:
+`function BellmanFord(Graph, source):
+  for each v in Graph:
+    dist[v] ← ∞
+  dist[source] ← 0
+  repeat V-1 times:
+    for each edge (u,v,w):
+      if dist[u] + w < dist[v]:
+        dist[v] ← dist[u] + w
+  for each edge (u,v,w):
+    if dist[u] + w < dist[v]:
+      report negative cycle`,
+    complexity: {
+    best:  "O(E)",
+    avg:   "O(V·E)",
+    worst: "O(V·E)",
+    space: "O(V)",
+    stable:"N/A"
+  },
+  curves: { best: "n", avg: "n2", worst: "n2" },
+
+    code:{
+cpp:`// Bellman-Ford
+void bellmanFord(int n, vector<tuple<int,int,int>> &edges, int src){
+  vector<int> dist(n,1e9); dist[src]=0;
+  for(int i=0;i<n-1;i++){
+    for(auto [u,v,w]:edges){
+      if(dist[u]+w<dist[v]) dist[v]=dist[u]+w;
+    }
+  }
+  for(auto [u,v,w]:edges){
+    if(dist[u]+w<dist[v]){ /* negative cycle */ }
+  }
+}`,
+java:`// Bellman-Ford
+static void bellmanFord(int n, List<int[]> edges, int src){
+  int[] dist=new int[n]; Arrays.fill(dist,1_000_000_000); dist[src]=0;
+  for(int i=0;i<n-1;i++){
+    for(int[] e:edges){
+      int u=e[0],v=e[1],w=e[2];
+      if(dist[u]+w<dist[v]) dist[v]=dist[u]+w;
+    }
+  }
+  for(int[] e:edges){ if(dist[e[0]]+e[2]<dist[e[1]]){/* negative cycle */} }
+}`,
+py:`# Bellman-Ford
+def bellman_ford(n, edges, src):
+    dist=[10**9]*n; dist[src]=0
+    for _ in range(n-1):
+        for u,v,w in edges:
+            if dist[u]+w<dist[v]:
+                dist[v]=dist[u]+w
+    for u,v,w in edges:
+        if dist[u]+w<dist[v]:
+            print("Negative cycle")`
+    },
+  },
+
+  "BFS": {
+    explain:`
+<p>Breadth-First Search finds shortest paths by number of edges in unweighted (or unit-weighted) graphs. It explores the graph layer by layer: first all nodes at distance 0, then all nodes at distance 1, then distance 2, and so on. The first time you discover a node you have already found a shortest path to it in terms of hops.</p>
+
+<p>The algorithm uses a FIFO queue. Start by visiting the source, give it distance 0, and push it into the queue. Repeatedly pop the front vertex and push any undiscovered neighbors, assigning them distance +1 and remembering their parent so you can rebuild a path later. In directed graphs BFS follows only outgoing edges, so some nodes can be unreachable from the start.</p>
+
+<ul>
+  <li>Initialize <code>dist[start]=0</code>, others <code>∞</code>; set <code>parent[]=null</code>; enqueue <code>start</code> and mark it visited.</li>
+  <li>While the queue is not empty, dequeue <code>u</code>; for each neighbor <code>v</code> not yet visited, set <code>dist[v]=dist[u]+1</code>, <code>parent[v]=u</code>, mark visited, and enqueue <code>v</code>.</li>
+  <li>Stop when the queue empties (or early if you only care about a target and it has been dequeued). Reconstruct paths by walking parents backward.</li>
+  <li><b>Complexity:</b> <code>O(V+E)</code> time and <code>O(V)</code> space.</li>
+  <li><b>Good use cases:</b> grids and mazes, “word ladder” style problems, social-network degrees, nearest resource search, connectivity and component discovery.</li>
+  <li><b>Common mistakes:</b> marking visited on dequeue instead of enqueue (causes duplicates), forgetting to store parents, treating a weighted graph as unweighted, ignoring direction in directed graphs, and revisiting cells in grid BFS.</li>
+  <li><b>Patterns worth knowing:</b> multi-source BFS (push many starts with distance 0); bipartite test via 2-coloring; 0/1 BFS (use a deque when edges have weight 0 or 1); topological ideas (Kahn’s algorithm is a BFS on indegrees).</li>
+</ul>
+`,
+    pseudocode:
+`function BFS(Graph, source):
+  for each v in Graph: dist[v] ← ∞
+  dist[source] ← 0
+  Q ← empty queue; enqueue(Q, source)
+  while Q not empty:
+    u ← dequeue(Q)
+    for each neighbor v of u:
+      if dist[v] = ∞:
+        dist[v] ← dist[u] + 1
+        enqueue(Q, v)`,
+     complexity: {
+    best:  "O(V+E)",
+    avg:   "O(V+E)",
+    worst: "O(V+E)",
+    space: "O(V)",
+    stable:"N/A"
+  },
+    code:{
+cpp:`// BFS shortest paths
+void bfs(int n, vector<vector<int>> &adj, int src){
+  vector<int> dist(n,1e9);
+  queue<int> q;
+  dist[src]=0; q.push(src);
+  while(!q.empty()){
+    int u=q.front(); q.pop();
+    for(int v:adj[u]){
+      if(dist[v]==1e9){
+        dist[v]=dist[u]+1;
+        q.push(v);
+      }
+    }
+  }
+}`,
+java:`// BFS shortest paths
+static void bfs(List<List<Integer>> adj, int src){
+  int n=adj.size(); int[] dist=new int[n];
+  Arrays.fill(dist,1_000_000_000);
+  Queue<Integer> q=new LinkedList<>();
+  dist[src]=0; q.add(src);
+  while(!q.isEmpty()){
+    int u=q.poll();
+    for(int v:adj.get(u)){
+      if(dist[v]==1_000_000_000){
+        dist[v]=dist[u]+1;
+        q.add(v);
+      }
+    }
+  }
+}`,
+py:`# BFS shortest paths
+from collections import deque
+def bfs(adj, src):
+    n=len(adj); dist=[10**9]*n
+    q=deque([src]); dist[src]=0
+    while q:
+        u=q.popleft()
+        for v in adj[u]:
+            if dist[v]==10**9:
+                dist[v]=dist[u]+1
+                q.append(v)`
+    },
+  curves: { best: "n", avg: "n", worst: "n" },
+  },
+
+  "A*": {
+    explain:`
+<p>A* finds the shortest path from a start to a specific target by guiding the search with a heuristic. It behaves like Dijkstra but prefers nodes that look closer to the target. When the heuristic never overestimates the remaining cost (admissible), A* is guaranteed to return an optimal route; when it also obeys the triangle inequality (consistent), nodes do not need to be reopened.</p>
+
+<p>For each node, track <code>g</code> (cost from start), <code>h</code> (estimated cost to the target), and <code>f = g + h</code>. Put the start in a priority queue ordered by <code>f</code>. Repeatedly pop the node with smallest <code>f</code>; if it is the target you are done. Otherwise, try to relax its outgoing edges: if going through this node lowers a neighbor’s <code>g</code>, update the neighbor’s <code>g</code>, recompute <code>f</code>, set its parent, and push it into the queue.</p>
+
+<ul>
+  <li>Initialize <code>g[start]=0</code>, <code>f[start]=h(start)</code>; set <code>parent[]=null</code>; push <code>start</code> into the priority queue.</li>
+  <li>Pop the node with smallest <code>f</code>; if it is the target, reconstruct the path via <code>parent</code> and stop.</li>
+  <li>For each edge <code>(u→v,w)</code>, if <code>g[u]+w &lt; g[v]</code>, update <code>g[v]</code>, set <code>parent[v]=u</code>, set <code>f[v]=g[v]+h(v)</code>, and update the queue.</li>
+  <li><b>Choosing a heuristic:</b> admissible (never overestimates) ensures optimality; consistent (triangle inequality) avoids reopens. Common choices: Manhattan for 4-neighbor grids, Euclidean for free-movement, Chebyshev for 8-neighbor grids, great-circle for maps.</li>
+  <li><b>Complexity:</b> worst case comparable to Dijkstra, <code>O((V+E) log V)</code>; with a good heuristic it expands far fewer nodes in practice. Space <code>O(V)</code>.</li>
+  <li><b>Good use cases:</b> game/robotics pathfinding, maps and navigation, any target-specific query with a meaningful geometric or domain heuristic.</li>
+  <li><b>Common mistakes:</b> using an overestimating heuristic (fast but incorrect), allowing negative edges, not stopping when the target is popped, failing to update priority keys, and ignoring that inconsistent heuristics may require node reopens.</li>
+  <li><b>Exam tips:</b> when <code>h≡0</code> A* becomes Dijkstra; tie-breaking on equal <code>f</code> (often prefer larger <code>g</code>) can improve routes; weighted A* (<code>f=g+λh</code>, <code>λ&gt;1</code>) speeds search but sacrifices optimality.</li>
+</ul>
+`,
+    pseudocode:
+`function A*(Graph, source, target):
+  for each v: dist[v] ← ∞
+  dist[source] ← 0
+  f[source] ← heuristic(source,target)
+  PQ ← priority queue with (source, f[source])
+  while PQ not empty:
+    u ← extract-min(PQ)
+    if u = target: break
+    for each edge (u,v,w):
+      if dist[v] > dist[u] + w:
+        dist[v] ← dist[u] + w
+        f[v] ← dist[v] + heuristic(v,target)
+        PQ.insert_or_update(v, f[v])`,
+ complexity: {
+    best:  "O(E) (perfect heuristic)",
+    avg:   "Depends on heuristic",
+    worst: "O((V+E) log V)",
+    space: "O(V)",
+    stable:"N/A"
+  },
+      code:{
+cpp:`// A* Search with Euclidean heuristic
+double heuristic(int a,int b,vector<pair<int,int>> coords){
+  return hypot(coords[a].first-coords[b].first, coords[a].second-coords[b].second);
+}
+void aStar(int n, vector<vector<pair<int,int>>> &adj, int src, int tgt, vector<pair<int,int>> coords){
+  vector<double> dist(n,1e9), f(n,1e9);
+  dist[src]=0; f[src]=heuristic(src,tgt,coords);
+  using P=pair<double,int>;
+  priority_queue<P, vector<P>, greater<P>> pq;
+  pq.push({f[src],src});
+  while(!pq.empty()){
+    auto [ff,u]=pq.top(); pq.pop();
+    if(u==tgt) break;
+    for(auto [v,w]:adj[u]){
+      if(dist[v]>dist[u]+w){
+        dist[v]=dist[u]+w;
+        f[v]=dist[v]+heuristic(v,tgt,coords);
+        pq.push({f[v],v});
+      }
+    }
+  }
+}`,
+java:`// A* Search
+static double heuristic(int a,int b,int[][] coords){
+  return Math.hypot(coords[a][0]-coords[b][0], coords[a][1]-coords[b][1]);
+}
+static void aStar(List<List<int[]>> adj, int src, int tgt, int[][] coords){
+  int n=adj.size(); double[] dist=new double[n], f=new double[n];
+  Arrays.fill(dist,1e9); Arrays.fill(f,1e9);
+  dist[src]=0; f[src]=heuristic(src,tgt,coords);
+  PriorityQueue<double[]> pq=new PriorityQueue<>(Comparator.comparingDouble(a->a[0]));
+  pq.add(new double[]{f[src],src});
+  while(!pq.isEmpty()){
+    double[] cur=pq.poll(); int u=(int)cur[1];
+    if(u==tgt) break;
+    for(int[] e:adj.get(u)){
+      int v=e[0],w=e[1];
+      if(dist[v]>dist[u]+w){
+        dist[v]=dist[u]+w;
+        f[v]=dist[v]+heuristic(v,tgt,coords);
+        pq.add(new double[]{f[v],v});
+      }
+    }
+  }
+}`,
+py:`# A* Search
+import heapq, math
+def heuristic(a,b,coords):
+    return math.hypot(coords[a][0]-coords[b][0], coords[a][1]-coords[b][1])
+def a_star(adj, src, tgt, coords):
+    n=len(adj)
+    dist=[10**9]*n; f=[10**9]*n
+    dist[src]=0; f[src]=heuristic(src,tgt,coords)
+    pq=[(f[src],src)]
+    while pq:
+        ff,u=heapq.heappop(pq)
+        if u==tgt: break
+        for v,w in adj[u]:
+            if dist[v]>dist[u]+w:
+                dist[v]=dist[u]+w
+                f[v]=dist[v]+heuristic(v,tgt,coords)
+                heapq.heappush(pq,(f[v],v))`
+    },
+  curves: { best: "n", avg: "nlogn", worst: "nlogn" }
+  }
+};
+
+/* -----------------------------
+   BIG-O CHART
+------------------------------*/
+function drawBigO(algo){
+  const c = document.getElementById("bigOChart");
+  const ctx = c.getContext("2d");
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.max(1, c.clientWidth);
+  const H = Math.max(1, c.clientHeight);
+  c.width  = Math.floor(W * dpr);
+  c.height = Math.floor(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); 
+
+  ctx.clearRect(0, 0, W, H);
+
+  const left=40, right=W-10, top=10, bottom=H-40;
+  ctx.strokeStyle = "rgba(255,255,255,.25)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(left, bottom);
+  ctx.lineTo(right, bottom);
+  ctx.stroke();
+
+  const curves = CONTENT[algo].curves || {};
+  const fnMap = {
+    n: n => n,
+    n2: n => n*n,
+    nlogn: n => n * Math.log2(Math.max(2, n)),
+    n1_3: n => Math.pow(n, 1.3)
+  };
+  const items = ["best","avg","worst"]
+    .filter(k => curves[k])
+    .map(k => ({ name: k[0].toUpperCase()+k.slice(1), fn: fnMap[curves[k]] }));
+
+  const SAMPLES = 200;
+  let maxV = 0;
+  for (const it of items){
+    for (let i=1;i<=SAMPLES;i++){
+      const v = it.fn(i);
+      if (isFinite(v)) maxV = Math.max(maxV, v);
+    }
+  }
+  if (maxV <= 0) maxV = 1;
+
+  const cols = [
+    getComputedStyle(document.documentElement).getPropertyValue("--accent-3").trim(),
+    getComputedStyle(document.documentElement).getPropertyValue("--accent-2").trim(),
+    getComputedStyle(document.documentElement).getPropertyValue("--accent-4").trim()
+  ];
+
+  items.forEach((it, idx)=>{
+    ctx.strokeStyle = cols[idx % cols.length] || "#7dd3fc";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i=1;i<=SAMPLES;i++){
+      const t = (i-1)/(SAMPLES-1);
+      const n = 1 + t*(SAMPLES-1);
+      const x = left + t * (right - left);
+      const y = bottom - (it.fn(n)/maxV) * (bottom - top);
+      if (i === 1) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  });
+
+  const legend = document.getElementById("chartLegend");
+  legend.innerHTML = items.map((it, idx)=>
+    `<div class="legendItem"><div class="swatch" style="background:${cols[idx%cols.length]}"></div>${it.name}</div>`
+  ).join("");
+}
+
+window.addEventListener('resize', () => drawBigO(currentAlgo));
+
+
+/* -----------------------------
+   INIT + EVENT BINDING
+------------------------------*/
+let currentAlgo="Dijkstra";
+function setAlgo(name){
+  currentAlgo=name;
+  document.getElementById("sectionTitle").innerText="About: "+name;
+  document.getElementById("explain").innerHTML=CONTENT[name].explain;
+  document.getElementById("pseudocodeBlock").textContent=CONTENT[name].pseudocode;
+  let c=CONTENT[name].complexity;
+  let rows=`<tr><td>Best</td><td>${c.best}</td><td>${c.space}</td><td>${c.stable}</td></tr>
+<tr><td>Average</td><td>${c.avg}</td><td>${c.space}</td><td>${c.stable}</td></tr>
+<tr><td>Worst</td><td>${c.worst}</td><td>${c.space}</td><td>${c.stable}</td></tr>`;
+  document.getElementById("complexRows").innerHTML=rows;
+  const first=Object.values(CONTENT[name].code)[0];
+  document.getElementById("codeBlock").textContent=first;
+  document.getElementById("chartLegend").innerHTML="";
+  drawBigO(name);
+}
+setAlgo("Dijkstra");
+
+document.getElementById("algoSelect").addEventListener("change",e=>{
+  setAlgo(e.target.value);
+  const name = e.target.value;
+
+if (name !== "A*") targetNode = null;
+
+drawGraph();
+
+  document.getElementById("negWeightsCtl").style.display=(e.target.value==="Bellman-Ford")?"block":"none";
+});
+
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    const lang=tab.dataset.lang;
+    document.getElementById("codeBlock").textContent=CONTENT[currentAlgo].code[lang];
+  });
+});
+
+let runner = null;
+
+function live(text){
+  document.getElementById("livePseudo").textContent = text;
+}
+
+document.getElementById("play").addEventListener("click", () => {
+  if (runner) return;
+
+  let gen;
+if (currentAlgo === "A*") {
+  const tgt = (targetNode == null) ? nodes.length - 1 : targetNode;
+  gen = Algo["A*"](startNode, tgt);
+} else if (currentAlgo === "Bellman-Ford") {
+  gen = Algo["Bellman-Ford"](startNode);
+} else if (currentAlgo === "BFS") {
+  gen = Algo["BFS"](startNode);            
+} else { 
+  gen = Algo["Dijkstra"](startNode);      
+}
+
+
+  if (currentAlgo === "Dijkstra" || currentAlgo === "A*")
+    updatePQList([{ node: startNode, dist: 0 }]);
+  else if (currentAlgo === "BFS")
+    updatePQList([{ node: startNode, dist: 0 }]);
+  else
+    updatePQList([]);
+
+  live("Start");
+
+  let cancelled = false;
+  runner = { cancel: () => { cancelled = true; } };
+  const parent = Array(nodes.length).fill(null);
+  const stepOnce = () => {
+    if (cancelled) { runner = null; return; }
+
+    const next = gen.next();
+if (next.done) {
+  live("Done.");
+  runner = null;
+
+  const tree = [];
+  for (let v = 0; v < parent.length; v++) {
+    const u = parent[v];
+    if (u !== null) tree.push({ u, v });
+  }
+  drawGraph(null, tree);   
+  return;
+}
+
+    const ev = next.value;
+
+    if (ev.type === "visit") {
+      updatePQList(ev.pq || ev.queue || []);
+      live(`Visit ${ev.node} (dist=${ev.dist})`);
+    } else if (ev.type === "relax") {
+      drawGraph({ u: ev.u, v: ev.v, w: ev.w });
+      live(`Relax ${ev.u} → ${ev.v} (w=${ev.w})`);
+    } else if (ev.type === "update") {
+  if (typeof ev.parent === "number") parent[ev.node] = ev.parent;
+  updatePQList(ev.pq || ev.queue || []);
+  live(`Update: dist[${ev.node}] = ${ev.newDist}`);
+  drawGraph();
+
+    } else if (ev.type === "negCycle") {
+      live(`Negative cycle via ${ev.u} → ${ev.v}`);
+    } else {
+      drawGraph();
+    }
+
+    const base = 1100;
+    const delay = Math.max(40, base - (+document.getElementById("speed").value));
+    setTimeout(stepOnce, delay);
+  };
+
+  stepOnce();
+});
+
+
+
+document.getElementById("pause").addEventListener("click",()=>{
+  if (runner) runner.cancel();
+  runner = null;
+});
+</script>
+</body>
+</html>

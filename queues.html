@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <title>Queues · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/queues.html" />
+<meta name="description" content="Learn queues (FIFO): array vs circular buffer with head/tail for O(1) ops, core APIs, time complexity, and implementations. Interactive simulator + C++/Java/Python code." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Queues · learnDataStructures" />
+<meta property="og:description" content="Learn queues (FIFO): array vs circular buffer with head/tail for O(1) ops, core APIs, time complexity, and implementations. Interactive simulator + C++/Java/Python code." />
+<meta property="og:url" content="https://learndatastructures.org/queues.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Queues overview with interactive simulator and code examples" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Queues · learnDataStructures" />
+<meta name="twitter:description" content="Learn queues (FIFO): array vs circular buffer with head/tail for O(1) ops, core APIs, time complexity, and implementations. Interactive simulator + C++/Java/Python code." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <style>
+    :root{
+      --bg:#0e1224;
+      --panel:#121836;
+      --panel-2:#0f1a2e;
+      --ink:#e9f2ff;
+      --muted:#a8b4d9;
+      --accent:#7be3d1;
+      --accent-2:#7ab7ff;
+      --stroke:#2a355e;
+      --ok:#41d39e;
+      --warn:#ffcc66;
+    }
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#dfe9ff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:#0f1a2e}
+    .edu code{background:#0e1a31; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+    .edu details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1a2e; margin:10px 0;}
+    .edu details > summary{cursor:pointer; color:#dbe7ff; font-weight:600; margin:4px 0 8px}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--panel-2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f2237; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+    .kw{color:#80ffd8}
+    .ty{color:#ffd26e}
+    .fn{color:#89b8ff}
+    .cm{color:#9fb0d6; font-style:italic}
+    .st{color:#ffc5a1}
+
+    .controls{display:flex; flex-wrap:wrap; gap:6px}
+    .controls .group{display:flex; gap:6px; align-items:center}
+    input[type="text"]{
+      background:#0b1a2e; color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:160px;
+    }
+    button{
+      background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke);
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    button:hover{border-color:#3a5d99}
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .btn-ok{background:#10342b; border-color:#215b4d}
+    .btn-warn{background:#3c2a02; border-color:#7a5a1d}
+    .kbar{color:var(--muted); font-size:13px}
+    .status{color:var(--muted); font-size:13px; margin-top:6px}
+    svg{display:block; width:100%; height:360px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .arrowLabel{font-size:11px; fill:#a9bee8}
+    .helper{color:var(--muted); font-size:13px; margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Queues (FIFO)</h2></div>
+      <div class="bd">
+        <p>
+A queue is a First-In-First-Out (FIFO) structure: the first item placed in is the first to come out. 
+This is like a line at a store checkout — the earliest person to line up is the first one served. 
+In its simplest form, you can imagine storing a queue inside a plain array. Adding new items is easy: 
+you place the element at the end of the array. The trouble comes when removing from the front: 
+to keep the “front” always at index 0, every remaining element must be shifted one position left. 
+That makes each <code>dequeue</code> operation take O(n) time, which is inefficient.
+</p>
+
+<p>
+A more efficient approach is to treat the array as “circular.” Instead of shifting elements, 
+we keep two moving indices: <em>head</em>, pointing to the front item, and <em>tail</em>, 
+pointing to where the next new item will go. When either index reaches the end of the array, 
+it simply wraps back to the start. This way, both <code>enqueue</code> and <code>dequeue</code> 
+take O(1) time, because we only update the indices instead of shifting the whole array. 
+The size of the queue is tracked separately, and it tells us when the queue is empty 
+(size = 0) or full (size = capacity).
+</p>
+        <h3>Core functions</h3>
+        <ul>
+          <li><strong>enqueue(x)</strong>: add <code>x</code> at the rear of the line.</li>
+          <li><strong>dequeue()</strong>: remove and return the item at the front.</li>
+          <li><strong>front()</strong>: peek at the front item.</li>
+          <li><strong>isEmpty()</strong>: <code>true</code> if there are no items.</li>
+          <li><strong>size()</strong>: shows how many items are currently stored.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Queue — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+        <div class="helper">Minimal, readable FIFO examples; focus on the idea, not boilerplate.</div>
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Operations (pseudocode)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive queue simulator</h2>
+        <div class="kbar">capacity: <strong>5</strong> · size: <span id="kSize">0</span> · front: <span id="kFront">—</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 640 360">
+          <defs>
+            <linearGradient id="gq" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="160" width="560" height="60" rx="12" ry="12" fill="#e4f3ff" stroke="#98a4c2" fill-opacity="0.06"></rect>
+          <g id="frontArrow" style="display:none">
+            <polygon id="frontTri" fill="#8cb6ff" opacity="0.9" points=""></polygon>
+            <text id="frontLbl" class="arrowLabel" text-anchor="middle">Front</text>
+          </g>
+          <g id="rearArrow" style="display:none">
+            <polygon id="rearTri" fill="#7fead6" opacity="0.9" points=""></polygon>
+            <text id="rearLbl" class="arrowLabel" text-anchor="middle">Rear</text>
+          </g>
+          <g id="itemsG"></g>
+        </svg>
+        <div class="controls">
+          <div class="group">
+            <input id="val" type="text" placeholder="value (e.g., 42)">
+            <button class="btn-ok" id="enqBtn">enqueue</button>
+            <button id="deqBtn">dequeue</button>
+            <button id="frontBtn">front</button>
+            <button id="isEmptyBtn">isEmpty</button>
+          </div>
+          <div class="controls">    
+            <button id="sizeBtn">size</button>
+            <button id="clearBtn" class="btn-warn">clear</button>
+          </div>
+        </div>
+        <div id="status" class="status"></div>
+        <div class="helper">Try: enqueue up to 6 values. When full, enqueue is disabled. Dequeue to free space.</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd">
+        <h2 style="padding-left:6px">Complexity, Pros/Cons, and Implementations</h2>
+      </div>
+      <div class="bd">
+        <h3>Time complexity</h3>
+        <table>
+          <thead>
+            <tr><th>Operation</th><th>Array/Circular-buffer queue</th><th>Linked-list queue</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>enqueue(x)</code></td><td>Amortized O(1)</td><td>O(1)</td><td>Array may occasionally resize; circular buffer avoids shifts</td></tr>
+            <tr><td><code>dequeue()</code></td><td>O(1)</td><td>O(1)</td><td>Remove from front</td></tr>
+            <tr><td><code>front()</code></td><td>O(1)</td><td>O(1)</td><td>Read front element</td></tr>
+            <tr><td><code>isEmpty()</code></td><td>O(1)</td><td>O(1)</td><td>Check if queue is empty</td></tr>
+            <tr><td><code>size()</code></td><td>O(1)</td><td>O(1)</td><td>Maintain a count</td></tr>
+          </tbody>
+        </table>
+
+        <h3 id="impl">Implementations by language — how to create & use</h3>
+
+        <h4>Python</h4>
+
+<details>
+  <summary>Simple circular-array queue (educational)</summary>
+  <p><em>Best for learning</em>: shows how wrap-around indexing avoids O(n) shifting.</p>
+<pre>class CircularQueue:
+    def __init__(self, capacity=8):
+        self._a = [None] * capacity
+        self._head = 0
+        self._tail = 0
+        self._size = 0
+
+    def enqueue(self, x):
+        if self._size == len(self._a):
+            raise IndexError("queue full")
+        self._a[self._tail] = x
+        self._tail = (self._tail + 1) % len(self._a)
+        self._size += 1
+
+    def dequeue(self):
+        if self._size == 0:
+            raise IndexError("queue empty")
+        x = self._a[self._head]
+        self._a[self._head] = None
+        self._head = (self._head + 1) % len(self._a)
+        self._size -= 1
+        return x
+
+    def front(self):
+        if self._size == 0:
+            raise IndexError("queue empty")
+        return self._a[self._head]
+
+    def isEmpty(self): return self._size == 0
+    def size(self):    return self._size
+</pre>
+</details>
+
+<details>
+  <summary>Linked-list queue</summary>
+  <p><em>Best for unbounded queues</em>: grows dynamically; no fixed capacity.</p>
+<pre>class Node:
+    def __init__(self, data, next=None):
+        self.data = data
+        self.next = next
+
+class LinkedQueue:
+    def __init__(self):
+        self.front = None
+        self.rear = None
+        self._size = 0
+
+    def enqueue(self, x):
+        node = Node(x)
+        if self.rear:
+            self.rear.next = node
+        else:
+            self.front = node
+        self.rear = node
+        self._size += 1
+
+    def dequeue(self):
+        if not self.front:
+            raise IndexError("queue empty")
+        x = self.front.data
+        self.front = self.front.next
+        if not self.front:
+            self.rear = None
+        self._size -= 1
+        return x
+
+    def front_item(self):
+        if not self.front:
+            raise IndexError("queue empty")
+        return self.front.data
+
+    def isEmpty(self): return self._size == 0
+    def size(self):    return self._size
+</pre>
+</details>
+
+<details>
+  <summary>Using collections.deque (standard library)</summary>
+  <p><em>Best for real-world use</em>: highly optimized C implementation, O(1) for all operations.</p>
+<pre>from collections import deque
+
+q = deque()
+q.append("A")      # enqueue
+q.append("B")
+front_item = q[0]  # peek
+x = q.popleft()    # dequeue
+print(front_item, x, len(q))
+</pre>
+</details>
+
+<details>
+  <summary>Thread-safe Queue (queue.Queue)</summary>
+  <p><em>Best for concurrency</em>: built-in blocking semantics for producer/consumer problems.</p>
+<pre>from queue import Queue
+
+q = Queue(maxsize=5)
+q.put(10)           # enqueue
+q.put(20)
+print(q.get())      # dequeue (blocks if empty)
+print(q.empty())    # check empty
+</pre>
+</details>
+
+<h4>Java</h4>
+
+<details>
+  <summary>Queue via LinkedList (standard library)</summary>
+  <p><em>Best for everyday Java</em>: simple FIFO using the Queue interface.</p>
+<pre>import java.util.*;
+
+public class QueueDemo {
+  public static void main(String[] args) {
+    Queue&lt;String&gt; q = new LinkedList&lt;&gt;(); // FIFO
+    q.offer("A"); q.offer("B");
+    System.out.println(q.peek()); // front
+    System.out.println(q.poll()); // dequeue
+    System.out.println(q.size());
+  }
+}</pre>
+</details>
+
+<details>
+  <summary>Minimal linked-list queue (educational)</summary>
+  <p><em>Best for pointer practice</em>: O(1) at both ends with head/tail refs.</p>
+<pre>public class LinkedQueue&lt;T&gt; {
+  private static class Node&lt;T&gt; { T v; Node&lt;T&gt; n; Node(T v){ this.v=v; } }
+  private Node&lt;T&gt; head, tail; private int size;
+
+  public void enqueue(T x){
+    Node&lt;T&gt; t = new Node&lt;&gt;(x);
+    if (tail == null) head = tail = t;
+    else { tail.n = t; tail = t; }
+    size++;
+  }
+  public T dequeue(){
+    if (size == 0) throw new java.util.NoSuchElementException();
+    T v = head.v; head = head.n; if (head == null) tail = null; size--; return v;
+  }
+  public T front(){ if (size==0) throw new java.util.NoSuchElementException(); return head.v; }
+  public boolean isEmpty(){ return size==0; }
+  public int size(){ return size; }
+}</pre>
+</details>
+
+<details>
+  <summary>Bounded, thread-safe queue (ArrayBlockingQueue)</summary>
+  <p><em>Best for producers/consumers</em>: blocking ops with fixed capacity.</p>
+<pre>import java.util.concurrent.*;
+
+public class BlockingQueueDemo {
+  public static void main(String[] args) throws InterruptedException {
+    BlockingQueue&lt;Integer&gt; q = new ArrayBlockingQueue&lt;&gt;(3);
+    q.put(1); q.put(2); q.put(3);        // blocks if full
+    System.out.println(q.take());        // blocks if empty
+  }
+}</pre>
+</details>
+<h4>C++</h4>
+
+<details>
+  <summary>Using std::queue (standard library)</summary>
+  <p><em>Best for everyday C++</em>: simple FIFO adapter with O(1) ops.</p>
+<pre>#include &lt;iostream&gt;
+#include &lt;queue&gt;
+int main(){
+  std::queue&lt;int&gt; q;
+  q.push(10); q.push(20); q.push(30);
+  std::cout &lt;&lt; q.front() &lt;&lt; "\n";
+  q.pop();
+  std::cout &lt;&lt; q.size() &lt;&lt; "\n";
+}</pre>
+</details>
+
+<details>
+  <summary>Minimal circular-buffer queue (educational)</summary>
+  <p><em>Best for fixed-size, no heap allocations</em>: wrap-around with head/tail.</p>
+<pre>#include &lt;vector&gt;
+#include &lt;cstddef&gt;
+template &lt;typename T&gt;
+class CircularQueue {
+  std::vector&lt;T&gt; a; std::size_t head=0, tail=0, cnt=0;
+public:
+  explicit CircularQueue(std::size_t cap): a(cap) {}
+  bool enqueue(const T&amp; x){
+    if (cnt == a.size()) return false;
+    a[tail] = x; tail = (tail + 1) % a.size(); cnt++; return true;
+  }
+  bool dequeue(T&amp; out){
+    if (cnt == 0) return false;
+    out = a[head]; head = (head + 1) % a.size(); cnt--; return true;
+  }
+  const T&amp; front() const { return a[head]; }
+  bool isEmpty() const { return cnt == 0; }
+  std::size_t size() const { return cnt; }
+};</pre>
+</details>
+
+<details>
+  <summary>Minimal linked-list queue (educational)</summary>
+  <p><em>Best for teaching nodes/pointers</em>: dynamic size with O(1) ends.</p>
+<pre>#include &lt;stdexcept&gt;
+template &lt;typename T&gt;
+struct Node { T v; Node* n; Node(const T&amp; v): v(v), n(nullptr) {} };
+
+template &lt;typename T&gt;
+class LinkedQueue {
+  Node&lt;T&gt;* head=nullptr; Node&lt;T&gt;* tail=nullptr; std::size_t sz=0;
+public:
+  ~LinkedQueue(){ while(head){ auto* t=head; head=head->n; delete t; } }
+  void enqueue(const T&amp; x){
+    auto* t = new Node&lt;T&gt;(x);
+    if (tail) tail->n = t; else head = t; tail = t; ++sz;
+  }
+  T dequeue(){
+    if (!head) throw std::runtime_error("empty");
+    T v = head->v; auto* t=head; head=head->n; if(!head) tail=nullptr; delete t; --sz; return v;
+  }
+  const T&amp; front() const { if(!head) throw std::runtime_error("empty"); return head->v; }
+  bool isEmpty() const { return sz==0; }
+  std::size_t size() const { return sz; }
+};</pre>
+</details>
+
+
+        <h3>Conceptual Questions</h3>
+
+<ol>
+  <li> In a FIFO queue, which item is removed first — the newest one added or the oldest one?</li>
+  <li> In the simple array implementation, why does <code>dequeue</code> require shifting elements? </li>
+  <li> How does a circular array queue avoid the shifting problem that occurs in a simple array queue?</li>
+  <li> If a circular array queue has capacity 6, and after several operations the head index is 4 and the tail index is 1, how many items are currently in the queue?</li>
+  <li> If a circular array queue is completely full, what are two different strategies you could use to handle an extra <code>enqueue</code>? What is one trade-off of each strategy?</li>
+</ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+AOS.init({ duration: 420, easing: "ease-out-quart" });
+
+const qs  = sel => document.querySelector(sel);
+const qsa = sel => Array.from(document.querySelectorAll(sel));
+
+const codeEl   = qs('#code');
+const pseudoEl = qs('#pseudo');
+const itemsG   = qs('#itemsG');
+const val      = qs('#val');
+const kSize    = qs('#kSize');
+const kFront   = qs('#kFront');
+const kOps     = qs('#kOps');
+const statusEl = qs('#status');
+
+const frontArrow = qs('#frontArrow');
+const rearArrow  = qs('#rearArrow');
+const frontTri   = qs('#frontTri');
+const rearTri    = qs('#rearTri');
+const frontLbl   = qs('#frontLbl');
+const rearLbl    = qs('#rearLbl');
+
+function highlight(lang, s) {
+  s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const stash=[]; const STX='\u0002', ETX='\u0003';
+  const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+
+  if (lang==='cpp' || lang==='java'){
+    s = s
+      .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+      .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+      .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+    s = s
+      .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+      .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  } else {
+    s = s
+      .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+      .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+    s = s
+      .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+      .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  }
+  s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+  return s;
+}
+
+const snippets = {
+cpp:`// Minimal FIFO with std::queue
+#include <queue>
+#include <string>
+std::queue<std::string> q;
+q.push("A");       // enqueue
+q.push("B");
+auto f = q.front();// "A" (front)
+q.pop();           // removes "A"
+bool empty = q.empty();
+auto n = q.size();`,
+java:`// Minimal FIFO with ArrayDeque (as a Queue)
+import java.util.ArrayDeque;
+ArrayDeque<String> q = new ArrayDeque<>();
+q.offer("A");       // enqueue
+q.offer("B");
+String f = q.peek(); // "A" (front)
+q.poll();            // removes "A"
+boolean empty = q.isEmpty();
+int n = q.size();`,
+py:`# Minimal FIFO with collections.deque
+from collections import deque
+q = deque()
+q.append("A")      # enqueue
+q.append("B")
+f = q[0]           # "A" (front)
+q.popleft()        # removes "A"
+empty = (len(q)==0)
+n = len(q)`
+};
+let currentLang='cpp';
+function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+qsa('.codeTabs button').forEach(b=>b.onclick=()=>{
+  qsa('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+  currentLang=b.dataset.lang; renderCode();
+});
+
+const tracer = { idx:0, timer:null, lines:[
+'function enqueue(x):',
+'  assert size < capacity',
+'  A[tail] ← x',
+'  tail ← (tail + 1) mod capacity',
+'  size ← size + 1','',
+'function dequeue():',
+'  assert size > 0',
+'  x ← A[head]',
+'  head ← (head + 1) mod capacity',
+'  size ← size - 1',
+'  return x','',
+'function front():',
+'  assert size > 0',
+'  return A[head]','',
+'function isEmpty():',
+'  return size == 0','',
+'function size():',
+'  return size'
+]};
+function renderPseudo(){
+  pseudoEl.innerHTML = tracer.lines
+    .map((ln,i)=>i===tracer.idx?`<div style="background:rgba(255,255,255,.06)">${ln}</div>`:`<div>${ln}</div>`)
+    .join('');
+}
+
+const CAPACITY = 6;
+let queue=[], ops=0;
+
+const baseX = 60, baseY = 190, w = 80, h = 38, gap = 8;
+
+function setDownArrow(group, tri, lbl, cx, visible, labelYOffset){
+  if (!visible){
+    group.style.display = 'none';
+    return;
+  }
+  const tipY  = baseY - h/2 - 4;    
+  const topY  = tipY - 12;           
+  const pts   = `${cx},${tipY} ${cx-9},${topY} ${cx+9},${topY}`;
+  tri.setAttribute('points', pts);
+  lbl.setAttribute('x', cx);
+  lbl.setAttribute('y', topY - (labelYOffset||6));
+  group.style.display = '';
+}
+
+function drawQueue(mode){
+  itemsG.innerHTML = '';
+  statusEl.textContent = '';
+
+  queue.forEach((v,i)=>{
+    const x = baseX + i*(w+gap);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+    if (mode === 'enqueue' && i === queue.length - 1){
+      g.setAttribute('data-aos','fade-left');
+      g.setAttribute('data-aos-duration','420');
+    }
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',x); rect.setAttribute('y',baseY - h/2);
+    rect.setAttribute('rx',8); rect.setAttribute('ry',8);
+    rect.setAttribute('width',w); rect.setAttribute('height',h);
+    rect.setAttribute('fill','url(#gq)'); rect.setAttribute('stroke','#0d2c4a');
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',x + w/2); text.setAttribute('y',baseY+5);
+    text.setAttribute('text-anchor','middle'); text.setAttribute('font-size','12'); text.setAttribute('fill','#001523');
+    text.textContent = v;
+
+    g.appendChild(rect); g.appendChild(text); itemsG.appendChild(g);
+  });
+
+  if (queue.length === 0){
+    setDownArrow(frontArrow, frontTri, frontLbl, 0, false);
+    setDownArrow(rearArrow,  rearTri,  rearLbl,  0, false);
+  } else if (queue.length === 1){
+    const cx = baseX + w/2;
+    setDownArrow(frontArrow, frontTri, frontLbl, cx, true, 10); 
+    setDownArrow(rearArrow,  rearTri,  rearLbl,  cx, true, -4); 
+  } else {
+    const frontCX = baseX + w/2;                                   
+    const rearCX  = baseX + (queue.length-1)*(w+gap) + w/2;       
+    setDownArrow(frontArrow, frontTri, frontLbl, frontCX, true, 8);
+    setDownArrow(rearArrow,  rearTri,  rearLbl,  rearCX,  true, 8);
+  }
+
+  if (mode === 'enqueue') AOS.refresh();
+}
+
+function enqueue(x){
+  if (queue.length >= CAPACITY){
+    statusEl.textContent = 'Queue is full (max 6). Dequeue to add more.';
+    return;
+  }
+  queue.push(x);
+  ops++; animatePseudo('enqueue');
+  refresh('enqueue');
+}
+
+function dequeue(){
+  if (queue.length === 0){
+    statusEl.textContent = 'Queue is empty. Nothing to dequeue.';
+    return;
+  }
+  const frontNode = itemsG.firstChild;
+  if (frontNode){
+    frontNode.setAttribute('data-aos','fade-right'); 
+    frontNode.setAttribute('data-aos-duration','300');
+    AOS.refresh();
+  }
+  const v = queue.shift();
+  ops++; animatePseudo('dequeue');
+  setTimeout(()=>refresh(), 300);
+  return v;
+}
+
+function front(){
+  if (!queue.length){
+    statusEl.textContent = 'Queue is empty.';
+    return;
+  }
+  ops++; animatePseudo('front');
+  refresh();
+  return queue[0];
+}
+
+function isEmpty(){ return queue.length === 0; }
+function size(){ return queue.length; }
+
+function refresh(mode){
+  drawQueue(mode);
+  kSize.textContent = queue.length;
+  kFront.textContent = queue.length ? queue[0] : '—';
+  kOps.textContent = ops;
+  const enqBtn = qs('#enqBtn');
+  enqBtn.disabled = (queue.length >= CAPACITY);
+}
+
+function animatePseudo(kind){
+  const ranges = { enqueue:[0,4], dequeue:[6,11], front:[13,15] }[kind];
+  tracer.idx = ranges[0]; renderPseudo();
+  clearInterval(tracer.timer);
+  let i = ranges[0];
+  tracer.timer = setInterval(()=>{
+    i++; tracer.idx = i; renderPseudo();
+    if (i >= ranges[1]) clearInterval(tracer.timer);
+  }, 260);
+}
+
+qs('#enqBtn').onclick = ()=>{
+  const x = val.value || String(Math.floor(Math.random()*90+10));
+  enqueue(x);
+  if (!val.value) val.value = ''; 
+};
+qs('#deqBtn').onclick = ()=>{
+  const v = dequeue();
+  if (v !== undefined) val.value = v;
+};
+qs('#frontBtn').onclick = ()=>{
+  const v = front();
+  if (v !== undefined) val.value = v;
+};
+qs('#isEmptyBtn').onclick = ()=>{ val.value = isEmpty() ? 'true' : 'false'; };
+qs('#sizeBtn').onclick = ()=>{ val.value = String(size()); };
+qs('#clearBtn').onclick = ()=>{ queue.length = 0; ops = 0; refresh(); statusEl.textContent=''; };
+
+renderCode(); renderPseudo();
+queue = ['1','2','3']; refresh();
+</script>
+</body>
+</html>

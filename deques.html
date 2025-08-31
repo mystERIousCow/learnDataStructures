@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deques · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/deques.html" />
+<meta name="description" content="Interactive deque (double-ended queue) tutorial and simulator: push/pop at both ends, circular-buffer visualization, pseudocode, and tiny code snippets in C++, Java, and Python." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Deques · learnDataStructures" />
+<meta property="og:description" content="Learn deques with an interactive circular-buffer simulator. Try push_front/back, pop_front/back, see indices wrap, and compare array vs linked implementations." />
+<meta property="og:url" content="https://learndatastructures.org/deques.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Deque circular buffer with head and tail markers" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Deques · learnDataStructures" />
+<meta name="twitter:description" content="Hands-on double-ended queues: operations, circular indexing, auto-resize, and complexity insights." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+    .edu details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:var(--pane2); margin:10px 0;}
+    .edu details > summary{cursor:pointer; color:#dbe7ff; font-weight:600; margin:4px 0 8px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"]{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:160px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .kbar{color:var(--muted); font-size:13px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+    .hl{background:rgba(255,255,255,.06)}
+
+    svg{display:block; width:100%; height:300px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+    label.switch{display:inline-flex;align-items:center;gap:6px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Deques (Double-ended queues)</h2></div>
+      <div class="bd">
+        <p>A <strong>deque</strong> lets you add/remove items at <em>both</em> the front and the back in amortized O(1) time.</p>
+        <p><strong>How it works (array-backed circular buffer):</strong> we keep two indices, <code>head</code> (first element) and <code>tail</code> (one past the last element). The elements logically occupy <code>size</code> contiguous positions in a <em>circular index space</em>. When we <code>push_front</code>, we <em>decrement the head index modulo capacity</em> and write there; for <code>push_back</code>, we write at <code>tail</code> and then <em>increment tail modulo capacity</em>. Pops adjust the corresponding index in the opposite direction. <u>We shift the <em>indices</em>, not the elements</u>—so no O(n) moves. If the buffer is full and resizing is enabled, we allocate a larger array and copy the <code>size</code> items once, re-laying them out from index 0..size-1.</p>
+        <p><strong>Real-life intuition:</strong> a line where VIPs can enter at the front, a work queue that prioritizes urgent tasks, or sliding-window algorithms that push/pop from both ends.</p>
+        <h3>Core functions</h3>
+        <ul>
+          <li><strong>push_front(x)</strong>, <strong>push_back(x)</strong></li>
+          <li><strong>pop_front()</strong>, <strong>pop_back()</strong></li>
+          <li><strong>front()</strong>, <strong>back()</strong></li>
+          <li><strong>isEmpty()</strong>, <strong>size()</strong></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Deque — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Operations (pseudocode)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">Pseudocode mirrors the simulator (circular buffer; auto-resize optional).</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive deque simulator</h2>
+        <div class="kbar">capacity: <strong><span id="kCap">8</span></strong> · size: <span id="kSize">0</span> · head: <span id="kHead">0</span> · tail: <span id="kTail">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 300" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <g id="cells"></g>
+          <g id="markers"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <input id="val" type="text" placeholder="value (e.g., 42)">
+          <button class="btn primary" id="pushFront">push_front</button>
+          <button class="btn primary" id="pushBack">push_back</button>
+          <button class="btn" id="popFront">pop_front</button>
+          <button class="btn" id="popBack">pop_back</button>
+          <button class="btn" id="peekFront">peek_front</button>
+          <button class="btn" id="peekBack">peek_back</button>
+        </div>
+
+        <div class="row">
+          <input id="capInput" type="number" min="4" step="1" value="8" style="width:90px">
+          <label for="capInput" class="tiny">capacity</label>
+          <label class="switch tiny"><input type="checkbox" id="autoResize" checked> auto-resize</label>
+          <button class="btn" id="applyCap">apply</button>
+          <button class="btn" id="randomBtn">randomize</button>
+          <button class="btn" id="undoBtn">undo</button>
+          <button class="btn danger" id="clearBtn">clear</button>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="badgePill">Double-ended</span>
+          <span class="badgePill">Circular buffer</span>
+          <span class="badgePill">Amortized O(1)</span>
+        </div>
+
+        <div id="status" class="tiny" style="margin-top:6px; min-height:18px"></div>
+      </div>
+    </section>
+  </div>
+
+<div class="edu-wrap">
+  <section class="edu-card edu">
+    <div class="hd"><h2>Deques</h2></div>
+    <div class="bd">
+      <h3>Array-backed circular buffer model (what this page simulates)</h3>
+      <p>
+        We store elements in a fixed-size array and track three values:
+        <code>head</code> (index of the front element), <code>tail</code> (index <em>one past</em> the back element),
+        and <code>size</code> (number of elements). The array is treated <em>circularly</em>, so when an index reaches
+        the end it wraps to 0 using modulo arithmetic.
+      </p>
+      <p><strong>Invariant:</strong> <code>tail = (head + size) mod capacity</code></p>
+
+      <h3>Why it’s O(1): shift indices, not elements</h3>
+      <ul>
+        <li><code>push_back(x)</code>: write to <code>A[tail]</code>, then <code>tail ← (tail + 1) mod C</code>, <code>size++</code>.</li>
+        <li><code>push_front(x)</code>: <code>head ← (head − 1 + C) mod C</code>, write to <code>A[head]</code>, <code>size++</code>.</li>
+        <li><code>pop_front()</code>: read/clear <code>A[head]</code>, then <code>head ← (head + 1) mod C</code>, <code>size--</code>.</li>
+        <li><code>pop_back()</code>: <code>tail ← (tail − 1 + C) mod C</code>, read/clear <code>A[tail]</code>, <code>size--</code>.</li>
+        <li><code>front()</code>/<code>back()</code> read ends in O(1).</li>
+      </ul>
+      <p>
+        No bulk shifting is needed; only <code>head</code>/<code>tail</code> move. That’s why end operations stay O(1).
+      </p>
+
+      <h3>Full vs empty</h3>
+      <ul>
+        <li><strong>With stored size</strong> (used here): empty ⇔ <code>size == 0</code>, full ⇔ <code>size == capacity</code>.</li>
+        <li><strong>Without size</strong> (alternative): keep one slot empty — empty ⇔ <code>head == tail</code>, full ⇔ <code>(tail + 1) mod C == head</code>.</li>
+      </ul>
+
+      <h3>Auto-resize (optional)</h3>
+      <p>
+        When full, we can <em>double</em> capacity: allocate a larger array, copy the <code>size</code> items in logical order
+        to indices <code>0..size−1</code>, then set <code>head = 0</code> and <code>tail = size</code>. A single push may cost O(n),
+        but over many pushes the cost is still amortized O(1).
+      </p>
+
+      <h3>Core functions</h3>
+      <ul>
+        <li><code>push_front(x)</code>, <code>push_back(x)</code></li>
+        <li><code>pop_front()</code>, <code>pop_back()</code></li>
+        <li><code>peek_front()</code>, <code>peek_back()</code></li>
+        <li><code>isEmpty()</code>, <code>size()</code></li>
+      </ul>
+
+      <h3>Implementations &amp; trade-offs</h3>
+      <ul>
+        <li><strong>Array deque:</strong> great cache locality and constants; occasional resize cost; capacity bound at any instant.</li>
+        <li><strong>Linked-list deque:</strong> true O(1) ends without resizing; worse locality and pointer overhead; naturally unbounded.</li>
+      </ul>
+
+      <h3>Typical uses</h3>
+      <ul>
+        <li>Flexible producer/consumer buffers that sometimes prioritize at the front.</li>
+        <li><strong>Sliding-window</strong> algorithms (e.g., monotonic deque for window min/max).</li>
+        <li>Back/forward navigation, undo/redo, and general worklists that add/remove at both ends.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+    
+      <div class="hd"><h2>Complexity, Pros/Cons, and Implementations</h2></div>
+      <div class="bd">
+        <h3>Time complexity</h3>
+        <table>
+          <thead>
+            <tr><th>Operation</th><th>Array/Circular-buffer deque</th><th>Linked-list deque</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>push_front(x)</code></td><td>Amortized O(1)</td><td>O(1)</td><td>Array may occasionally resize; circular indices</td></tr>
+            <tr><td><code>push_back(x)</code></td><td>Amortized O(1)</td><td>O(1)</td><td>Same as above</td></tr>
+            <tr><td><code>pop_front()</code></td><td>O(1)</td><td>O(1)</td><td>Advance <code>head</code></td></tr>
+            <tr><td><code>pop_back()</code></td><td>O(1)</td><td>O(1)</td><td>Retreat <code>tail</code></td></tr>
+            <tr><td><code>front()</code>/<code>back()</code></td><td>O(1)</td><td>O(1)</td><td>Read ends</td></tr>
+            <tr><td><code>isEmpty()</code>/<code>size()</code></td><td>O(1)</td><td>O(1)</td><td>Maintain a count</td></tr>
+          </tbody>
+        </table>
+
+        <h3 id="impl">Implementations by language — how to create & use</h3>
+
+        <h4>Python</h4>
+        <details>
+          <summary>Using <code>collections.deque</code> (standard library)</summary>
+<pre>from collections import deque
+
+dq = deque()
+dq.append(10)          # push_back
+dq.appendleft(5)       # push_front
+x = dq.pop()           # pop_back
+y = dq.popleft()       # pop_front
+f, b = dq[0], dq[-1]   # front, back
+n = len(dq)</pre>
+        </details>
+
+        <details>
+          <summary>Educational circular-array deque</summary>
+<pre>class ArrayDeque:
+    def __init__(self, capacity=8):
+        self._a = [None]*capacity
+        self._cap = capacity
+        self._head = 0; self._tail = 0; self._size = 0
+
+    def _grow(self):
+        b = [None]*(self._cap*2)
+        for i in range(self._size):
+            b[i] = self._a[(self._head + i) % self._cap]
+        self._a, self._cap = b, self._cap*2
+        self._head, self._tail = 0, self._size
+
+    def push_back(self, x):
+        if self._size == self._cap: self._grow()
+        self._a[self._tail] = x
+        self._tail = (self._tail + 1) % self._cap
+        self._size += 1
+
+    def push_front(self, x):
+        if self._size == self._cap: self._grow()
+        self._head = (self._head - 1 + self._cap) % self._cap
+        self._a[self._head] = x
+        self._size += 1
+
+    def pop_front(self):
+        if self._size == 0: raise IndexError("empty")
+        v = self._a[self._head]; self._a[self._head] = None
+        self._head = (self._head + 1) % self._cap
+        self._size -= 1; return v
+
+    def pop_back(self):
+        if self._size == 0: raise IndexError("empty")
+        self._tail = (self._tail - 1 + self._cap) % self._cap
+        v = self._a[self._tail]; self._a[self._tail] = None
+        self._size -= 1; return v
+
+    def front(self): 
+        if self._size == 0: raise IndexError("empty")
+        return self._a[self._head]
+
+    def back(self):
+        if self._size == 0: raise IndexError("empty")
+        return self._a[(self._tail - 1 + self._cap) % self._cap]
+
+    def isEmpty(self): return self._size == 0
+    def size(self):    return self._size</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>Using <code>ArrayDeque</code> (standard library)</summary>
+<pre>import java.util.ArrayDeque;
+import java.util.Deque;
+
+Deque&lt;Integer&gt; dq = new ArrayDeque&lt;&gt;();
+dq.addLast(10);     // push_back
+dq.addFirst(5);     // push_front
+int x = dq.removeLast();   // pop_back
+int y = dq.removeFirst();  // pop_front
+int f = dq.getFirst();     // front
+int b = dq.getLast();      // back
+int n = dq.size();</pre>
+        </details>
+
+        <details>
+          <summary>Minimal linked-list deque (educational)</summary>
+<pre>public class LinkedDeque&lt;T&gt; {
+  private static class Node&lt;T&gt;{ T v; Node&lt;T&gt; p,n; Node(T v){this.v=v;} }
+  private Node&lt;T&gt; head, tail; private int size;
+  public void pushFront(T x){ Node&lt;T&gt; a=new Node&lt;&gt;(x);
+    if(head==null){ head=tail=a; } else { a.n=head; head.p=a; head=a; } size++; }
+  public void pushBack(T x){ Node&lt;T&gt; a=new Node&lt;&gt;(x);
+    if(tail==null){ head=tail=a; } else { a.p=tail; tail.n=a; tail=a; } size++; }
+  public T popFront(){ if(size==0) throw new java.util.NoSuchElementException();
+    T v=head.v; head=head.n; if(head!=null) head.p=null; else tail=null; size--; return v; }
+  public T popBack(){ if(size==0) throw new java.util.NoSuchElementException();
+    T v=tail.v; tail=tail.p; if(tail!=null) tail.n=null; else head=null; size--; return v; }
+  public T front(){ if(size==0) throw new java.util.NoSuchElementException(); return head.v; }
+  public T back(){ if(size==0) throw new java.util.NoSuchElementException(); return tail.v; }
+  public int size(){ return size; } public boolean isEmpty(){ return size==0; }
+}</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>Using <code>std::deque</code> (standard library)</summary>
+<pre>#include &lt;deque&gt;
+#include &lt;iostream&gt;
+int main(){
+  std::deque&lt;int&gt; dq;
+  dq.push_back(10); dq.push_front(5);
+  std::cout &lt;&lt; dq.front() &lt;&lt; " " &lt;&lt; dq.back() &lt;&lt; "\n";
+  dq.pop_front(); dq.pop_back();
+}</pre>
+        </details>
+
+        <details>
+          <summary>Minimal circular-buffer deque (educational)</summary>
+<pre>#include &lt;vector&gt;
+#include &lt;stdexcept&gt;
+template&lt;typename T&gt; class ArrayDeque {
+  std::vector&lt;T&gt; a; size_t head=0, tail=0, cnt=0;
+public:
+  explicit ArrayDeque(size_t cap=8): a(cap) {}
+  size_t capacity() const { return a.size(); }
+  size_t size() const { return cnt; }
+  bool empty() const { return cnt==0; }
+  void grow(){ std::vector&lt;T&gt; b(a.size()*2);
+    for(size_t i=0;i&lt;cnt;i++) b[i]=a[(head+i)%a.size()];
+    a.swap(b); head=0; tail=cnt; }
+  void push_back(const T&amp; x){ if(cnt==a.size()) grow(); a[tail]=x; tail=(tail+1)%a.size(); ++cnt; }
+  void push_front(const T&amp; x){ if(cnt==a.size()) grow(); head=(head-1+a.size())%a.size(); a[head]=x; ++cnt; }
+  T pop_front(){ if(!cnt) throw std::runtime_error("empty"); T v=a[head]; head=(head+1)%a.size(); --cnt; return v; }
+  T pop_back(){ if(!cnt) throw std::runtime_error("empty"); tail=(tail-1+a.size())%a.size(); T v=a[tail]; --cnt; return v; }
+  const T&amp; front() const { if(!cnt) throw std::runtime_error("empty"); return a[head]; }
+  const T&amp; back()  const { if(!cnt) throw std::runtime_error("empty"); return a[(tail-1+a.size())%a.size()]; }
+};</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Conceptual Questions</h2></div>
+      <div class="bd">
+        <ol>
+          <li>In a circular-buffer deque with capacity <code>C</code>, why does <code>tail = (head + size) mod C</code> always hold?</li>
+          <li>Would it be helpful to have <code>head</code> and <code>tail</code> start in the middle? Why or why not?</li>
+          <li>If <code>C = 8</code>, <code>head = 6</code>, <code>tail = 2</code>, what is <code>size</code>?</li>
+          <li>Compare handling a full deque by (a) rejecting, (b) resizing (doubling). What are the time/space trade-offs?</li>
+          <li>Why can array-backed deques beat linked-list deques in practice despite occasional resizing?</li>
+          <li>How would you distinguish “empty” vs “full” without a stored <code>size</code>? (Hint: sentinel gap or version bit.)</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const qs=s=>document.querySelector(s); const qsa=s=>Array.from(document.querySelectorAll(s));
+  const cellsG=qs('#cells'), markersG=qs('#markers');
+  const kSize=qs('#kSize'), kCap=qs('#kCap'), kHead=qs('#kHead'), kTail=qs('#kTail');
+  const val=qs('#val'); const capInput=qs('#capInput'); const autoResize=qs('#autoResize'); const statusEl=qs('#status');
+
+  let cap=8, a=new Array(cap).fill(undefined), head=0, tail=0, size=0, history=[];
+  let originalState=null;
+
+  const tracer={ idx:0, timer:null, lines:[
+    'push_back(x):',
+    '  if size == capacity: grow()',
+    '  A[tail] <- x',
+    '  tail <- (tail + 1) mod capacity',
+    '  size <- size + 1',
+    '',
+    'push_front(x):',
+    '  if size == capacity: grow()',
+    '  head <- (head - 1 + capacity) mod capacity',
+    '  A[head] <- x',
+    '  size <- size + 1',
+    '',
+    'pop_front():',
+    '  assert size > 0',
+    '  v <- A[head]; A[head] <- ⌀',
+    '  head <- (head + 1) mod capacity',
+    '  size <- size - 1; return v',
+    '',
+    'pop_back():',
+    '  assert size > 0',
+    '  tail <- (tail - 1 + capacity) mod capacity',
+    '  v <- A[tail]; A[tail] <- ⌀',
+    '  size <- size - 1; return v'
+  ]};
+  const pseudo=qs('#pseudo');
+  function renderPseudo(){ pseudo.innerHTML = tracer.lines.map((ln,i)=> i===tracer.idx?`<div class="hl">${ln}</div>`:`<div>${ln}</div>`).join(''); }
+
+  const code=qs('#code');
+  const snippets={
+    cpp:`#include <deque>\nstd::deque<int> dq;\n// push\ndq.push_front(3); dq.push_back(9);\n// pop\ndq.pop_front(); dq.pop_back();`,
+    java:`import java.util.ArrayDeque;\nArrayDeque<Integer> dq = new ArrayDeque<>();\ndq.addFirst(3); dq.addLast(9);\ndq.removeFirst(); dq.removeLast();`,
+    py:`from collections import deque\ndq = deque()\ndq.appendleft(3); dq.append(9)\ndq.popleft(); dq.pop()`
+  };
+  function highlight(lang, s) {
+  s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const stash=[]; const STX='\u0002', ETX='\u0003';
+  const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+
+  if (lang==='cpp' || lang==='java'){
+    s = s
+      .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+      .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+      .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+    s = s
+      .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+      .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  } else {
+    s = s
+      .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+      .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+    s = s
+      .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+      .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  }
+  s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+  return s;
+}
+  let currentLang='cpp';
+  function renderCode(){ code.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  qsa('.codeTabs button').forEach(b=>b.onclick=()=>{ qsa('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); });
+
+  function draw(){
+    cellsG.innerHTML=''; markersG.innerHTML='';
+    const W=720, x0=20, y0=40, cellW=Math.floor((W-40)/cap), cellH=48;
+    for(let i=0;i<cap;i++){
+      const x=x0+i*cellW;
+      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',x); rect.setAttribute('y',y0); rect.setAttribute('width',cellW-6); rect.setAttribute('height',cellH);
+      rect.setAttribute('rx',10); rect.setAttribute('fill', a[i]===undefined? '#0f1730':'url(#g1)'); rect.setAttribute('stroke','#26345f');
+      cellsG.appendChild(rect);
+      const idx=document.createElementNS('http://www.w3.org/2000/svg','text');
+      idx.setAttribute('x',x+(cellW-6)/2); idx.setAttribute('y',y0+cellH+14); idx.setAttribute('text-anchor','middle'); idx.setAttribute('font-size','10'); idx.setAttribute('fill','#cfe3ff');
+      idx.textContent=i; cellsG.appendChild(idx);
+      if(a[i]!==undefined){
+        const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x',x+(cellW-6)/2); t.setAttribute('y',y0+cellH/2+4); t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','14'); t.setAttribute('fill','#001523');
+        t.textContent=a[i]; cellsG.appendChild(t);
+      }
+    }
+    function marker(label,i,dy,color){
+      const x=x0+i*cellW+(cellW-6)/2; const y=y0-16+dy;
+      const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',x); text.setAttribute('y',y); text.setAttribute('text-anchor','middle'); text.setAttribute('font-size','12'); text.setAttribute('fill',color);
+      text.textContent=label; markersG.appendChild(text);
+      const tri=document.createElementNS('http://www.w3.org/2000/svg','path');
+      tri.setAttribute('d',`M ${x-8} ${y+4} L ${x+8} ${y+4} L ${x} ${y+12} Z`); tri.setAttribute('fill',color); tri.setAttribute('opacity','0.75'); markersG.appendChild(tri);
+    }
+    marker('head',head,0,'#6ec3ff'); marker('tail',tail,18,'#8fffda');
+
+    kSize.textContent=size; kCap.textContent=cap; kHead.textContent=head; kTail.textContent=tail;
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg || ''; }
+  function snapshot(){ history.push({a:a.slice(), head, tail, size, cap, auto:autoResize.checked}); }
+  function ensureCapacity(){
+    if(size<cap) return true;
+    if(!autoResize.checked){ setStatus('Deque is full. Enable auto-resize or increase capacity.'); return false; }
+    resize(cap*2); setStatus('Auto-resize doubled capacity.'); return true;
+  }
+  function resize(newCap){
+    const b=new Array(newCap).fill(undefined);
+    for(let i=0;i<size;i++){ b[i]=a[(head+i)%cap]; }
+    a=b; cap=newCap; head=0; tail=size; capInput.value=cap;
+  }
+
+  function animate(kind){
+    const map={push_back:[0,4], push_front:[6,10], pop_front:[12,16], pop_back:[18,22]};
+    const r=map[kind]; tracer.idx=r[0]; renderPseudo(); let i=r[0];
+    clearInterval(tracer.timer);
+    tracer.timer=setInterval(()=>{ i++; tracer.idx=i; renderPseudo(); if(i>=r[1]) clearInterval(tracer.timer); }, 250);
+  }
+  function push_back(x){
+    if(size===cap && !ensureCapacity()) return;
+    snapshot(); a[tail]=x; tail=(tail+1)%cap; size++; animate('push_back'); draw(); setStatus('');
+  }
+  function push_front(x){
+    if(size===cap && !ensureCapacity()) return;
+    snapshot(); head=(head-1+cap)%cap; a[head]=x; size++; animate('push_front'); draw(); setStatus('');
+  }
+  function pop_front(){
+    if(size===0){ setStatus('Deque is empty.'); return; }
+    snapshot(); const v=a[head]; a[head]=undefined; head=(head+1)%cap; size--; animate('pop_front'); draw(); val.value=v; setStatus(''); return v;
+  }
+  function pop_back(){
+    if(size===0){ setStatus('Deque is empty.'); return; }
+    snapshot(); tail=(tail-1+cap)%cap; const v=a[tail]; a[tail]=undefined; size--; animate('pop_back'); draw(); val.value=v; setStatus(''); return v;
+  }
+
+  qs('#pushBack').onclick=()=>{ const x=val.value||String(Math.floor(Math.random()*90+10)); push_back(x); };
+  qs('#pushFront').onclick=()=>{ const x=val.value||String(Math.floor(Math.random()*90+10)); push_front(x); };
+  qs('#popFront').onclick=()=>{ pop_front(); };
+  qs('#popBack').onclick=()=>{ pop_back(); };
+  qs('#peekFront').onclick=()=>{ if(size) val.value=a[head]; else setStatus('Deque is empty.'); };
+  qs('#peekBack').onclick=()=>{ if(size) val.value=a[(tail-1+cap)%cap]; else setStatus('Deque is empty.'); };
+
+  qs('#clearBtn').onclick=()=>{ 
+    if(!originalState) return;
+    snapshot();
+    ({cap, head, tail, size} = originalState);
+    a = originalState.a.slice();
+    autoResize.checked = originalState.auto;
+    capInput.value = cap;
+    draw(); setStatus('Reset to original state.');
+  };
+
+  qs('#undoBtn').onclick=()=>{ 
+    const s=history.pop(); 
+    if(!s) return; 
+    ({a, head, tail, size, cap} = JSON.parse(JSON.stringify(s)));
+    autoResize.checked = s.auto;
+    capInput.value=cap; draw(); setStatus('Undid last change.'); 
+  };
+
+  qs('#randomBtn').onclick=()=>{ 
+    if(size===0){ setStatus('Nothing to randomize (deque is empty).'); return; }
+    snapshot();
+    const s=size;
+    const b=new Array(cap).fill(undefined);
+    for(let i=0;i<s;i++){ b[i]=Math.floor(Math.random()*99); }
+    a=b; head=0; tail=s%cap; size=s;
+    draw(); setStatus('Randomized values (size preserved).'); 
+  };
+
+  qs('#applyCap').onclick=()=>{ 
+    let v=parseInt(capInput.value,10); 
+    if(!Number.isFinite(v)||v<4) v=4; 
+    if(v < size){ setStatus(`Cannot set capacity to ${v}; current size is ${size}.`); capInput.value = cap; return; }
+    if(v===cap){ setStatus('Capacity unchanged.'); return; }
+    snapshot(); resize(v); draw(); setStatus('Applied capacity.'); 
+  };
+
+  renderPseudo(); renderCode(); draw();
+
+  [3,7,12].forEach(x=>push_back(x));
+
+  originalState = {
+    a: a.slice(),
+    cap, head, tail, size,
+    auto: autoResize.checked
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tries (Prefix Trees) · learnDataStructures</title>
+<link rel="canonical" href="https://learndatastructures.org/tries.html" />
+
+<meta name="description" content="Learn Tries (prefix trees): O(L) insert/search, autocomplete, delete. Standard vs compressed (radix) vs TST. Interactive simulator + Python/Java/C++ code." />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Tries (Prefix Trees) · learnDataStructures" />
+<meta property="og:description" content="Learn Tries (prefix trees): O(L) insert/search, autocomplete, delete. Standard vs compressed (radix) vs TST. Interactive simulator + Python/Java/C++ code." />
+<meta property="og:url" content="https://learndatastructures.org/tries.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Trie (prefix tree) learning page with simulator and code examples" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tries (Prefix Trees) · learnDataStructures" />
+<meta name="twitter:description" content="Learn Tries (prefix trees): O(L) insert/search, autocomplete, delete. Standard vs compressed (radix) vs TST. Interactive simulator + Python/Java/C++ code." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="learnDataStructures">
+<meta property="og:title" content="Tries (Prefix Trees) · learnDataStructures">
+<meta property="og:description" content="Learn Tries (prefix trees): O(L) insert/search, autocomplete, and delete. Explore standard, compressed, and TST variants with an interactive simulator and code in Python, Java, C++.">
+<meta property="og:image" content="/open.png">
+
+
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:120px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0; flex-wrap:wrap}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    svg{display:block; width:100%; height:520px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .node{cursor:pointer}
+    .node text{font-size:12px; fill:#001523; pointer-events:none}
+    .node .terminal{stroke:#ffd166; stroke-width:2}
+    .edgeLabel{font-size:11px; fill:#dbe7ff; paint-order:stroke; stroke:#0a1630; stroke-width:2px}
+    .found circle{stroke:#ffd166; stroke-width:3}
+    .sideCol{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .list{background:#0f1732; border:1px solid var(--stroke); border-radius:8px; padding:8px; max-height:128px; overflow:auto; min-width:160px}
+    .muted{color:#a8b2c9}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Trie (Prefix Tree)</h2></div>
+      <div class="bd">
+        <h3>What is a Trie?</h3>
+        <p>A <strong>Trie</strong> (pronounced “try”), or <em>prefix tree</em>, stores a set of <strong>strings</strong> by sharing their prefixes. Each edge is labeled by a character; walking from the root and reading labels spells prefixes. We mark nodes where <em>a word ends</em> (a boolean flag, often called <code>isWord</code> or <code>end</code>).</p>
+        <ul>
+          <li>In this page we restrict the alphabet to lowercase <code>a..z</code> and auto-lowercase user input.</li>
+          <li>Unlike a BST that compares whole keys, a Trie compares characters incrementally. The time depends on <em>word length</em>, not on the number of words.</li>
+        </ul>
+
+        <h3>Core operations (high level)</h3>
+        <ul>
+          <li><strong>Insert(word)</strong>: walk characters; create a child if missing; mark the last node as <code>end=true</code>.</li>
+          <li><strong>Search(word)</strong> (exact): walk characters; return true iff you end at a node with <code>end=true</code>.</li>
+          <li><strong>StartsWith(prefix)</strong>: walk characters; return true if you didn’t fall off the tree.</li>
+          <li><strong>Autocomplete(prefix, k)</strong>: find the prefix node, then DFS/BFS to collect up to <code>k</code> words.</li>
+          <li><strong>Delete(word)</strong> (this page): <em>unmark</em> the end flag; then <em>prune</em> any nodes that became useless (no children and not an end).</li>
+        </ul>
+
+        <h3>Complexities (alphabet size σ=26)</h3>
+        <table>
+          <thead><tr><th>Operation</th><th>Time</th><th>Space (per insert)</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>insert / search / startsWith</td><td>O(L)</td><td>O(L)</td><td>L = length of word/prefix</td></tr>
+            <tr><td>autocomplete (k results)</td><td>O(L + k·avgLen)</td><td>—</td><td>Traverse prefix then collect</td></tr>
+            <tr><td>delete</td><td>O(L)</td><td>—</td><td>Unmark + prune unused nodes</td></tr>
+            <tr><td>memory</td><td>—</td><td>O(total chars)</td><td>Prefix sharing saves space; compare to HashSet strings</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Variants</h3>
+        <ul>
+          <li><strong>Standard Trie</strong>: each node has up to σ children (σ = size of alphabet, 26 for lowercase english letters, 128 for ASCII).</li>
+          <li><strong>Compressed/Radix Trie</strong>: compress runs of single-child edges into one edge labeled by a string segment. Same queries; better memory.</li>
+          <li><strong>Ternary Search Tree (TST)</strong>: BST over characters in each node (<code>char c; left &lt; c &lt; right; eq to advance</code>). Space-efficient with sorted-array performance characteristics.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- MAIN -->
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Trie — reference & pseudocode</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Pseudocode (insert, search, startsWith, autocomplete, delete)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          <span class="badgePill">Alphabet: a..z (auto-lowercase)</span>
+          <span class="badgePill">Delete = unmark + prune</span>
+          <span class="badgePill">Autocomplete = DFS from prefix</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive Trie simulator</h2>
+        <div class="tiny">words: <span id="kWords">0</span> · nodes: <span id="kNodes">0</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="nodeGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <g id="edges"></g>
+          <g id="labels"></g>
+          <g id="nodes"></g>
+          <g id="overlay"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <input id="wordInput" type="text" placeholder="word (a..z)" />
+          <button class="btn primary" id="insertBtn">insert</button>
+          <button class="btn" id="searchBtn">search</button>
+          <button class="btn danger" id="deleteBtn">delete</button>
+          <button class="btn" id="randomBtn">random 8</button>
+          <button class="btn" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+        </div>
+
+        <div class="sideCol" style="margin:6px 0">
+          <input id="wordInput" type="text" placeholder="word (a..z)" maxlength="7" />
+          <input id="prefixInput" type="text" placeholder="prefix (a..z)" maxlength="7" />
+
+          <button class="btn" id="startBtn">startsWith?</button>
+          <button class="btn" id="autoBtn">autocomplete (top-10)</button>
+          <span class="tiny muted" id="autoCount"></span>
+          <div class="list" id="autoList"></div>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Variants</h2></div>
+      <div class="bd">
+        <h3>Standard Trie (map children)</h3>
+
+        <h4>Python</h4>
+        <details open>
+          <summary>Trie using <code>dict</code> children</summary>
+<pre>
+class Node:
+    __slots__ = ("end","ch")
+    def __init__(self): self.end=False; self.ch={}
+class Trie:
+    def __init__(self): self.root=Node()
+    def insert(self, w: str) -&gt; None:
+        u=self.root
+        for c in w:
+            if c not in u.ch: u.ch[c]=Node()
+            u=u.ch[c]
+        u.end=True
+    def search(self, w: str) -&gt; bool:
+        u=self.root
+        for c in w:
+            u=u.ch.get(c); 
+            if u is None: return False
+        return u.end
+    def startsWith(self, p: str) -&gt; bool:
+        u=self.root
+        for c in p:
+            u=u.ch.get(c)
+            if u is None: return False
+        return True
+    def delete(self, w: str) -&gt; None:
+        def rec(u,i):
+            if i==len(w):
+                if not u.end: return False, False
+                u.end=False
+                return True, (not u.ch)
+            c=w[i]
+            v=u.ch.get(c)
+            if v is None: return False, False
+            existed, prune = rec(v,i+1)
+            if prune: u.ch.pop(c, None)
+            return existed, (not u.end and not u.ch)
+        rec(self.root,0)
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>Trie using <code>HashMap&lt;Character,Node&gt;</code></summary>
+<pre>
+import java.util.*;
+
+class Trie {
+  static class Node {
+    boolean end;
+    Map&lt;Character,Node&gt; ch=new HashMap&lt;&gt;();
+  }
+  private final Node root=new Node();
+
+  public void insert(String w){
+    Node u=root;
+    for(char cc: w.toCharArray()){
+      char c=(char)('a'+(cc-'a'));             // assume cleaned to a..z
+      u.ch.putIfAbsent(c, new Node());
+      u=u.ch.get(c);
+    }
+    u.end=true;
+  }
+  public boolean search(String w){
+    Node u=root;
+    for(char c: w.toCharArray()){
+      u=u.ch.get(c);
+      if(u==null) return false;
+    }
+    return u.end;
+  }
+  public boolean startsWith(String p){
+    Node u=root;
+    for(char c: p.toCharArray()){
+      u=u.ch.get(c);
+      if(u==null) return false;
+    }
+    return true;
+  }
+  public void delete(String w){
+    rec(root,w,0);
+  }
+  private boolean rec(Node u, String w, int i){
+    if(i==w.length()){
+      if(!u.end) return false;
+      u.end=false;
+      return u.ch.isEmpty();
+    }
+    Node v=u.ch.get(w.charAt(i));
+    if(v==null) return false;
+    boolean prune = rec(v,w,i+1);
+    if(prune) u.ch.remove(w.charAt(i));
+    return !u.end && u.ch.isEmpty();
+  }
+}
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>Trie using <code>unordered_map&lt;char,Node*&gt;</code></summary>
+<pre>
+#include &lt;unordered_map&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Node{
+  bool end=false;
+  unordered_map&lt;char,Node*&gt; ch;
+};
+struct Trie{
+  Node* root = new Node();
+  void insert(const string&amp; w){
+    Node* u=root;
+    for(char c: w){
+      if(!u-&gt;ch.count(c)) u-&gt;ch[c]=new Node();
+      u=u-&gt;ch[c];
+    }
+    u-&gt;end=true;
+  }
+  bool search(const string&amp; w){
+    Node* u=root;
+    for(char c: w){ auto it=u-&gt;ch.find(c); if(it==u-&gt;ch.end()) return false; u=it-&gt;second; }
+    return u-&gt;end;
+  }
+  bool startsWith(const string&amp; p){
+    Node* u=root;
+    for(char c: p){ auto it=u-&gt;ch.find(c); if(it==u-&gt;ch.end()) return false; u=it-&gt;second; }
+    return true;
+  }
+  void erase(const string&amp; w){ rec(root,w,0); }
+  bool rec(Node* u, const string&amp; w, int i){
+    if(i==(int)w.size()){ if(!u-&gt;end) return false; u-&gt;end=false; return u-&gt;ch.empty(); }
+    auto it=u-&gt;ch.find(w[i]); if(it==u-&gt;ch.end()) return false;
+    bool prune = rec(it-&gt;second,w,i+1);
+    if(prune) u-&gt;ch.erase(w[i]);
+    return !u-&gt;end &amp;&amp; u-&gt;ch.empty();
+  }
+};
+</pre>
+        </details>
+
+        <h3>Compressed (Radix) Trie</h3>
+        <p>Edges carry <em>strings</em> instead of single chars. During traversal, we match the longest common prefix of the remaining query and the edge label.</p>
+
+        <details>
+          <summary>Pseudocode (radix insert/search)</summary>
+<pre>
+// Node has map&lt;char, (label, child)&gt;; label is string segment
+insert(w):
+  u = root
+  i = 0
+  while i &lt; len(w):
+    c = w[i]
+    if no edge from u starting with c: add edge (w[i..], new node end=true); return
+    (lab, v) = edge[u][c]
+    k = LCP(lab, w[i..])
+    if k == len(lab): u = v; i += k; continue
+    // split edge at k
+    mid = new node
+    edge[u][c] = (lab[0..k), mid]
+    edge[mid][lab[k]] = (lab[k..], v)
+    if k == len(w)-i: mid.end = true
+    else edge[mid][w[i+k]] = (w[i+k..], new node end=true)
+    return
+search(w):
+  u=root; i=0
+  while i &lt; len(w):
+    c=w[i]; if no edge[u][c]: return false
+    (lab,v)=edge[u][c]
+    if w[i..].startsWith(lab): i+=len(lab); u=v
+    else return false
+  return u.end
+</pre>
+        </details>
+
+        <h3>Ternary Search Tree (TST)</h3>
+        <p>Each node stores one character <code>c</code> and three pointers: <code>lo</code> for characters &lt; c, <code>eq</code> to advance to the next character (when equal), and <code>hi</code> for &gt; c. Words end by setting <code>end=true</code> at the node that matched the final character.</p>
+
+        <details>
+          <summary>Python TST</summary>
+<pre>
+class TNode:
+    __slots__=("c","lo","eq","hi","end")
+    def __init__(self,c): self.c=c; self.lo=self.eq=self.hi=None; self.end=False
+
+class TST:
+    def __init__(self): self.root=None
+    def insert(self, w):
+        def rec(u, i):
+            c=w[i]
+            if u is None: u=TNode(c)
+            if c &lt; u.c: u.lo = rec(u.lo,i)
+            elif c &gt; u.c: u.hi = rec(u.hi,i)
+            else:
+                if i+1==len(w): u.end=True
+                else: u.eq = rec(u.eq,i+1)
+            return u
+        if w: self.root = rec(self.root,0)
+    def search(self, w):
+        u=self.root; i=0
+        while u:
+            c=w[i]
+            if c &lt; u.c: u=u.lo
+            elif c &gt; u.c: u=u.hi
+            else:
+                if i+1==len(w): return u.end
+                i+=1; u=u.eq
+        return False
+</pre>
+        </details>
+
+        <details>
+          <summary>Java TST (core)</summary>
+<pre>
+class TST {
+  static class Node { char c; Node lo,eq,hi; boolean end; Node(char c){this.c=c;} }
+  Node root;
+  public void insert(String w){ root = ins(root,w,0); }
+  private Node ins(Node u, String w, int i){
+    char c=w.charAt(i);
+    if(u==null) u=new Node(c);
+    if(c&lt;u.c) u.lo=ins(u.lo,w,i);
+    else if(c&gt;u.c) u.hi=ins(u.hi,w,i);
+    else if(i+1==w.length()) u.end=true;
+    else u.eq=ins(u.eq,w,i+1);
+    return u;
+  }
+  public boolean search(String w){
+    Node u=root; int i=0;
+    while(u!=null){
+      char c=w.charAt(i);
+      if(c&lt;u.c) u=u.lo;
+      else if(c&gt;u.c) u=u.hi;
+      else { if(i+1==w.length()) return u.end; i++; u=u.eq; }
+    }
+    return false;
+  }
+}
+</pre>
+        </details>
+
+        <details>
+          <summary>C++ TST (core)</summary>
+<pre>
+struct TNode{ char c; bool end=false; TNode* lo=nullptr; TNode* eq=nullptr; TNode* hi=nullptr; TNode(char c):c(c){} };
+
+TNode* ins(TNode* u, const string&amp; w, int i){
+  char c=w[i];
+  if(!u) u=new TNode(c);
+  if(c&lt;u-&gt;c) u-&gt;lo=ins(u-&gt;lo,w,i);
+  else if(c&gt;u-&gt;c) u-&gt;hi=ins(u-&gt;hi,w,i);
+  else if(i+1==(int)w.size()) u-&gt;end=true;
+  else u-&gt;eq=ins(u-&gt;eq,w,i+1);
+  return u;
+}
+bool search(TNode* u, const string&amp; w){
+  int i=0;
+  while(u){
+    char c=w[i];
+    if(c&lt;u-&gt;c) u=u-&gt;lo;
+    else if(c&gt;u-&gt;c) u=u-&gt;hi;
+    else { if(i+1==(int)w.size()) return u-&gt;end; i++; u=u-&gt;eq; }
+  }
+  return false;
+}
+</pre>
+        </details>
+
+        <h3>“Library”/Idiomatic alternatives</h3>
+        <ul>
+          <li><strong>Python</strong>: for many problems, a <code>set</code> of words + <code>bisect</code> over a sorted list can do prefix ranges (<code>O(log n + k)</code>), but Tries win when many prefixes or character-by-character traversal is needed.</li>
+          <li><strong>Java</strong>: <code>TreeSet</code> supports <code>subSet(prefixRange)</code> to emulate prefix queries; <code>HashSet</code> for exact words.</li>
+          <li><strong>C++</strong>: <code>std::set</code>/<code>std::map</code> support prefix range via <code>lower_bound</code>/<code>upper_bound</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Concept Checks</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Explain why Trie <em>search</em> and <em>insert</em> are <code>O(L)</code> regardless of the number of words.</li>
+          <li>Show how <strong>delete</strong> unmarks and prunes without breaking other words that share prefixes.</li>
+          <li>Implement <strong>autocomplete</strong> and argue about <code>O(L + k)</code> behavior when results are limited to <code>k</code>.</li>
+          <li>Compare Standard Trie vs <strong>TST</strong> vs <strong>Compressed Trie</strong> on memory and constant factors.</li>
+          <li>LeetCode practice: “Implement Trie (Prefix Tree)”, “Design Add and Search Words (with ‘.’ wildcard)”, “Word Search II” (grid + Trie + backtracking).</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// Minimal Trie API (map-based children)
+#include <unordered_map>
+struct Node{ bool end=false; std::unordered_map<char,Node*> ch; };
+struct Trie{
+  Node* root = new Node();
+  void insert(const std::string& w);
+  bool search(const std::string& w);
+  bool startsWith(const std::string& p);
+  void erase(const std::string& w);
+};`,
+java:`// Minimal Trie API (HashMap children)
+class Trie {
+  static class Node { boolean end; java.util.Map<Character,Node> ch = new java.util.HashMap<>(); }
+  private final Node root = new Node();
+  public void insert(String w);
+  public boolean search(String w);
+  public boolean startsWith(String p);
+  public void delete(String w);
+}`,
+py:`# Minimal Trie API (dict children)
+class Node: 
+    def __init__(self): self.end=False; self.ch={}
+class Trie:
+    def __init__(self): self.root=Node()
+    def insert(self, w): ...
+    def search(self, w): ...
+    def startsWith(self, p): ...
+    def delete(self, w): ...`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const ps = [
+'// Alphabet a..z. All input lowercased.',
+'insert(word):',
+'  u = root',
+'  for c in word:',
+'    if c not in u.children: u.children[c] = new Node()',
+'    u = u.children[c]',
+'  u.end = true',
+'',
+'search(word):',
+'  u = root',
+'  for c in word:',
+'    if c not in u.children: return false',
+'    u = u.children[c]',
+'  return u.end',
+'',
+'startsWith(prefix):',
+'  u = root',
+'  for c in prefix:',
+'    if c not in u.children: return false',
+'    u = u.children[c]',
+'  return true',
+'',
+'autocomplete(prefix, k):',
+'  u = nodeFor(prefix); if u == null: return []',
+'  out = []',
+'  DFS(u, prefix):',
+'    if u.end: out.push(prefix); if out.size == k: return',
+'    for (c, v) in u.children sorted by c: DFS(v, prefix + c)',
+'  return out',
+'',
+'delete(word)  // unmark + prune',
+'  rec(u, i):',
+'    if i == len(word):',
+'      if not u.end: return (false, false)  // not present',
+'      u.end = false',
+'      return (true, u.children empty)',
+'    c = word[i]',
+'    if c not in u.children: return (false, false)',
+'    (existed, pruneChild) = rec(u.children[c], i+1)',
+'    if pruneChild: remove u.children[c]',
+'    return (existed, (not u.end) and (u.children empty))'
+  ];
+function renderPseudo(){
+  pseudoEl.innerHTML = ps.map(ln => `<div>${ln}</div>`).join('');
+}
+  renderPseudo();
+
+  const edgesG = document.querySelector('#edges');
+  const labelsG = document.querySelector('#labels');
+  const nodesG = document.querySelector('#nodes');
+  const overlayG = document.querySelector('#overlay');
+  const VIEW_W=760, VIEW_H=520, NODE_R=15, LEVEL_H=86;
+
+  const kWords=document.querySelector('#kWords');
+  const kNodes=document.querySelector('#kNodes');
+  const kOps=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+  const autoList=document.querySelector('#autoList');
+  const autoCount=document.querySelector('#autoCount');
+
+  const wordInput=document.querySelector('#wordInput');
+  const insertBtn=document.querySelector('#insertBtn');
+  const searchBtn=document.querySelector('#searchBtn');
+  const deleteBtn=document.querySelector('#deleteBtn');
+  const randomBtn=document.querySelector('#randomBtn');
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+
+  const prefixInput=document.querySelector('#prefixInput');
+  const startBtn=document.querySelector('#startBtn');
+  const autoBtn=document.querySelector('#autoBtn');
+
+  let ops=0, root=mkNode(), hist=[]; 
+  let q=[], busy=false;              
+
+  function mkNode(){ return {end:false, ch:Object.create(null), id:(mkNode._id=(mkNode._id||0)+1)}; }
+
+  function normalize(s){
+  return (s || '').toLowerCase().replace(/[^a-z]/g,'').slice(0, 7);
+}
+
+
+  function countNodes(u){ let c=1; for(const k in u.ch) c+=countNodes(u.ch[k]); return c; }
+  function countWords(u){ let c=u.end?1:0; for(const k in u.ch) c+=countWords(u.ch[k]); return c; }
+
+  function insertWord(w){
+  if (!w || w.length >= 8) return false; 
+  let u=root, added=false;
+  for (const c of w){
+    if(!u.ch[c]){ u.ch[c]=mkNode(); added=true; }
+    u=u.ch[c];
+  }
+  if(!u.end){ u.end=true; added=true; }
+  return added;
+}
+
+
+  function searchWord(w){
+    let u=root;
+    for(const c of w){ u=u.ch[c]; if(!u) return false; }
+    return !!u.end;
+  }
+
+  function startsWith(p){
+    let u=root;
+    for(const c of p){ u=u.ch[c]; if(!u) return false; }
+    return true;
+  }
+
+  function nodeForPrefix(p){
+    let u=root;
+    for(const c of p){ u=u.ch[c]; if(!u) return null; }
+    return u;
+  }
+
+  function deleteWord(w){
+    function rec(u,i){
+      if(i===w.length){
+        if(!u.end) return [false,false];
+        u.end=false;
+        return [true, Object.keys(u.ch).length===0];
+      }
+      const c=w[i];
+      const v=u.ch[c];
+      if(!v) return [false,false];
+      const [existed, prune] = rec(v,i+1);
+      if(prune) delete u.ch[c];
+      const canPrune = !u.end && Object.keys(u.ch).length===0;
+      return [existed, canPrune];
+    }
+    return rec(root,0)[0];
+  }
+
+  function autocomplete(p, k=10){
+    const u=nodeForPrefix(p);
+    if(!u) return [];
+    const out=[];
+    function dfs(x, prefix){
+      if(out.length>=k) return;
+      if(x.end) out.push(prefix);
+      const keys=Object.keys(x.ch).sort();
+      for(const c of keys){ dfs(x.ch[c], prefix+c); if(out.length>=k) break; }
+    }
+    dfs(u,p);
+    return out;
+  }
+
+  function serialize(u){
+    const kids={};
+    for(const c in u.ch) kids[c]=serialize(u.ch[c]);
+    return {e:u.end, k:kids};
+  }
+  function deserialize(s){
+    const u=mkNode(); u.end=s.e;
+    for(const c in s.k){ u.ch[c]=deserialize(s.k[c]); }
+    return u;
+  }
+  function saveSnap(){ hist.push(serialize(root)); if(hist.length>40) hist.shift(); }
+  function undo(){ const s=hist.pop(); if(s===undefined) return false; root=deserialize(s); draw(); return true; }
+
+  function layout(){
+    const pos=new Map();
+    let xi=0, maxX=0, maxY=0;
+    (function dfs(u,d){
+      if(!u) return;
+      const keys=Object.keys(u.ch).sort();
+      for(const c of keys) dfs(u.ch[c], d+1);
+      const px = 40 + (xi++)*34;
+      const py = 30 + d*86;
+      pos.set(u,{x:px,y:py});
+      maxX=Math.max(maxX,px); maxY=Math.max(maxY,py);
+    })(root,0);
+    return {pos, maxX, maxY};
+  }
+
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+  function draw(){
+    edgesG.innerHTML=''; labelsG.innerHTML=''; nodesG.innerHTML=''; overlayG.innerHTML='';
+    edgesG.removeAttribute('transform'); labelsG.removeAttribute('transform'); nodesG.removeAttribute('transform'); overlayG.removeAttribute('transform');
+
+    const words=countWords(root)-0;
+    kWords.textContent=String(words);
+    kNodes.textContent=String(countNodes(root));
+    kOps.textContent=String(ops);
+
+    const L=layout();
+    const margin=20;
+    const needW=L.maxX + NODE_R + margin;
+    const needH=L.maxY + NODE_R + margin;
+    const scaleX=Math.min(1,(VIEW_W-margin)/Math.max(margin,needW));
+    const scaleY=Math.min(1,(VIEW_H-margin)/Math.max(margin,needH));
+    const S=Math.min(scaleX,scaleY);
+    edgesG.setAttribute('transform',`scale(${S})`);
+    labelsG.setAttribute('transform',`scale(${S})`);
+    nodesG.setAttribute('transform',`scale(${S})`);
+    overlayG.setAttribute('transform',`scale(${S})`);
+
+    (function walk(u){
+      const p=L.pos.get(u);
+      const keys=Object.keys(u.ch).sort();
+      for(const c of keys){
+        const v=u.ch[c];
+        const pc=L.pos.get(v);
+        const path = mk('path', {
+  d: `M ${p.x} ${p.y+NODE_R} C ${p.x} ${(p.y+pc.y)/2} ${pc.x} ${(p.y+pc.y)/2} ${pc.x} ${pc.y-NODE_R}`,
+  stroke:'#37507f',
+  fill:'none'
+});
+        edgesG.appendChild(path);
+        const tx = (p.x+pc.x)/2;
+        const ty = (p.y+pc.y)/2 - 4;
+        const t=mk('text',{x:tx, y:ty, class:'edgeLabel', 'text-anchor':'middle'});
+        t.textContent=c;
+        labelsG.appendChild(t);
+        walk(v);
+      }
+    })(root);
+
+    (function walk(u){
+      const p=L.pos.get(u);
+const g = mk('g', { class:'node', transform:`translate(${p.x},${p.y})` });
+      const c=mk('circle',{r:NODE_R, fill:'url(#nodeGrad)', stroke:'#214064'});
+      if(u.end) c.setAttribute('class','terminal');
+      const t=mk('text',{y:4,'text-anchor':'middle'});
+      t.textContent = u===root ? '∅' : '';
+      g.appendChild(c); g.appendChild(t);
+      nodesG.appendChild(g);
+      const keys=Object.keys(u.ch).sort();
+      for(const k in u.ch) walk(u.ch[k]);
+    })(root);
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+  function pulseNode(u, color='var(--pulse)'){
+    const L=layout(); const p=L.pos.get(u); if(!p) return;
+    const r=mk('circle',{cx:p.x, cy:p.y, r:9, fill:color, opacity:.95, stroke:'#222','stroke-width':1});
+    overlayG.appendChild(r);
+    setTimeout(()=>{ r.remove(); }, 350);
+  }
+  function pulsePathFor(prefix){
+    let u=root;
+    pulseNode(u);
+    for(const c of prefix){
+      if(!u.ch[c]) return;
+      u=u.ch[c];
+      pulseNode(u);
+    }
+  }
+
+  function enqueue(fn){ q.push(fn); drain(); }
+  function drain(){
+    if(busy) return;
+    busy=true;
+    (function loop(){
+      const fn=q.shift();
+      if(!fn){ busy=false; return; }
+      try{ fn(); } catch(e){ console.error(e); setStatus('error: '+e.message); }
+      setTimeout(loop, 0);
+    })();
+  }
+
+  function getWord(){
+  const raw = (wordInput.value || '').toLowerCase();
+  const w = raw.replace(/[^a-z]/g,'');
+  if (w.length === 0){ setStatus('enter letters a..z'); return null; }
+  if (w.length >= 8){ setStatus('max length is 7 letters'); return null; }
+  return w;
+}
+function getPrefix(){
+  const raw = (prefixInput.value || '').toLowerCase();
+  const p = raw.replace(/[^a-z]/g,'');
+  if (p.length === 0){ setStatus('enter prefix a..z'); return null; }
+  if (p.length >= 8){ setStatus('max length is 7 letters'); return null; }
+  return p;
+}
+
+  function updateStats(){ kWords.textContent=String(countWords(root)); kNodes.textContent=String(countNodes(root)); }
+
+  insertBtn.onclick = ()=>enqueue(()=>{
+    const w=getWord(); if(!w) return;
+    saveSnap();
+    const added = insertWord(w);
+    ops++; draw();
+    if(added){ pulsePathFor(w); setStatus('inserted '+w); }
+    else setStatus('already present: '+w);
+  });
+
+  searchBtn.onclick = ()=>enqueue(()=>{
+    const w=getWord(); if(!w) return;
+    const ok=searchWord(w);
+    draw(); 
+    pulsePathFor(w);
+    setStatus(ok ? ('found '+w) : ('not found: '+w));
+  });
+
+  deleteBtn.onclick = ()=>enqueue(()=>{
+    const w=getWord(); if(!w) return;
+    saveSnap();
+    const ok=deleteWord(w);
+    ops++; draw();
+    setStatus(ok ? ('deleted '+w+' (unmark+prune)') : ('not found: '+w));
+  });
+
+  startBtn.onclick = ()=>enqueue(()=>{
+    const p = getPrefix(); if(!p) return;
+    const ok = startsWith(p);
+    pulsePathFor(p);
+    setStatus(ok ? ('has prefix '+p) : ('no words with prefix '+p));
+  });
+
+  function renderAutoList(items){
+    autoList.innerHTML='';
+    if(items.length===0){ autoList.textContent='(no suggestions)'; autoCount.textContent=''; return; }
+    const frag=document.createDocumentFragment();
+    for(const s of items){
+      const div=document.createElement('div'); div.textContent=s; frag.appendChild(div);
+    }
+    autoList.appendChild(frag);
+    autoCount.textContent = items.length+' shown';
+  }
+
+  autoBtn.onclick = ()=>enqueue(()=>{
+    const p = getPrefix(); if(!p) return;
+    const items = autocomplete(p, 10);
+    draw(); pulsePathFor(p);
+    renderAutoList(items);
+    setStatus(items.length ? ('autocomplete for "'+p+'"') : ('no suggestions for "'+p+'"'));
+  });
+
+  randomBtn.onclick = ()=>enqueue(()=>{
+  saveSnap();
+  root = mkNode(); 
+  const pool = ["cat","car","cart","card","care","dog","door","dot","dove","apple","ape","april","bat","bath","band","ban","cap","cape","zebra","zen","zoom","zone"];
+  const used=new Set();
+  let cnt=0;
+  while(cnt<8){
+    const s=pool[Math.floor(Math.random()*pool.length)];
+    if(used.has(s)) continue;
+    used.add(s);
+    insertWord(s);
+    cnt++;
+  }
+  ops++; draw(); setStatus('new random 8 inserted');
+});
+
+
+  clearBtn.onclick = ()=>enqueue(()=>{
+    saveSnap();
+    root=mkNode();
+    ops++; draw(); setStatus('cleared'); autoList.innerHTML=''; autoCount.textContent='';
+  });
+
+  undoBtn.onclick = ()=>enqueue(()=>{
+    if(undo()){ ops++; setStatus('undid last change'); autoList.innerHTML=''; autoCount.textContent=''; }
+    else setStatus('nothing to undo');
+  });
+
+  wordInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') insertBtn.click(); });
+  prefixInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') autoBtn.click(); });
+wordInput.addEventListener('input', ()=>{
+  wordInput.value = normalize(wordInput.value);
+});
+prefixInput.addEventListener('input', ()=>{
+  prefixInput.value = normalize(prefixInput.value);
+});
+
+  (function preload(){
+    const defaults = ["cat","car","dog","dot","ape"];
+    for(const w of defaults) insertWord(w);
+    draw();
+    setStatus('preloaded: '+defaults.slice(0,8).join(', ')+' …');
+  })();
+})();
+</script>
+</body>
+</html>

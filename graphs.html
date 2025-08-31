@@ -1,0 +1,1514 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Graphs · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/graphs.html" />
+<meta name="description" content="Interactive graphs primer: build directed/undirected, weighted/unweighted graphs; run BFS, DFS, topological sort, cycle & bipartite checks, components, and see adjacency lists/matrices." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Graphs · learnDataStructures" />
+<meta property="og:description" content="Create and explore graphs visually. Run BFS/DFS, toposort, cycle & bipartite checks, and generate an adjacency matrix." />
+<meta property="og:url" content="https://learndatastructures.org/graphs.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Interactive graph with nodes, edges, and traversal highlights" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Graphs · learnDataStructures" />
+<meta name="twitter:description" content="Hands-on graph algorithms: BFS, DFS, topological sort, cycles, bipartite, components, and adjacency matrix." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+      body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:120px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0; flex-wrap:wrap}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    svg{display:block; width:100%; height:520px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02); touch-action:none}
+    .node{cursor:pointer}
+    .node text{font-size:12px; fill:#001523; pointer-events:none}
+    .edgeLabel{font-size:12px; fill:#e7f0ff; text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .ghost{stroke-dasharray:4 4}
+    .found circle{stroke:#ffd166; stroke-width:3}
+    .matrix{width:100%; border-collapse:collapse; margin-top:8px}
+    .matrix td,.matrix th{border:1px solid var(--stroke); padding:6px; text-align:center}
+    .matrix th{background:var(--pane2)}
+    .matrix .fill{animation: pulse .5s ease}
+    @keyframes pulse{ from{background:#1b2b55} to{background:transparent} }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <!-- EXPLANATION -->
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Graphs — the essential toolbox</h2></div>
+      <div class="bd">
+        <h3>What is a graph?</h3>
+        <p>A <strong>graph</strong> is a set of <em>vertices</em> (a.k.a. nodes) connected by <em>edges</em>. You can model networks (maps, prerequisites, social links) with graphs.</p>
+        <ul>
+          <li><strong>Directed</strong> (digraph): edges have an arrow <code>u → v</code>. <strong>Undirected</strong>: edges are two-way <code>u — v</code>.</li>
+          <li><strong>Weighted</strong>: each edge has a non-negative weight (we allow integers). <strong>Unweighted</strong>: all weights are <code>1</code>.</li>
+          <li><strong>Adjacent</strong>: <code>u</code> and <code>v</code> share an edge. <strong>Degree</strong> of <code>v</code>: number of incident edges (for directed: in-degree / out-degree).</li>
+          <li><strong>Path</strong>: sequence of vertices where consecutive vertices share an edge. <strong>Cycle</strong>: path that starts and ends at the same vertex (length ≥ 1).</li>
+          <li><strong>Connected</strong> (undirected): there is a path between every pair. For directed, we distinguish <strong>strongly</strong> vs <strong>weakly</strong> connected.</li>
+        </ul>
+
+        <h3>Representations</h3>
+        <ul>
+          <li><strong>Adjacency list</strong>: for each vertex, store its neighbors (and weights). Space <code>O(n + m)</code>. Great for sparse graphs.</li>
+          <li><strong>Adjacency matrix</strong>: <code>n × n</code> table where entry <code>[i][j]</code> is 1 (or weight) if edge <code>i→j</code> exists; else 0/∞. Space <code>O(n²)</code>. Great for dense graphs and instant <code>hasEdge(i,j)</code>.</li>
+        </ul>
+
+        <h3>Traversals</h3>
+        <ul>
+          <li><strong>BFS</strong> (breadth-first search): explores in layers using a queue. On unweighted graphs, BFS gives <em>shortest path length (in edges)</em> from a start.</li>
+          <li><strong>DFS</strong> (depth-first search): explores along a branch using a stack/recursion. Useful for cycle detection, topological sort, and component discovery.</li>
+        </ul>
+
+        <h3>Other core tasks</h3>
+        <ul>
+          <li><strong>Topological sort</strong> (DAG only): a linear order where every directed edge goes left→right. We show Kahn’s algorithm (BFS on in-degrees).</li>
+          <li><strong>Cycle detection</strong>:
+            <ul>
+              <li>Undirected: DFS avoiding the parent — if you see an already-visited neighbor ≠ parent ⇒ cycle.</li>
+              <li>Directed: DFS with a 3-color/recursion stack — encountering a gray (in-stack) vertex ⇒ back edge ⇒ cycle.</li>
+            </ul>
+          </li>
+          <li><strong>Bipartite check</strong> (undirected): 2-coloring using BFS/DFS; if a conflict occurs, it’s not bipartite.</li>
+          <li><strong>Connected components</strong>: group vertices reachable from each other (via BFS/DFS) or via <strong>Union-Find (Disjoint Set Union)</strong>.</li>
+        </ul>
+
+        <h3>Complexities (adjacency list)</h3>
+        <table>
+          <thead><tr><th>Operation</th><th>Time</th><th>Space</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>BFS / DFS (all vertices)</td><td>O(n + m)</td><td>O(n)</td><td>Visit each vertex & edge once</td></tr>
+            <tr><td>Topological sort (Kahn)</td><td>O(n + m)</td><td>O(n)</td><td>Maintains queue of zero in-degree</td></tr>
+            <tr><td>Cycle detection (undirected)</td><td>O(n + m)</td><td>O(n)</td><td>DFS with parent</td></tr>
+            <tr><td>Cycle detection (directed)</td><td>O(n + m)</td><td>O(n)</td><td>DFS colors/stack</td></tr>
+            <tr><td>Bipartite check</td><td>O(n + m)</td><td>O(n)</td><td>BFS/DFS 2-color</td></tr>
+            <tr><td>Connected components</td><td>O(n + m)</td><td>O(n)</td><td>Using BFS/DFS or DSU</td></tr>
+            <tr><td>Adjacency matrix build</td><td>O(n²) fill + O(m) set</td><td>O(n²)</td><td>We animate the fill</td></tr>
+          </tbody>
+        </table>
+
+        <p class="tiny">
+          Need shortest paths (Dijkstra, A*, Bellman-Ford, BFS on unweighted)? See <code>dijkstra.html</code> (your lab).
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- MAIN -->
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Graphs — reference & pseudocode</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Pseudocode (BFS, DFS, topo, cycles, bipartite, components, DSU)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          <span class="badgePill">Adjacency list (default)</span>
+          <span class="badgePill">Directed/Undirected supported</span>
+          <span class="badgePill">Animated adjacency matrix</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive Graph Simulator</h2>
+        <div class="tiny">V: <span id="kV">0</span> · E: <span id="kE">0</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#7fb7ff"></path>
+            </marker>
+            <linearGradient id="nodeGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="overlay"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <label class="tiny">mode:</label>
+          <select id="modeSel">
+            <option value="add">Click to add node</option>
+            <option value="edge">Click two nodes to create edge</option>
+            <option value="erase">Erase (click node / click near edge)</option>
+            <option value="pan">Pan (disabled: we auto fit)</option>
+          </select>
+          <label class="tiny">graph:</label>
+          <select id="dirSel">
+            <option value="undirected">Undirected</option>
+            <option value="directed">Directed</option>
+          </select>
+          <label class="tiny">weights:</label>
+          <select id="wtSel">
+            <option value="unweighted">Unweighted</option>
+            <option value="weighted">Weighted</option>
+          </select>
+          <button class="btn" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+          <button class="btn" id="sampleBtn">sample</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <input id="startInput" type="number" min="0" placeholder="start vertex id" style="width:140px" />
+          <button class="btn" id="bfsBtn">BFS</button>
+          <button class="btn" id="dfsBtn">DFS</button>
+          <button class="btn" id="ccBtn">Connected Components</button>
+          <button class="btn" id="bipBtn">Bipartite?</button>
+          <button class="btn" id="cycBtn">Cycle?</button>
+          <button class="btn" id="topoBtn">Toposort</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+
+          <label class="tiny">animation delay</label>
+          <input id="speed" type="range" min="120" max="1200" step="40" value="480" />
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <button class="btn" id="matrixBtn">Generate adjacency matrix</button>
+          <span class="tiny" id="matrixNote">labels are vertex ids (0..)</span>
+        </div>
+        <div id="matrixWrap"></div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Notes</h2></div>
+      <div class="bd">
+        <h3>Implementations by Language (choose a variant)</h3>
+
+        <h4>Python</h4>
+        <details open>
+          <summary>Adjacency list + BFS/DFS/topo/cycles/bipartite/components</summary>
+<pre>
+from collections import deque, defaultdict
+
+class Graph:
+    def __init__(self, n, directed=False):
+        self.n = n
+        self.dir = directed
+        self.adj = [[] for _ in range(n)]   # (v, w) pairs if weighted
+
+    def add_edge(self, u, v, w=1):
+        self.adj[u].append((v, w))
+        if not self.dir:
+            self.adj[v].append((u, w))
+
+    def bfs(self, s):
+        vis=[False]*self.n; q=deque([s]); vis[s]=True; order=[]
+        while q:
+            u=q.popleft(); order.append(u)
+            for v,_ in self.adj[u]:
+                if not vis[v]: vis[v]=True; q.append(v)
+        return order
+
+    def dfs(self, s):
+        vis=[False]*self.n; order=[]
+        def go(u):
+            vis[u]=True; order.append(u)
+            for v,_ in self.adj[u]:
+                if not vis[v]: go(v)
+        go(s); return order
+
+    def topo_kahn(self):
+        indeg=[0]*self.n
+        for u in range(self.n):
+            for v,_ in self.adj[u]: indeg[v]+=1
+        from collections import deque
+        q=deque([i for i in range(self.n) if indeg[i]==0])
+        out=[]
+        while q:
+            u=q.popleft(); out.append(u)
+            for v,_ in self.adj[u]:
+                indeg[v]-=1
+                if indeg[v]==0: q.append(v)
+        return out if len(out)==self.n else None  # None if cycle
+
+    def has_cycle_undirected(self):
+        vis=[False]*self.n
+        def go(u,p):
+            vis[u]=True
+            for v,_ in self.adj[u]:
+                if not vis[v]:
+                    if go(v,u): return True
+                elif v!=p:
+                    return True
+            return False
+        for i in range(self.n):
+            if not vis[i] and go(i,-1): return True
+        return False
+
+    def has_cycle_directed(self):
+        color=[0]*self.n # 0=white,1=gray,2=black
+        def go(u):
+            color[u]=1
+            for v,_ in self.adj[u]:
+                if color[v]==1: return True
+                if color[v]==0 and go(v): return True
+            color[u]=2; return False
+        return any(color[i]==0 and go(i) for i in range(self.n))
+
+    def bipartite(self):
+        color=[-1]*self.n
+        from collections import deque
+        for s in range(self.n):
+            if color[s]!=-1: continue
+            color[s]=0; q=deque([s])
+            while q:
+                u=q.popleft()
+                for v,_ in self.adj[u]:
+                    if color[v]==-1:
+                        color[v]=color[u]^1; q.append(v)
+                    elif color[v]==color[u]:
+                        return False, None
+        return True, color
+
+    def components(self):
+        vis=[False]*self.n; comps=[]
+        for s in range(self.n):
+            if vis[s]: continue
+            stack=[s]; vis[s]=True; cur=[]
+            while stack:
+                u=stack.pop(); cur.append(u)
+                for v,_ in self.adj[u]:
+                    if not vis[v]: vis[v]=True; stack.append(v)
+            comps.append(cur)
+        return comps
+</pre>
+        </details>
+        <details>
+          <summary>Union-Find (Disjoint Set Union) for components</summary>
+<pre>
+class DSU:
+    def __init__(self, n):
+        self.p=list(range(n)); self.r=[0]*n
+    def find(self,x):
+        if self.p[x]!=x: self.p[x]=self.find(self.p[x])
+        return self.p[x]
+    def union(self,a,b):
+        ra,rb=self.find(a),self.find(b)
+        if ra==rb: return False
+        if self.r[ra]&lt;self.r[rb]: ra,rb=rb,ra
+        self.p[rb]=ra
+        if self.r[ra]==self.r[rb]: self.r[ra]+=1
+        return True
+</pre>
+        </details>
+        <details>
+          <summary>Library note: <code>networkx</code> equivalents</summary>
+<pre>
+# import networkx as nx
+# G = nx.Graph() or nx.DiGraph()
+# G.add_edge(u, v, weight=w)
+# list(nx.bfs_tree(G, s))
+# list(nx.dfs_preorder_nodes(G, s))
+# list(nx.topological_sort(DAG))
+# nx.is_directed_acyclic_graph(G)
+# nx.is_bipartite(G)
+# list(nx.connected_components(G))
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>Adjacency list + BFS/DFS/topo/cycles/bipartite/components</summary>
+<pre>
+import java.util.*;
+class Graph {
+  final int n; final boolean dir;
+  final ArrayList&lt;int[]&gt;[] adj; // (v,w)
+  @SuppressWarnings("unchecked")
+  Graph(int n, boolean dir){
+    this.n=n; this.dir=dir;
+    adj=new ArrayList[n];
+    for(int i=0;i&lt;n;i++) adj[i]=new ArrayList&lt;&gt;();
+  }
+  void addEdge(int u,int v,int w){
+    adj[u].add(new int[]{v,w});
+    if(!dir) adj[v].add(new int[]{u,w});
+  }
+  List&lt;Integer&gt; bfs(int s){
+    boolean[] vis=new boolean[n];
+    ArrayDeque&lt;Integer&gt; q=new ArrayDeque&lt;&gt;();
+    List&lt;Integer&gt; out=new ArrayList&lt;&gt;();
+    vis[s]=true; q.add(s);
+    while(!q.isEmpty()){
+      int u=q.poll(); out.add(u);
+      for(int[] e:adj[u]){ int v=e[0]; if(!vis[v]){ vis[v]=true; q.add(v); } }
+    }
+    return out;
+  }
+  List&lt;Integer&gt; dfs(int s){
+    boolean[] vis=new boolean[n];
+    List&lt;Integer&gt; out=new ArrayList&lt;&gt;();
+    Deque&lt;Integer&gt; st=new ArrayDeque&lt;&gt;();
+    st.push(s);
+    while(!st.isEmpty()){
+      int u=st.pop();
+      if(vis[u]) continue; vis[u]=true; out.add(u);
+      List&lt;int[]&gt; nbrs=adj[u];
+      for(int i=nbrs.size()-1;i&gt;=0;i--){ int v=nbrs.get(i)[0]; if(!vis[v]) st.push(v); }
+    }
+    return out;
+  }
+  List&lt;Integer&gt; topoKahn(){
+    int[] indeg=new int[n];
+    for(int u=0;u&lt;n;u++) for(int[] e:adj[u]) indeg[e[0]]++;
+    ArrayDeque&lt;Integer&gt; q=new ArrayDeque&lt;&gt;();
+    for(int i=0;i&lt;n;i++) if(indeg[i]==0) q.add(i);
+    List&lt;Integer&gt; out=new ArrayList&lt;&gt;();
+    while(!q.isEmpty()){
+      int u=q.poll(); out.add(u);
+      for(int[] e:adj[u]){ int v=e[0]; if(--indeg[v]==0) q.add(v); }
+    }
+    return out.size()==n?out:null;
+  }
+  boolean hasCycleUndirected(){
+    boolean[] vis=new boolean[n];
+    for(int s=0;s&lt;n;s++){
+      if(vis[s]) continue;
+      ArrayDeque&lt;int[]&gt; st=new ArrayDeque&lt;&gt;(); // (u,parent)
+      st.push(new int[]{s,-1});
+      while(!st.isEmpty()){
+        int[] t=st.pop(); int u=t[0],p=t[1];
+        if(vis[u]) continue; vis[u]=true;
+        for(int[] e:adj[u]){
+          int v=e[0];
+          if(!vis[v]) st.push(new int[]{v,u});
+          else if(v!=p) return true;
+        }
+      }
+    }
+    return false;
+  }
+  boolean hasCycleDirected(){
+    int[] color=new int[n]; // 0 W,1 G,2 B
+    for(int s=0;s&lt;n;s++){
+      if(color[s]!=0) continue;
+      ArrayDeque&lt;int[]&gt; st=new ArrayDeque&lt;&gt;(); // (u,itIndex)
+      st.push(new int[]{s,0});
+      ArrayList&lt;Iterator&lt;int[]&gt;&gt; its=new ArrayList&lt;&gt;(Collections.nCopies(n,null));
+      while(!st.isEmpty()){
+        int[] t=st.peek(); int u=t[0]; int itIdx=t[1];
+        if(color[u]==0){ color[u]=1; its.set(u, adj[u].iterator()); }
+        Iterator&lt;int[]&gt; it=its.get(u);
+        if(it.hasNext()){
+          int v=it.next()[0];
+          if(color[v]==1) return true;
+          if(color[v]==0) st.push(new int[]{v,0});
+        }else{
+          color[u]=2; st.pop();
+        }
+      }
+    }
+    return false;
+  }
+  boolean bipartite(){
+    int[] col=new int[n];
+    Arrays.fill(col,-1);
+    for(int s=0;s&lt;n;s++){
+      if(col[s]!=-1) continue;
+      ArrayDeque&lt;Integer&gt; q=new ArrayDeque&lt;&gt;();
+      col[s]=0; q.add(s);
+      while(!q.isEmpty()){
+        int u=q.poll();
+        for(int[] e:adj[u]){
+          int v=e[0];
+          if(col[v]==-1){ col[v]=col[u]^1; q.add(v); }
+          else if(col[v]==col[u]) return false;
+        }
+      }
+    }
+    return true;
+  }
+  List&lt;List&lt;Integer&gt;&gt; components(){
+    boolean[] vis=new boolean[n];
+    List&lt;List&lt;Integer&gt;&gt; comps=new ArrayList&lt;&gt;();
+    for(int s=0;s&lt;n;s++){
+      if(vis[s]) continue;
+      ArrayDeque&lt;Integer&gt; st=new ArrayDeque&lt;&gt;();
+      st.push(s); vis[s]=true; List&lt;Integer&gt; cur=new ArrayList&lt;&gt;();
+      while(!st.isEmpty()){
+        int u=st.pop(); cur.add(u);
+        for(int[] e:adj[u]){ int v=e[0]; if(!vis[v]){ vis[v]=true; st.push(v); } }
+      }
+      comps.add(cur);
+    }
+    return comps;
+  }
+}
+</pre>
+        </details>
+        <details>
+          <summary>Union-Find (DSU)</summary>
+<pre>
+class DSU{
+  int[] p, r;
+  DSU(int n){ p=new int[n]; r=new int[n]; for(int i=0;i&lt;n;i++) p[i]=i; }
+  int find(int x){ return p[x]==x?x:(p[x]=find(p[x])); }
+  boolean union(int a,int b){
+    int ra=find(a), rb=find(b); if(ra==rb) return false;
+    if(r[ra]&lt;r[rb]){ int t=ra; ra=rb; rb=t; }
+    p[rb]=ra; if(r[ra]==r[rb]) r[ra]++; return true;
+  }
+}
+</pre>
+        </details>
+        <details>
+          <summary>Library note: Java Collections</summary>
+<pre>
+// Queue: ArrayDeque&lt;Integer&gt;
+// Priority queue (not needed here, but for SSSP): new PriorityQueue&lt;int[]&gt;(Comparator.comparingInt(a-&gt;a[1]));
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>Adjacency list + BFS/DFS/topo/cycles/bipartite/components</summary>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+struct Graph{
+  int n; bool dir; vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj;
+  Graph(int n,bool dir):n(n),dir(dir),adj(n){}
+  void add_edge(int u,int v,int w=1){
+    adj[u].push_back({v,w});
+    if(!dir) adj[v].push_back({u,w});
+  }
+  vector&lt;int&gt; bfs(int s){
+    vector&lt;int&gt; vis(n); queue&lt;int&gt; q; vector&lt;int&gt; out;
+    vis[s]=1; q.push(s);
+    while(!q.empty()){
+      int u=q.front(); q.pop(); out.push_back(u);
+      for(auto [v,w]:adj[u]) if(!vis[v]){ vis[v]=1; q.push(v); }
+    }
+    return out;
+  }
+  vector&lt;int&gt; dfs(int s){
+    vector&lt;int&gt; vis(n); vector&lt;int&gt; out; stack&lt;int&gt; st; st.push(s);
+    while(!st.empty()){
+      int u=st.top(); st.pop();
+      if(vis[u]) continue; vis[u]=1; out.push_back(u);
+      for(int i=(int)adj[u].size()-1;i&gt;=0;--i){ int v=adj[u][i].first; if(!vis[v]) st.push(v); }
+    }
+    return out;
+  }
+  vector&lt;int&gt; topo_kahn(){
+    vector&lt;int&gt; indeg(n); for(int u=0;u&lt;n;u++) for(auto [v,w]:adj[u]) indeg[v]++;
+    queue&lt;int&gt; q; for(int i=0;i&lt;n;i++) if(indeg[i]==0) q.push(i);
+    vector&lt;int&gt; out;
+    while(!q.empty()){
+      int u=q.front(); q.pop(); out.push_back(u);
+      for(auto [v,w]:adj[u]) if(--indeg[v]==0) q.push(v);
+    }
+    if((int)out.size()!=n) return {};
+    return out;
+  }
+  bool has_cycle_undirected(){
+    vector&lt;int&gt; vis(n);
+    for(int s=0;s&lt;n;s++){
+      if(vis[s]) continue;
+      stack&lt;pair&lt;int,int&gt;&gt; st; st.push({s,-1});
+      while(!st.empty()){
+        auto [u,p]=st.top(); st.pop();
+        if(vis[u]) continue; vis[u]=1;
+        for(auto [v,w]:adj[u]){
+          if(!vis[v]) st.push({v,u});
+          else if(v!=p) return true;
+        }
+      }
+    }
+    return false;
+  }
+  bool has_cycle_directed(){
+    vector&lt;int&gt; color(n); // 0W,1G,2B
+    function&lt;bool(int)&gt; go = [&](int u){
+      color[u]=1;
+      for(auto [v,w]:adj[u]){
+        if(color[v]==1) return true;
+        if(color[v]==0 &amp;&amp; go(v)) return true;
+      }
+      color[u]=2; return false;
+    };
+    for(int i=0;i&lt;n;i++) if(color[i]==0 &amp;&amp; go(i)) return true;
+    return false;
+  }
+  bool bipartite(){
+    vector&lt;int&gt; col(n,-1);
+    for(int s=0;s&lt;n;s++){
+      if(col[s]!=-1) continue;
+      queue&lt;int&gt; q; col[s]=0; q.push(s);
+      while(!q.empty()){
+        int u=q.front(); q.pop();
+        for(auto [v,w]:adj[u]){
+          if(col[v]==-1){ col[v]=col[u]^1; q.push(v); }
+          else if(col[v]==col[u]) return false;
+        }
+      }
+    }
+    return true;
+  }
+  vector&lt;vector&lt;int&gt;&gt; components(){
+    vector&lt;int&gt; vis(n); vector&lt;vector&lt;int&gt;&gt; comps;
+    for(int s=0;s&lt;n;s++){
+      if(vis[s]) continue;
+      vector&lt;int&gt; cur; stack&lt;int&gt; st; st.push(s); vis[s]=1;
+      while(!st.empty()){
+        int u=st.top(); st.pop(); cur.push_back(u);
+        for(auto [v,w]:adj[u]) if(!vis[v]){ vis[v]=1; st.push(v); }
+      }
+      comps.push_back(cur);
+    }
+    return comps;
+  }
+};
+</pre>
+        </details>
+        <details>
+          <summary>Union-Find (DSU)</summary>
+<pre>
+struct DSU{
+  vector&lt;int&gt; p,r;
+  DSU(int n):p(n),r(n,0){ iota(p.begin(),p.end(),0); }
+  int find(int x){ return p[x]==x?x:p[x]=find(p[x]); }
+  bool unite(int a,int b){
+    a=find(a); b=find(b); if(a==b) return false;
+    if(r[a]&lt;r[b]) swap(a,b);
+    p[b]=a; if(r[a]==r[b]) r[a]++; return true;
+  }
+};
+</pre>
+        </details>
+        <details>
+          <summary>Library note: STL</summary>
+<pre>
+// queue&lt;int&gt;, stack&lt;int&gt;, vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt;, etc.
+// For shortest paths use priority_queue (see your dijkstra.html lab).
+</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Concept Checks</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Define vertex, edge, degree, path, cycle, directed vs. undirected, weighted vs. unweighted.</li>
+          <li>Explain when to prefer adjacency list vs adjacency matrix.</li>
+          <li>Run BFS and DFS from a start vertex; explain why BFS visits by layers and DFS goes deep.</li>
+          <li>Perform Kahn’s topological sort and show why it detects cycles when the result is shorter than <code>n</code>.</li>
+          <li>Detect cycles in undirected (parent check) and directed (gray/back edge) graphs.</li>
+          <li>Show a 2-coloring or give a counterexample for bipartite check.</li>
+          <li>Compute connected components by DFS and by Union-Find; discuss complexity.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// Minimal graph API (adjacency list)
+struct Graph{
+  int n; bool dir;
+  vector<vector<pair<int,int>>> adj; // (v, w)
+  Graph(int n,bool dir):n(n),dir(dir),adj(n){}
+  void add_edge(int u,int v,int w=1){
+    adj[u].push_back({v,w});
+    if(!dir) adj[v].push_back({u,w});
+  }
+  vector<int> bfs(int s);
+  vector<int> dfs(int s);
+  vector<int> topo_kahn(); // empty if cycle
+  bool has_cycle_undirected();
+  bool has_cycle_directed();
+  bool bipartite();
+  vector<vector<int>> components();
+};`,
+java:`// Minimal graph API (adjacency list)
+class Graph {
+  Graph(int n, boolean directed) { /* ... */ }
+  void addEdge(int u, int v, int w) { /* ... */ }
+  List<Integer> bfs(int s);
+  List<Integer> dfs(int s);
+  List<Integer> topoKahn();    // null if cycle
+  boolean hasCycleUndirected();
+  boolean hasCycleDirected();
+  boolean bipartite();
+  List<List<Integer>> components();
+}`,
+py:`# Minimal graph API (adjacency list)
+class Graph:
+    def __init__(self, n, directed=False): ...
+    def add_edge(self, u, v, w=1): ...
+    def bfs(self, s): ...
+    def dfs(self, s): ...
+    def topo_kahn(self): ...     # None if cycle
+    def has_cycle_undirected(self): ...
+    def has_cycle_directed(self): ...
+    def bipartite(self): ...
+    def components(self): ...`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface|null|true|false)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|Deque|List|Graph)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from|None|True|False)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+return s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),
+  (_, i) => `<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const ps = [
+'// BFS (unweighted shortest layers)',
+'BFS(G, s):',
+'  mark all unvisited; q = empty queue',
+'  vis[s]=true; enqueue(q, s)',
+'  while q not empty:',
+'    u = dequeue(q); visit(u)',
+'    for each (v) in G.neighbors(u):',
+'      if not vis[v]: vis[v]=true; enqueue(q, v)',
+'',
+'// DFS (preorder)',
+'DFS(G, s):',
+'  vis = all false',
+'  def go(u): vis[u]=true; visit(u)',
+'    for v in G.neighbors(u): if not vis[v]: go(v)',
+'  go(s)',
+'',
+'// Kahn topological sort (DAG only)',
+'TOPO(G):',
+'  indeg[v] = in-degree of v',
+'  q = all v with indeg[v]==0',
+'  out = []',
+'  while q not empty:',
+'    u = pop(q); append u to out',
+'    for v in G.neighbors(u):',
+'      indeg[v]-- ; if indeg[v]==0: push(q, v)',
+'  if |out| < |V|: cycle exists (no topo order)',
+'  return out',
+'',
+'// Cycle detection (undirected)',
+'HAS_CYCLE_UND(G):',
+'  def go(u, parent):',
+'    vis[u]=true',
+'    for v in G.neighbors(u):',
+'      if not vis[v] and go(v, u): return true',
+'      else if v != parent: return true',
+'    return false',
+'  for each component: if go(s, -1): return true',
+'  return false',
+'',
+'// Cycle detection (directed) — 3-color DFS',
+'HAS_CYCLE_DIR(G):',
+'  color[v]=WHITE',
+'  def go(u):',
+'    color[u]=GRAY',
+'    for v in G.neighbors(u):',
+'      if color[v]==GRAY: return true  // back edge',
+'      if color[v]==WHITE and go(v): return true',
+'    color[u]=BLACK; return false',
+'  for each v: if color[v]==WHITE and go(v): return true',
+'  return false',
+'',
+'// Bipartite check (undirected): BFS 2-color',
+'BIPARTITE(G):',
+'  color[v] = -1',
+'  for each component root s:',
+'    color[s]=0; q=[s]',
+'    while q:',
+'      u=pop(q)',
+'      for v in G.neighbors(u):',
+'        if color[v]==-1: color[v]=color[u]^1; push(q, v)',
+'        else if color[v]==color[u]: return false',
+'  return true',
+'',
+'// Connected components via DFS',
+'COMPONENTS(G):',
+'  vis=false; comps=[]',
+'  for v in V:',
+'    if not vis[v]: run DFS/BFS to collect component; push to comps',
+'',
+'// Union-Find (DSU) essentials',
+'FIND(x): if p[x]!=x: p[x]=FIND(p[x]); return p[x]',
+'UNION(a,b): ra=FIND(a), rb=FIND(b)',
+'  if ra==rb: return false',
+'  attach smaller rank under larger; inc rank if equal'
+  ];
+function renderPseudo(){
+  pseudoEl.innerHTML = ps.map(ln => `<div>${ln}</div>`).join('');
+}
+  renderPseudo();
+
+  const VIEW_W=760, VIEW_H=520, NODE_R=16;
+
+  const edgesG = document.querySelector('#edges');
+  const nodesG = document.querySelector('#nodes');
+  const overlayG = document.querySelector('#overlay');
+
+  const kV=document.querySelector('#kV');
+  const kE=document.querySelector('#kE');
+  const kOps=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+
+  const modeSel=document.querySelector('#modeSel');
+  const dirSel=document.querySelector('#dirSel');
+  const wtSel=document.querySelector('#wtSel');
+
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+  const sampleBtn=document.querySelector('#sampleBtn');
+
+  const startInput=document.querySelector('#startInput');
+  const bfsBtn=document.querySelector('#bfsBtn');
+  const dfsBtn=document.querySelector('#dfsBtn');
+  const ccBtn=document.querySelector('#ccBtn');
+  const bipBtn=document.querySelector('#bipBtn');
+  const cycBtn=document.querySelector('#cycBtn');
+  const topoBtn=document.querySelector('#topoBtn');
+
+//   const stepBtn=document.querySelector('#stepBtn');
+//   const runBtn=document.querySelector('#runBtn');
+//   const stopBtn=document.querySelector('#stopBtn');
+  const speed=document.querySelector('#speed');
+
+  const matrixBtn=document.querySelector('#matrixBtn');
+  const matrixWrap=document.querySelector('#matrixWrap');
+
+  let ops=0;
+  let graph = mkGraph(false, false); 
+  let history=[];
+
+  let anim = { list:[], i:0, timer:null, kind:'', meta:null };
+  let q=[], busy=false;
+
+  const LIMIT_V=30, LIMIT_E=120;
+
+  function mkGraph(directed, weighted){
+    return {
+      directed, weighted,
+      nodes:[], 
+      edges:[], 
+      nextId:0
+    };
+  }
+
+  function saveSnap(){
+    history.push(JSON.stringify(graph));
+    if(history.length>40) history.shift();
+  }
+  function undo(){
+    const s=history.pop();
+    if(!s) return false;
+    graph = JSON.parse(s);
+    draw();
+    return true;
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+  function within(x, a, b){ return Math.max(a, Math.min(b, x)); }
+  function dist2(ax,ay,bx,by){ const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; }
+  function byId(id){ return graph.nodes.find(n=>n.id===id); }
+  function edgeId(u,v){ return `${u}->${v}`; }
+
+  function recount(){
+    kV.textContent=String(graph.nodes.length);
+    kE.textContent=String(graph.edges.length);
+    kOps.textContent=String(ops);
+  }
+
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+    let lastFit = { S: 1, offsetX: 0, offsetY: 0 };
+  function draw(){
+  edgesG.innerHTML = '';
+  nodesG.innerHTML = '';
+  overlayG.innerHTML = '';
+
+  recount();
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of graph.nodes){
+    if (n.x < minX) minX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.x > maxX) maxX = n.x;
+    if (n.y > maxY) maxY = n.y;
+  }
+
+  const margin = 32;
+  let S = 1, offsetX = 0, offsetY = 0;
+
+  if (graph.nodes.length > 0){
+    const needW = (maxX - minX) + 2 * margin || 1; 
+    const needH = (maxY - minY) + 2 * margin || 1;
+    S = Math.min(1, Math.min(VIEW_W / needW, VIEW_H / needH));
+    offsetX = margin - minX;
+    offsetY = margin - minY;
+
+    const t = `translate(${offsetX},${offsetY}) scale(${S})`;
+    edgesG.setAttribute('transform', t);
+    nodesG.setAttribute('transform', t);
+    overlayG.setAttribute('transform', t);
+  } else {
+    edgesG.removeAttribute('transform');
+    nodesG.removeAttribute('transform');
+    overlayG.removeAttribute('transform');
+  }
+
+  lastFit = { S, offsetX, offsetY };
+
+  for (const e of graph.edges){
+    const a = byId(e.u), b = byId(e.v);
+    if (!a || !b) continue;
+
+    const ax = a.x, ay = a.y, bx = b.x, by = b.y;
+    const path = mk('path', {
+      d: `M ${ax} ${ay} L ${bx} ${by}`,
+      stroke: '#37507f',
+      fill: 'none',
+      'stroke-width': 2
+    });
+    if (graph.directed) path.setAttribute('marker-end', 'url(#arrow)');
+    else path.removeAttribute('marker-end');
+
+    path.dataset.id = e.id;
+    edgesG.appendChild(path);
+
+    const mx = (ax + bx) / 2, my = (ay + by) / 2;
+    const lbl = mk('text', { x: mx, y: my - 6, class: 'edgeLabel', 'text-anchor':'middle' });
+    lbl.textContent = graph.weighted ? String(e.w) : '';
+    edgesG.appendChild(lbl);
+  }
+
+  for (const n of graph.nodes){
+    const g = mk('g', { class:'node', transform:`translate(${n.x},${n.y})` });
+    const c = mk('circle', { r: NODE_R, fill:'url(#nodeGrad)', stroke:'#214064' });
+    const t = mk('text', { y: 4, 'text-anchor':'middle' });
+    t.textContent = String(n.id);
+    g.appendChild(c);
+    g.appendChild(t);
+    g.dataset.id = n.id;
+    nodesG.appendChild(g);
+  }
+}
+
+
+
+  function pulseNodeById(id, color='var(--pulse)'){
+    const n=byId(id); if(!n) return;
+    const r=mk('circle',{cx:n.x, cy:n.y, r:9, fill:color, opacity:.95, stroke:'#222','stroke-width':1});
+    overlayG.appendChild(r);
+    setTimeout(()=>{ r.remove(); }, Math.max(160, +speed.value-100));
+  }
+
+  function nodeAt(x,y){
+    for(const n of graph.nodes){
+      if(dist2(x,y,n.x,n.y) <= (NODE_R+4)*(NODE_R+4)) return n;
+    }
+    return null;
+  }
+  function edgeAt(x,y){
+    const TH=6;
+    for(const e of graph.edges){
+      const a=byId(e.u), b=byId(e.v);
+      if(!a || !b) continue;
+      const d = pointSegDist(a.x,a.y,b.x,b.y,x,y);
+      if(d<=TH) return e;
+    }
+    return null;
+  }
+  function pointSegDist(x1,y1,x2,y2, px,py){
+    const A=[x1,y1], B=[x2,y2], P=[px,py];
+    const vx=B[0]-A[0], vy=B[1]-A[1];
+    const wx=P[0]-A[0], wy=P[1]-A[1];
+    const c1= vx*wx + vy*wy;
+    if(c1<=0) return Math.hypot(px-x1, py-y1);
+    const c2= vx*vx + vy*vy;
+    if(c2<=c1) return Math.hypot(px-x2, py-y2);
+    const t=c1/c2;
+    const proj=[x1+t*vx, y1+t*vy];
+    return Math.hypot(px-proj[0], py-proj[1]);
+  }
+
+  const svg=document.querySelector('#vis');
+
+  let edgePick = { from: null, ring: null };
+
+  const MIN_NODE_GAP = NODE_R * 2 + 8;
+  function spotIsFree(x,y, ignoreId=null){
+    for(const n of graph.nodes){
+      if(ignoreId!=null && n.id===ignoreId) continue;
+      if(Math.hypot(n.x - x, n.y - y) < MIN_NODE_GAP) return false;
+    }
+    return true;
+  }
+  function findFreeSpotNear(x,y){
+  if(spotIsFree(x,y)) return {x,y};
+
+  const leftG   = (0 - lastFit.offsetX) / lastFit.S + NODE_R;
+  const rightG  = (VIEW_W - lastFit.offsetX) / lastFit.S - NODE_R;
+  const topG    = (0 - lastFit.offsetY) / lastFit.S + NODE_R;
+  const bottomG = (VIEW_H - lastFit.offsetY) / lastFit.S - NODE_R;
+
+  const stepR = NODE_R + 6, maxR = 240, stepA = Math.PI/8;
+  for(let r=stepR; r<=maxR; r+=stepR){
+    for(let a=0; a<Math.PI*2; a+=stepA){
+      const nx = Math.max(leftG,  Math.min(rightG,  x + r*Math.cos(a)));
+      const ny = Math.max(topG,   Math.min(bottomG, y + r*Math.sin(a)));
+      if(spotIsFree(nx,ny)) return {x:nx, y:ny};
+    }
+  }
+  return null;
+}
+
+  function svgPos(evt){
+  let m = nodesG.getScreenCTM && nodesG.getScreenCTM();
+  if (!m || !isFinite(m.a) || !isFinite(m.d)) m = svg.getScreenCTM();
+
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX;
+  pt.y = evt.clientY;
+  const p = pt.matrixTransform(m.inverse()); 
+
+  const leftG   = (0 - lastFit.offsetX) / lastFit.S + NODE_R;
+  const rightG  = (VIEW_W - lastFit.offsetX) / lastFit.S - NODE_R;
+  const topG    = (0 - lastFit.offsetY) / lastFit.S + NODE_R;
+  const bottomG = (VIEW_H - lastFit.offsetY) / lastFit.S - NODE_R;
+
+  return {
+    x: Math.max(leftG,  Math.min(rightG,  p.x)),
+    y: Math.max(topG,   Math.min(bottomG, p.y))
+  };
+}
+
+
+  svg.addEventListener('mousedown', (e)=>{
+    if(e.button!==0) return;
+    const {x,y}=svgPos(e);
+
+    if(modeSel.value==='add'){
+      enqueue(()=>{
+        if(graph.nodes.length>=LIMIT_V){ setStatus('vertex limit reached'); return; }
+        const p = findFreeSpotNear(x,y);
+        if(!p){ setStatus('no free space nearby'); return; }
+        saveSnap();
+        const id = graph.nextId++;
+        graph.nodes.push({id, x:p.x, y:p.y});
+        ops++; draw(); setStatus('added vertex '+id);
+      });
+    }
+    else if(modeSel.value==='edge'){
+      const n=nodeAt(x,y);
+      enqueue(()=>{
+        if(n){
+          if(edgePick.from == null){
+            edgePick.from = n.id;
+            if(edgePick.ring) edgePick.ring.remove();
+            edgePick.ring = mk('circle', { cx:n.x, cy:n.y, r: NODE_R+5, fill:'none', stroke:'#8fffda', 'stroke-width':2 });
+            overlayG.appendChild(edgePick.ring);
+            setStatus('select a target node…');
+          }else if(n.id !== edgePick.from){
+            if(graph.edges.length>=LIMIT_E){ setStatus('edge limit reached'); cleanupPick(); return; }
+            saveSnap();
+            let w=1;
+            if(graph.weighted){
+              const raw = prompt('Edge weight (non-negative integer):','1');
+              if(raw===null) { setStatus('edge canceled'); cleanupPick(); return; }
+              w = Math.max(0, Math.floor(Number(raw))); if(!Number.isFinite(w)) w=1;
+            }
+            addEdge(edgePick.from, n.id, w);
+            ops++; draw(); pulseNodeById(edgePick.from); pulseNodeById(n.id);
+            setStatus(`added edge ${edgePick.from} ${graph.directed?'→':'—'} ${n.id}${graph.weighted?(' (w='+w+')'):''}`);
+            cleanupPick();
+          }else{
+            setStatus('edge canceled'); cleanupPick();
+          }
+        }else{
+          cleanupPick();
+        }
+      });
+    }
+    else if(modeSel.value==='erase'){
+      enqueue(()=>{
+        const n=nodeAt(x,y);
+        if(n){ saveSnap(); removeNode(n.id); ops++; draw(); setStatus('removed vertex '+n.id); cleanupPick(); return; }
+        const eHit=edgeAt(x,y);
+        if(eHit){ saveSnap(); removeEdge(eHit.u, eHit.v); ops++; draw(); setStatus('removed edge '+eHit.u+(graph.directed?'→':'—')+eHit.v); cleanupPick(); return; }
+      });
+    }
+  });
+
+  function cleanupPick(){
+    if(edgePick.ring){ edgePick.ring.remove(); }
+    edgePick.from = null; edgePick.ring = null;
+  }
+
+  function addEdge(u,v,w){
+    if(hasEdge(u,v)) return;
+    graph.edges.push({u,v,w,id:edgeId(u,v)});
+    if(!graph.directed){
+    }
+  }
+  function hasEdge(u,v){
+    return graph.edges.some(e=>e.u===u && e.v===v) || (!graph.directed && graph.edges.some(e=>e.u===v && e.v===u));
+  }
+  function removeEdge(u,v){
+    graph.edges = graph.edges.filter(e=> !( (e.u===u && e.v===v) || (!graph.directed && e.u===v && e.v===u) ));
+  }
+  function removeNode(id){
+    graph.nodes = graph.nodes.filter(n=>n.id!==id);
+    graph.edges = graph.edges.filter(e=> e.u!==id && e.v!==id);
+  }
+
+  clearBtn.onclick = ()=>enqueue(()=>{ saveSnap(); graph = mkGraph(dirSel.value==='directed', wtSel.value==='weighted'); ops++; draw(); matrixWrap.innerHTML=''; setStatus('cleared'); cleanupPick(); });
+  undoBtn.onclick = ()=>enqueue(()=>{ if(undo()){ ops++; setStatus('undid last change'); } else setStatus('nothing to undo'); cleanupPick(); });
+  sampleBtn.onclick = ()=>enqueue(()=>{
+    saveSnap();
+    graph = mkGraph(dirSel.value==='directed', wtSel.value==='weighted');
+    const pts = [
+      [120,120],[240,80],[360,120],[480,80],[600,120],
+      [200,300],[320,300],[440,300],[560,300]
+    ];
+    for(const p of pts){ graph.nodes.push({id:graph.nextId++, x:p[0], y:p[1]}); }
+    const E = graph.directed
+      ? [[0,1],[1,2],[2,3],[3,4],[1,6],[0,5],[5,6],[6,7],[7,8]] 
+      : [[5,6],[6,7],[7,8],[8,5],[2,6],[1,2],[2,3],[3,4]];
+    for(const [u,v] of E){ addEdge(u,v,1); }
+    ops++; draw(); setStatus('loaded sample'); cleanupPick();
+  });
+
+  dirSel.onchange = ()=>enqueue(()=>{ saveSnap(); graph.directed = (dirSel.value==='directed'); ops++; draw(); setStatus('graph set to '+dirSel.value); });
+  wtSel.onchange  = ()=>enqueue(()=>{ saveSnap(); graph.weighted = (wtSel.value==='weighted'); ops++; draw(); setStatus('weights '+(graph.weighted?'on (prompt on edge create)':'off')); });
+
+  bfsBtn.onclick = ()=>enqueue(()=>{ runTraversal('bfs'); });
+  dfsBtn.onclick = ()=>enqueue(()=>{ runTraversal('dfs'); });
+  topoBtn.onclick = ()=>enqueue(()=>{ runTraversal('topo'); });
+  cycBtn.onclick = ()=>enqueue(()=>{ runTraversal('cycle'); });
+  bipBtn.onclick = ()=>enqueue(()=>{ runTraversal('bip'); });
+  ccBtn.onclick  = ()=>enqueue(()=>{ runTraversal('cc'); });
+
+//   stepBtn.onclick = ()=>enqueue(()=>{ if(!anim.list.length) setStatus('nothing to step'); else stepOnce(false); });
+//   runBtn.onclick  = ()=>enqueue(()=>{ if(!anim.list.length) setStatus('nothing to run'); else startTimer(); });
+//   stopBtn.onclick = ()=>enqueue(()=>{ stopTimer(); overlayG.innerHTML=''; setStatus('stopped'); });
+
+  matrixBtn.onclick = ()=>enqueue(()=>{ animateMatrix(); document.querySelector('#matrixNote').textContent = `labels are vertex ids (0..), ${graph.directed ? 'directed' : 'undirected'} matrix`; });
+
+  function buildAdj(){
+    const ids = graph.nodes.map(n=>n.id).sort((a,b)=>a-b);
+    const idx = new Map(ids.map((id,i)=>[id,i]));
+    const rev = ids;
+    const n = ids.length;
+    const adj = Array.from({length:n}, ()=>[]);
+    const indeg = Array(n).fill(0);
+    for(const e of graph.edges){
+      const u = idx.get(e.u), v = idx.get(e.v);
+      if(u==null || v==null) continue;
+      adj[u].push([v, graph.weighted?e.w:1]);
+      if(!graph.directed) adj[v].push([u, graph.weighted?e.w:1]);
+      if(graph.directed) indeg[v]++;
+    }
+    return {n, adj, indeg, idx, rev};
+  }
+
+  function getStartInfo(idx, rev) {
+    const raw = (startInput.value ?? '').trim();
+    if (raw === '') return { ok: true, i: 0, id: rev[0] ?? null };
+    const S = Number(raw);
+    if (!Number.isInteger(S) || !idx.has(S)) {
+      return { ok: false, msg: `start vertex id "${raw}" not found` };
+    }
+    return { ok: true, i: idx.get(S), id: S };
+  }
+
+ function runTraversal(kind){
+  const {n, adj, indeg, idx, rev} = buildAdj();
+  if(n===0){ setStatus('add some vertices first'); return; }
+  const st = getStartInfo(idx, rev);
+  if(!st.ok){ setStatus(st.msg); return; }
+
+  overlayG.innerHTML=''; 
+  stopTimer();
+
+  anim = listFor(kind, n, adj, indeg, idx, rev, st.i);
+
+  if(!anim || !anim.list || anim.list.length===0){
+    setStatus(anim && anim.meta && anim.meta.msg ? anim.meta.msg : 'nothing to show');
+    return;
+  }
+  anim.i = 0;          
+  anim.timer = null;   
+
+  stepOnce(true);
+  startTimer();
+}
+
+
+  function listFor(kind, n, adj, indeg, idx, rev, startIndex){
+    if(kind==='bfs'){
+      const vis=Array(n).fill(false); const q=[]; const order=[];
+      vis[startIndex]=true; q.push(startIndex);
+      while(q.length){
+        const u=q.shift(); order.push(['visit', u]);
+        for(const [v,_] of adj[u]){
+          if(!vis[v]){ vis[v]=true; q.push(v); order.push(['discover', v]); }
+        }
+      }
+      return {kind, list:order.map(x=>({type:x[0], id:rev[x[1]]})), meta:{msg:'BFS order: '+order.filter(x=>x[0]==='visit').map(x=>rev[x[1]]).join(' → ')}};
+    }
+
+    if(kind==='dfs'){
+      const vis=Array(n).fill(false); const out=[];
+      (function go(u){
+        vis[u]=true; out.push(['visit',u]);
+        for(const [v,_] of adj[u]) if(!vis[v]){ out.push(['discover',v]); go(v); }
+      })(startIndex);
+      return {kind, list:out.map(x=>({type:x[0], id:rev[x[1]]})), meta:{msg:'DFS preorder: '+out.filter(x=>x[0]==='visit').map(x=>rev[x[1]]).join(' → ')}};
+    }
+
+    if(kind==='topo'){
+      if(!graph.directed) return {list:[], meta:{msg:'Toposort is for directed graphs. Switch to Directed.'}};
+      const indeg2 = indeg.slice();
+      const q=[]; for(let i=0;i<n;i++) if(indeg2[i]===0) q.push(i);
+      const out=[]; const anim=[];
+      while(q.length){
+        const u=q.shift(); out.push(u); anim.push({type:'visit', id:rev[u]});
+        for(const [v,_] of adj[u]){ indeg2[v]--; if(indeg2[v]===0) q.push(v); }
+      }
+      if(out.length!==n) return {list:[], meta:{msg:'Cycle detected — no topological order'}};
+      return {kind, list:anim, meta:{msg:'Topological order: '+out.map(i=>rev[i]).join(' → ')}};
+    }
+
+    if(kind==='cycle'){
+      if(graph.directed){
+        const color=Array(n).fill(0); 
+        const anim=[];
+        let found=false;
+        function go(u){
+          color[u]=1; anim.push({type:'gray', id:rev[u]});
+          for(const [v,_] of adj[u]){
+            if(color[v]===1){ anim.push({type:'back', id:rev[v]}); found=true; return; }
+            if(color[v]===0){ go(v); if(found) return; }
+          }
+          color[u]=2; anim.push({type:'black', id:rev[u]});
+        }
+        for(let i=0;i<n && !found;i++) if(color[i]===0) go(i);
+        if(!found) return {list:anim, meta:{msg:'No directed cycle found'}};
+        return {list:anim, meta:{msg:'Directed cycle detected'}};
+      } else {
+        const vis=Array(n).fill(false);
+        const parent=Array(n).fill(-1);
+        const anim=[];
+        let found=false;
+        function go(u){
+          vis[u]=true; anim.push({type:'visit', id:rev[u]});
+          for(const [v,_] of adj[u]){
+            if(!vis[v]){ parent[v]=u; anim.push({type:'discover', id:rev[v]}); go(v); if(found) return; }
+            else if(v!==parent[u]){ anim.push({type:'back', id:rev[v]}); found=true; return; }
+          }
+        }
+        for(let i=0;i<n && !found;i++) if(!vis[i]) go(i);
+        if(!found) return {list:anim, meta:{msg:'No undirected cycle found'}};
+        return {list:anim, meta:{msg:'Undirected cycle detected'}};
+      }
+    }
+
+    if(kind==='bip'){
+      if(graph.directed) setStatus('Checking bipartiteness on the underlying undirected graph');
+      const color=Array(n).fill(-1);
+      const anim=[];
+      for(let s=0;s<n;s++){
+        if(color[s]!==-1) continue;
+        const q=[s]; color[s]=0; anim.push({type:'discover', id:rev[s]});
+        while(q.length){
+          const u=q.shift(); anim.push({type:'visit', id:rev[u]});
+          for(const [v,_] of adj[u]){
+            if(color[v]===-1){ color[v]=color[u]^1; q.push(v); anim.push({type:'discover', id:rev[v]}); }
+            else if(color[v]===color[u]) return {list:anim, meta:{msg:'Not bipartite (found same-color edge)'}};
+          }
+        }
+      }
+      return {list:anim, meta:{msg:'Graph is bipartite (2-coloring exists)'}};
+    }
+
+    if(kind==='cc'){
+      const vis=Array(n).fill(false); const comps=[]; const anim=[];
+      for(let s=0;s<n;s++){
+        if(vis[s]) continue;
+        const stack=[s]; vis[s]=true; const cur=[];
+        anim.push({type:'componentStart', id:rev[s]});
+        while(stack.length){
+          const u=stack.pop(); cur.push(u); anim.push({type:'visit', id:rev[u]});
+          for(const [v,_] of adj[u]){
+            if(!vis[v]){ vis[v]=true; stack.push(v); anim.push({type:'discover', id:rev[v]}); }
+          }
+        }
+        comps.push(cur.map(i=>rev[i]));
+      }
+      return {list:anim, meta:{msg:'Components: '+comps.map(c=>'{'+c.join(', ')+'}').join('  '), comps}};
+    }
+
+    return {list:[], meta:{msg:'unknown task'}};
+  }
+
+  function colorFor(type){
+    if(type==='visit') return '#ffd166';
+    if(type==='discover') return '#8fffda';
+    if(type==='gray') return '#ffd166';
+    if(type==='black') return '#b7c4ff';
+    if(type==='back') return '#ff7a7a';
+    if(type==='componentStart') return '#6ec3ff';
+    return 'var(--pulse)';
+  }
+
+  function stepOnce(reset){
+    if(reset){ overlayG.innerHTML=''; }
+    if(anim.i>=anim.list.length){ stopTimer(); setStatus(anim.meta && anim.meta.msg ? anim.meta.msg : 'done'); return false; }
+    const ev = anim.list[anim.i++];
+    if(!ev){ stopTimer(); setStatus('animation stream ended'); return false; }
+    pulseNodeById(ev.id, colorFor(ev.type));
+    if(anim.meta && anim.meta.msg && anim.i%4===0) setStatus(anim.meta.msg);
+    return true;
+  }
+  function startTimer(){
+    stopTimer();
+    anim.timer = setInterval(()=>{ if(!stepOnce(false)) stopTimer(); }, +speed.value);
+  }
+  function stopTimer(){ if(anim.timer){ clearInterval(anim.timer); anim.timer=null; } }
+
+  function animateMatrix(){
+    const {n, idx, rev} = buildAdj();
+    if(n===0){ setStatus('add some vertices first'); return; }
+    const M = Array.from({length:n}, ()=>Array(n).fill(0));
+    for(const e of graph.edges){
+      const u = idx.get(e.u), v = idx.get(e.v);
+      if(u==null || v==null) continue;
+      const val = graph.weighted ? e.w : 1;
+      M[u][v] = val;
+      if(!graph.directed) M[v][u] = val;
+    }
+
+    const tbl = document.createElement('table'); tbl.className='matrix';
+    const thead = document.createElement('thead');
+    const thr = document.createElement('tr');
+    thr.appendChild(document.createElement('th')); 
+    for(let j=0;j<n;j++){ const th=document.createElement('th'); th.textContent=rev[j]; thr.appendChild(th); }
+    thead.appendChild(thr); tbl.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    for(let i=0;i<n;i++){
+      const tr=document.createElement('tr');
+      const th=document.createElement('th'); th.textContent=rev[i]; tr.appendChild(th);
+      for(let j=0;j<n;j++){ const td=document.createElement('td'); td.textContent=''; tr.appendChild(td); }
+      tbody.appendChild(tr);
+    }
+    tbl.appendChild(tbody);
+    matrixWrap.innerHTML=''; matrixWrap.appendChild(tbl);
+
+    let i=0, j=0;
+    const fillTimer = setInterval(()=>{
+      if(i>=n){ clearInterval(fillTimer); setStatus('adjacency matrix ready'); return; }
+      const cell = tbody.children[i].children[j+1];
+      cell.textContent = String(M[i][j]);
+      cell.classList.add('fill');
+      setTimeout(()=>cell.classList.remove('fill'), 250);
+      j++;
+      if(j>=n){ j=0; i++; }
+    }, Math.max(60, +speed.value/4));
+  }
+
+  function enqueue(fn){ q.push(fn); drain(); }
+  function drain(){
+    if(busy) return;
+    busy=true;
+    (function loop(){
+      const fn=q.shift();
+      if(!fn){ busy=false; return; }
+      try{ fn(); } catch(e){ console.error(e); setStatus('error: '+e.message); }
+      setTimeout(loop, 0);
+    })();
+  }
+
+  function init(){
+  graph = mkGraph(false, false);
+  const pts = [[120,220],[240,130],[380,100],[520,130],[640,220]];
+  for(const p of pts){ graph.nodes.push({id:graph.nextId++, x:p[0], y:p[1]}); }
+  addEdge(0,1,1); addEdge(1,2,1); addEdge(2,3,1); addEdge(3,4,1);
+  draw();
+  setStatus('click canvas to add vertex · edge mode: click two nodes · erase mode: click node or edge');
+}
+
+window.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>
+</body>
+</html>

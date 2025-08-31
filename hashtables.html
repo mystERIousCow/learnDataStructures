@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hash Tables · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/hashtables.html" />
+<meta name="description" content="Hash tables explained with an interactive simulator: separate chaining vs open addressing (linear probing), load factor, rehashing, and code snippets in Python, Java, and C++." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Hash Tables · learnDataStructures" />
+<meta property="og:description" content="Interactive hash table visualizations and code: sets vs maps, collisions, load factor, and rehashing." />
+<meta property="og:url" content="https://learndatastructures.org/hashtables.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Interactive hash table simulator with buckets and probe paths" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Hash Tables · learnDataStructures" />
+<meta name="twitter:description" content="Visualize chaining vs linear probing, tune load factor, and practice hash set/map ops." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+      body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:140px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .kbar{color:var(--muted); font-size:13px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .hl{background:rgba(255,255,255,.06)}
+
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+
+    svg{display:block; width:100%; height:360px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+    label.switch{display:inline-flex;align-items:center;gap:6px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Hash Tables (Set & Map)</h2></div>
+      <div class="bd">
+        <p>
+  <p>
+  A <strong>hash table</strong> is a data structure that lets you store and retrieve items extremely quickly, usually in constant time on average. The basic idea is simple: each item has a <strong>key</strong>, and a <strong>hash function</strong> turns that key into a number. That number is then reduced with modulo (<code>hash(key) mod m</code>) to decide which <strong>bucket</strong> (or slot) in an underlying array the item belongs to. For example, the string <code>"cat"</code> can be hashed into a number and placed in a specific bucket of the table.
+</p>
+
+<p>
+  Because the number of possible keys is much larger than the number of available buckets, <strong>collisions</strong> are unavoidable — different keys may end up in the same bucket. To handle this, hash tables use strategies such as <strong>separate chaining</strong>, where each bucket points to a small list of entries that share that slot, or <strong>open addressing</strong>, where items are stored directly in the array and collisions are resolved by probing forward until an empty slot is found.
+</p>
+
+<p>
+  Hash tables can operate in two modes: a <strong>hash set</strong>, which stores unique keys only (e.g., <code>{"cat", "dog"}</code>), or a <strong>hash map</strong>, which stores <strong>key–value pairs</strong> (e.g., <code>{"cat": 3, "dog": 5}</code>). To keep performance fast, hash tables also monitor their <strong>load factor</strong> (the ratio of items to buckets). If it grows too large, the table is resized and all items are <strong>rehashed</strong> into a bigger array.
+</p>
+
+<p>
+  The strength of hash tables is their speed: insertion, lookup, and deletion are typically <code>O(1)</code> on average. They are widely used in applications that need fast membership checks and quick key-based lookups, such as dictionaries, compiler symbol tables, or web caches. However, they are not ideal when data must remain in sorted order or when range queries are required — in those cases, balanced trees or ordered maps are a better choice.
+</p>
+
+
+
+        <h3>Hash table <em>set</em> vs <em>map</em></h3>
+        <ul>
+          <li><strong>Hash Set:</strong> stores <em>unique keys</em> only (e.g., { "cat", "dog" }). Operations use just the key.</li>
+          <li><strong>Hash Map:</strong> stores <em>key → value</em> pairs (e.g., { "cat": 3, "dog": 5 }). On insert, an existing key updates its value.</li>
+          <li>In this page’s simulator, switch between <span class="badgePill">Set</span> and <span class="badgePill">Map</span>. In set mode the value field is ignored.</li>
+        </ul>
+
+        <h3>Key ideas</h3>
+        <ul>
+          <li><strong>Load factor</strong> α = <code>size / buckets</code>. Keep α low (≈0.75 for open addressing; 1–5+ okay for chaining) to maintain O(1) average time.</li>
+          <li><strong>Rehashing:</strong> growing the table (more buckets) and reinserting all items when α exceeds a threshold.</li>
+          <li><strong>Complexity (average):</strong> <code>insert/find/erase</code> are typically O(1); worst-case is O(n) if everything collides or a pathological hash is used.</li>
+        </ul>
+
+        <h3>When to choose a hash table</h3>
+        <ul>
+          <li>Fast membership tests, counting, indexing by unique keys, symbol tables, caches, deduplication.</li>
+          <li>Avoid when you need <em>sorted</em> iteration or range queries — use balanced trees / ordered maps.</li>
+        </ul>
+
+        <h3>Real-world Examples</h3>
+        <ul>
+          <li>Dictionaries (word → definition)</li>
+          <li>Compiler symbol tables</li>
+          <li>Web cache (URL → response)</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- MAIN -->
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Hash Table — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Operations (pseudocode)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          Pseudocode shows both <strong>separate chaining</strong> and <strong>open addressing (linear probing)</strong>. Deletion in open addressing uses <em>tombstones</em>.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive hash-table simulator</h2>
+        <div class="kbar">size: <span id="kSize">0</span> · buckets: <span id="kBuckets">0</span> · α: <span id="kAlpha">0.00</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 360" preserveAspectRatio="xMidYMid meet">
+          <defs id="svgDefs"></defs>
+          <g id="grid"></g>
+          <g id="overlay"></g>
+          <g id="labels"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <select id="mode">
+            <option value="set">Set (keys only)</option>
+            <option value="map">Map (key → value)</option>
+          </select>
+          <select id="strategy">
+            <option value="chain">Separate Chaining</option>
+            <option value="linear">Open Addressing · Linear Probing</option>
+          </select>
+          <select id="hashFn">
+            <option value="djb2">djb2 (strings → 32-bit)</option>
+            <option value="sum">sum of char codes</option>
+          </select>
+          <input id="capacity" type="number" min="3" step="1" value="8" style="width:90px" placeholder="# of buckets">
+          <button class="btn" id="rehashBtn">rehash(m)</button>
+          <label class="switch tiny"><input type="checkbox" id="autoResize" checked> auto-resize</label>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <input id="key" type="text" placeholder="key (e.g., apple)">
+          <input id="val" type="text" placeholder="value (ignored in Set)">
+          <button class="btn primary" id="putBtn">insert / update</button>
+          <button class="btn" id="getBtn">find</button>
+          <button class="btn" id="delBtn">erase</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <button class="btn" id="randomBtn">insert random keys</button>
+          <button class="btn danger" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+          <span class="badgePill">Chaining: α allowed > 1</span>
+          <span class="badgePill">Probing: α target ≈ 0.75</span>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Complexity</h2></div>
+      <div class="bd">
+        <h3>Time complexity (average, good hash)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>Separate chaining</th>
+              <th>Open addressing (linear)</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>insert/put(k,v)</code></td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+              <td>Rehash when α high; linear probing clusters as α→1</td>
+            </tr>
+            <tr>
+              <td><code>find/get(k)</code></td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+              <td>Expected probe length ~ 1/(1-α) for linear probing</td>
+            </tr>
+            <tr>
+              <td><code>erase(k)</code></td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+              <td>Open addressing uses tombstones to maintain probe sequences</td>
+            </tr>
+            <tr>
+              <td><code>rehash</code></td>
+              <td>O(n)</td>
+              <td>O(n)</td>
+              <td>Resizes are occasional; amortized costs stay O(1)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Implementations by Language</h3>
+        <h4>Python</h4>
+        <details open>
+          <summary>Built-ins: <code>set</code> (hash set), <code>dict</code> (hash map)</summary>
+<pre>
+S = {"cat", "dog"}           # hash set (unique keys)
+M = {"cat": 3, "dog": 5}     # hash map (key → value)
+"cat" in S                   # O(1) average
+M.get("cat", 0)              # 3
+M["dog"] = 6                 # update
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary><code>HashSet&lt;E&gt;</code> and <code>HashMap&lt;K,V&gt;</code></summary>
+<pre>
+import java.util.*;
+
+HashSet&lt;String&gt; S = new HashSet&lt;&gt;();
+S.add("cat"); S.add("dog");
+boolean has = S.contains("cat");
+
+HashMap&lt;String,Integer&gt; M = new HashMap&lt;&gt;();
+M.put("cat", 3);
+M.put("dog", 5);
+int v = M.getOrDefault("cat", 0);
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary><code>std::unordered_set</code> and <code>std::unordered_map</code></summary>
+<pre>
+#include &lt;unordered_set&gt;
+#include &lt;unordered_map&gt;
+using namespace std;
+
+unordered_set&lt;string&gt; S;
+S.insert("cat"); S.insert("dog");
+bool has = S.count("cat");
+
+unordered_map&lt;string,int&gt; M;
+M["cat"] = 3; M["dog"] = 5;
+int v = M.at("cat");
+</pre>
+        </details>
+
+        <ul>
+          <li><strong>Custom hashing:</strong> For compound keys, provide a good hash and equality. Aim for uniform distribution.</li>
+          <li><strong>Iteration order:</strong> Typically unspecified for hash tables (Python dict preserves insertion order by design; still O(1) ops).</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Conceptual Questions</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Why does load factor affect performance differently in chaining vs open addressing?</li>
+          <li>What's the difference between a hash set and a hash map?</li>
+          <li>How would you choose table size when rehashing? Why are primes or powers of two common?</li>
+          <li>What makes a hash function “good” for a given key distribution?</li>
+          <li>When would you prefer a hash set over a balanced tree set and vice versa?</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// unordered_set / unordered_map
+#include <unordered_set>
+#include <unordered_map>
+using namespace std;
+
+unordered_set<string> S = {"cat","dog"};
+bool has = S.count("cat");
+
+unordered_map<string,int> M;
+M["cat"]=3; M["dog"]=5;
+int v = M.at("cat");`,
+java:`// HashSet / HashMap
+import java.util.*;
+
+HashSet<String> S = new HashSet<>();
+S.add("cat"); S.add("dog");
+boolean has = S.contains("cat");
+
+HashMap<String,Integer> M = new HashMap<>();
+M.put("cat",3); M.put("dog",5);
+int v = M.getOrDefault("cat",0);`,
+py:`# Python built-ins
+S = {"cat", "dog"}         # set
+"cat" in S                 # True
+
+M = {"cat": 3, "dog": 5}   # dict (hash map)
+M["dog"] = 6               # update
+v = M.get("cat", 0)        # 3`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const lines = [
+'// Separate chaining (each bucket holds a small list of (key,value))',
+'hash(k): return H(k) mod m',
+'put(k,v):',
+'  i ← hash(k)',
+'  if (k in bucket[i]): update value',
+'  else: append (k,v) to bucket[i]; size++',
+'  if load_factor() > threshold: rehash(2m)',
+'',
+'get(k):',
+'  i ← hash(k)',
+'  for each (k2,v2) in bucket[i]: if k2==k: return v2',
+'  return NOT_FOUND',
+'',
+'erase(k):',
+'  i ← hash(k)',
+'  remove (k,*) from bucket[i] if present; size--',
+'',
+'// Open addressing: all entries live in the array with empty/tombstone markers',
+'put(k,v):',
+'  if load_factor() > 0.75: rehash(2m)',
+'  i ← hash(k); first_tomb ← NONE',
+'  while table[i] not EMPTY:',
+'    if table[i] is TOMBSTONE and first_tomb==NONE: first_tomb←i',
+'    else if table[i].key == k: table[i].val ← v; return',
+'    i ← (i + 1) mod m // linear probe',
+'  if first_tomb != NONE: i ← first_tomb',
+'  table[i] ← (k,v); size++',
+'',
+'get(k):',
+'  i ← hash(k)',
+'  while table[i] not EMPTY:',
+'    if table[i] not TOMBSTONE and table[i].key == k: return table[i].val',
+'    i ← (i + 1) mod m',
+'  return NOT_FOUND',
+'',
+'erase(k):',
+'  i ← hash(k)',
+'  while table[i] not EMPTY:',
+'    if table[i] not TOMBSTONE and table[i].key == k:',
+'       table[i] ← TOMBSTONE; size--; return',
+'    i ← (i + 1) mod m'
+  ];
+  function renderPseudo(){ pseudoEl.innerHTML = lines.map(ln=>`<div>${ln}</div>`).join(''); }
+  renderPseudo();
+
+  const svg = document.querySelector('#vis');
+  const gridG = document.querySelector('#grid');
+  const overlayG = document.querySelector('#overlay');
+  const labelsG = document.querySelector('#labels');
+  const defs = document.querySelector('#svgDefs');
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+  function ensureGradient(){
+    if(document.getElementById('gLinear')) return;
+    const lg=mk('linearGradient',{id:'gLinear',x1:0,x2:1});
+    lg.appendChild(mk('stop',{'offset':'0%','stop-color':'#6ec3ff'}));
+    lg.appendChild(mk('stop',{'offset':'100%','stop-color':'#8fffda'}));
+    defs.appendChild(lg);
+  }
+  ensureGradient();
+
+  const kSize=document.querySelector('#kSize');
+  const kBuckets=document.querySelector('#kBuckets');
+  const kAlpha=document.querySelector('#kAlpha');
+  const kOpsLbl=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+
+  const modeSel=document.querySelector('#mode');
+  const stratSel=document.querySelector('#strategy');
+  const hashSel=document.querySelector('#hashFn');
+  const capInput=document.querySelector('#capacity');
+  const autoResize=document.querySelector('#autoResize');
+
+  const keyInput=document.querySelector('#key');
+  const valInput=document.querySelector('#val');
+
+  const putBtn=document.querySelector('#putBtn');
+  const getBtn=document.querySelector('#getBtn');
+  const delBtn=document.querySelector('#delBtn');
+  const randomBtn=document.querySelector('#randomBtn');
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+  const rehashBtn=document.querySelector('#rehashBtn');
+
+  let ops=0;
+  let hist=[];
+  const DEFAULT_M = 8;
+
+ 
+  const EMPTY = null;
+  const TOMBSTONE = { tomb: true };
+
+  let m = DEFAULT_M;
+  let size = 0;
+  let buckets = null;  
+  let slots = null;   
+
+  function djb2(str){
+    let h=5381|0;
+    for(let i=0;i<str.length;i++){ h=((h<<5)+h + str.charCodeAt(i))|0; } 
+    return h>>>0; 
+  }
+  function sumHash(str){
+    let s=0;
+    for(let i=0;i<str.length;i++) s = (s + str.charCodeAt(i))|0;
+    return s>>>0;
+  }
+  function H(key){
+    const s = String(key);
+    return (hashSel.value==='djb2'?djb2(s):sumHash(s)) % m;
+  }
+
+  function saveSnapshot(){
+    hist.push({
+      ops, m, size,
+      strategy: stratSel.value,
+      mode: modeSel.value,
+      hash: hashSel.value,
+      buckets: buckets ? buckets.map(b => b.map(e=>({...e}))) : null,
+      slots: slots ? slots.map(s => s===null?null:(s===TOMBSTONE?{tomb:true}:{key:s.key, val:s.val})) : null
+    });
+  }
+
+  function restoreLast(){
+    const s = hist.pop();
+    if(!s) return false;
+    ops = s.ops; m=s.m; size=s.size;
+    stratSel.value = s.strategy;
+    modeSel.value = s.mode;
+    hashSel.value = s.hash || 'djb2';
+    buckets = s.buckets ? s.buckets.map(b => b.map(e=>({...e}))) : null;
+    slots = s.slots ? s.slots.map(x => x===null?null:(x.tomb?TOMBSTONE:{key:x.key,val:x.val})) : null;
+    capInput.value = String(m);
+    draw();
+    return true;
+  }
+
+  function initStructure(){
+    if(stratSel.value==='chain'){
+      buckets = Array.from({length:m}, ()=>[]);
+      slots = null;
+    } else {
+      slots = Array.from({length:m}, ()=>EMPTY);
+      buckets = null;
+    }
+    size = 0;
+  }
+
+  function rehash(newM){
+    newM = Math.max(3, Math.floor(newM));
+    const oldEntries = allEntries();
+    m = newM;
+    capInput.value = String(m); 
+    if(stratSel.value==='chain'){
+      buckets = Array.from({length:m}, ()=>[]);
+      slots = null;
+      size = 0;
+      for(const e of oldEntries) chain_put(e.key, e.val);
+    } else {
+      slots = Array.from({length:m}, ()=>EMPTY);
+      buckets = null;
+      size = 0;
+      for(const e of oldEntries) linear_put(e.key, e.val);
+    }
+  }
+
+  function allEntries(){
+    const out=[];
+    if(buckets){
+      for(const b of buckets) for(const e of b) out.push({key:e.key, val:e.val});
+    } else if(slots){
+      for(const s of slots) if(s && s!==TOMBSTONE) out.push({key:s.key, val:s.val});
+    }
+    return out;
+  }
+
+  function chain_find_idx(bi, key){
+    const b = buckets[bi];
+    for(let i=0;i<b.length;i++){
+      if(b[i].key===key) return i;
+    }
+    return -1;
+  }
+  function chain_put(key, val){
+    const i = H(key);
+    const j = chain_find_idx(i, key);
+    if(j>=0){
+      buckets[i][j].val = val; 
+      return false; 
+    } else {
+      buckets[i].push({key, val});
+      size++;
+      return true;
+    }
+  }
+  function chain_get(key){
+    const i = H(key);
+    const j = chain_find_idx(i, key);
+    if(j>=0) return buckets[i][j].val;
+    return undefined;
+  }
+  function chain_del(key){
+    const i = H(key);
+    const j = chain_find_idx(i, key);
+    if(j>=0){ buckets[i].splice(j,1); size--; return true; }
+    return false;
+  }
+
+  function linear_put(key, val){
+    if((size + 1) / m > 0.75) { 
+      rehash(m*2);
+    }
+    let i = H(key);
+    let firstTomb = -1;
+    let steps = 0;
+    while(steps < m){
+      const s = slots[i];
+      if(s===EMPTY){
+        const useIndex = (firstTomb>=0) ? firstTomb : i;
+        slots[useIndex] = {key, val};
+        size++;
+        return true;
+      } else if(s===TOMBSTONE){
+        if(firstTomb<0) firstTomb = i;
+      } else if(s.key===key){
+        s.val = val; 
+        return false;
+      }
+      i = (i+1)%m; steps++;
+    }
+    rehash(m*2);
+    return linear_put(key, val);
+  }
+  function linear_get(key, pathOut){
+    let i = H(key);
+    let steps = 0;
+    while(steps < m){
+      const s = slots[i];
+      if(pathOut) pathOut.push(i);
+      if(s===EMPTY) return {found:false, val:undefined, idx:i};
+      if(s!==TOMBSTONE && s.key===key) return {found:true, val:s.val, idx:i};
+      i = (i+1)%m; steps++;
+    }
+    return {found:false, val:undefined, idx:-1};
+  }
+  function linear_del(key){
+    let i = H(key);
+    let steps = 0;
+    while(steps < m){
+      const s = slots[i];
+      if(s===EMPTY) return false;
+      if(s!==TOMBSTONE && s.key===key){
+        slots[i] = TOMBSTONE;
+        size--;
+        if(autoResize.checked) maybeCleanupTombstones();
+        return true;
+      }
+      i = (i+1)%m; steps++;
+    }
+    return false;
+  }
+  function maybeCleanupTombstones(){
+    if(!slots) return;
+    let t=0; for(const s of slots) if(s===TOMBSTONE) t++;
+    if(t > m*0.25) { rehash(m); }
+  }
+
+  function put(k, v){
+    const val = (modeSel.value==='set') ? true : v;
+    if(stratSel.value==='chain'){
+      const added = chain_put(k, val);
+      if(autoResize.checked && (size / m) > 2.5){ 
+        rehash(m*2);
+      }
+      return added;
+    } else {
+      return linear_put(k, val);
+    }
+  }
+
+  function get(k){
+    if(stratSel.value==='chain'){
+      const val = chain_get(k);
+      return {found: val!==undefined, val};
+    } else {
+      const path=[];
+      const r = linear_get(k, path);
+      return {found:r.found, val:r.val, path};
+    }
+  }
+
+  function erase(k){
+    if(stratSel.value==='chain'){
+      return chain_del(k);
+    } else {
+      return linear_del(k);
+    }
+  }
+
+  const VIEW_W = 760, VIEW_H = 360;
+  const padX = 18, padY = 40;
+  const bucketW = 86, bucketH = 36, gapX = 10, gapY = 10;
+
+  function draw(){
+    gridG.innerHTML=''; overlayG.innerHTML=''; labelsG.innerHTML='';
+    ensureGradient();
+
+    kSize.textContent = String(size);
+    kBuckets.textContent = String(m);
+    kAlpha.textContent = (m? (size/m).toFixed(2) : '0.00');
+    kOpsLbl.textContent = String(ops);
+
+    if(stratSel.value==='chain') drawChaining();
+    else drawLinear();
+  }
+
+  function drawChaining(){
+    const cols = Math.max(3, Math.floor((VIEW_W - 2*padX + gapX) / (bucketW + gapX)));
+    const rows = Math.ceil(m / cols);
+    for(let i=0;i<m;i++){
+      const r = Math.floor(i / cols);
+      const c = i % cols;
+      const x = padX + c*(bucketW+gapX);
+      const y = padY + r*(bucketH+70); 
+      drawBucketRect(x, y, i);
+
+      const chain = buckets[i];
+      const cx = x + bucketW + 16;
+      let cy = y + 2;
+      for(let j=0;j<chain.length;j++){
+        drawNode(cx, cy + j*(bucketH+6), chain[j].key, chain[j].val);
+        if(j===0){
+          drawArrow(x+bucketW, y+bucketH/2, cx, cy + bucketH/2, 'right', '#8fffda', true);
+        } else {
+          drawArrow(cx, cy + (j-1)*(bucketH+6) + bucketH, cx, cy + j*(bucketH+6), 'down', '#6ec3ff', false);
+        }
+      }
+    }
+    label('Separate Chaining: each bucket holds a small list of entries', VIEW_W/2, 20, 12);
+  }
+
+  function drawLinear(){
+    const slotsPerRow = Math.max(3, Math.floor((VIEW_W - 2*padX + gapX) / (bucketW + gapX)));
+    const neededRows = Math.ceil(m / slotsPerRow);
+    for(let i=0;i<m;i++){
+      const r = Math.floor(i / slotsPerRow);
+      const c = i % slotsPerRow;
+      const x = padX + c*(bucketW+gapX);
+      const y = padY + r*(bucketH+20);
+
+      const s = slots[i];
+      let fill = '#0d2c4a', text='#001523', stroke='#214064', labelText='';
+      if(s===EMPTY){ fill = '#0f1730'; stroke='#223059'; labelText='∅'; }
+      else if(s===TOMBSTONE){ fill = '#2b1c1c'; stroke='#5a1e1e'; labelText='×'; }
+      else { /* occupied */ }
+
+      const rect = mk('rect',{x,y,rx:8,ry:8,width:bucketW,height:bucketH,fill,stroke});
+      gridG.appendChild(rect);
+
+      const idxLabel = mk('text',{x:x+8,y:y-6,'font-size':11,fill:'#9fb7ff'});
+      idxLabel.textContent = String(i);
+      labelsG.appendChild(idxLabel);
+
+      if(s && s!==TOMBSTONE){
+        const t=mk('text',{x:x+bucketW/2, y:y+bucketH/2+5, 'text-anchor':'middle','font-size':12, fill:text});
+        t.textContent = renderEntry(s.key, s.val);
+        gridG.appendChild(t);
+      } else {
+        const t=mk('text',{x:x+bucketW/2, y:y+bucketH/2+5, 'text-anchor':'middle','font-size':12, fill:'#6f7ea0'});
+        t.textContent = labelText;
+        gridG.appendChild(t);
+      }
+    }
+    label('Open Addressing · Linear Probing: entries live in the table; ∅=empty, ×=tombstone', VIEW_W/2, 20, 12);
+  }
+
+  function drawBucketRect(x,y,i){
+    const r=mk('rect',{x, y, rx:8, ry:8, width:bucketW, height:bucketH, fill:'#0f1730', stroke:'#223059'});
+    gridG.appendChild(r);
+    const idx=mk('text',{x:x+bucketW/2, y:y+bucketH/2+5, 'text-anchor':'middle', 'font-size':12, fill:'#9fb7ff'});
+    idx.textContent = '['+i+']';
+    gridG.appendChild(idx);
+  }
+
+  function drawNode(x,y,key,val){
+    const r=mk('rect',{x, y, rx:8, ry:8, width:bucketW, height:bucketH, fill:'url(#gLinear)', stroke:'#0d2c4a'});
+    gridG.appendChild(r);
+    const t=mk('text',{x:x+bucketW/2, y:y+bucketH/2+5, 'text-anchor':'middle','font-size':12, fill:'#001523'});
+    t.textContent = renderEntry(key, val);
+    gridG.appendChild(t);
+  }
+
+  function ensureArrowMarker() {
+  if (document.getElementById('arrowHead')) return;
+  const m = mk('marker', {
+    id: 'arrowHead',
+    viewBox: '0 0 10 10',
+    refX: 9, refY: 5,           
+    markerWidth: 8, markerHeight: 8,
+    orient: 'auto'               
+  });
+  m.appendChild(mk('path', { d: 'M0,0 L10,5 L0,10 Z', fill: '#8fffda' }));
+  defs.appendChild(m);
+}
+
+
+  function drawArrow(x1, y1, x2, y2, dir, color='#8fffda', curved=false) {
+  ensureArrowMarker();
+  const d = curved
+    ? `M ${x1} ${y1} Q ${(x1+x2)/2} ${(y1+y2)/2 - 16} ${x2} ${y2}`
+    : `M ${x1} ${y1} L ${x2} ${y2}`;
+  overlayG.appendChild(mk('path', {
+    d, stroke: color, fill: 'none', 'stroke-width': 2,
+    'stroke-linecap': 'round',
+    'marker-end': 'url(#arrowHead)'
+  }));
+}
+
+
+  function label(txt,x,y,fs){
+    const t=mk('text',{x,y,'text-anchor':'middle','font-size':fs||12,fill:'#cfe3ff'}); t.textContent=txt; labelsG.appendChild(t);
+  }
+
+  function renderEntry(k, v){
+    return (modeSel.value==='set') ? String(k) : (String(k)+':'+String(v));
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+
+  function resetAll(newM){
+    saveSnapshot();
+    m = newM || DEFAULT_M;
+    capInput.value = String(m);
+    initStructure();
+    ops++;
+    draw();
+    setStatus('reset');
+  }
+
+  function doPut(){
+    const k = keyInput.value || randomWord();
+    const v = valInput.value || Math.floor(Math.random()*100);
+    saveSnapshot();
+    const added = put(k, v);
+    ops++;
+    draw();
+    const i = H(k);
+    if(stratSel.value==='linear'){
+      const path=[];
+      linear_get(k, path);
+      showProbePath(path, 'insert');
+      setStatus(added ? `inserted "${k}"` : `updated "${k}"`);
+    } else {
+      setStatus(added ? `inserted "${renderEntry(k,v)}"` : `updated "${k}"`);
+    }
+  }
+
+  function doGet(){
+    const k = keyInput.value;
+    if(!k){ setStatus('enter a key to find'); return; }
+    const r = get(k);
+    ops++;
+    draw();
+    if(stratSel.value==='linear' && r.path){
+      showProbePath(r.path, 'search');
+    }
+    if(r.found){
+      setStatus(modeSel.value==='set' ? `found "${k}"` : `found ${k} → ${r.val}`);
+    } else {
+      setStatus('not found');
+    }
+  }
+
+  function doDel(){
+    const k = keyInput.value;
+    if(!k){ setStatus('enter a key to erase'); return; }
+    saveSnapshot();
+    const ok = erase(k);
+    ops++;
+    draw();
+    setStatus(ok ? `erased "${k}"` : 'not found');
+  }
+
+  function doRandom(){
+    saveSnapshot();
+    const n = Math.max(1, Math.min(6, Math.floor(m/2)));
+    for(let i=0;i<n;i++){
+      const k = randomWord();
+      const v = Math.floor(Math.random()*100);
+      put(k, v);
+    }
+    ops++;
+    draw();
+    setStatus('inserted random keys');
+  }
+
+  function doClear(){
+    saveSnapshot();
+    initStructure();
+    ops++;
+    draw();
+    setStatus('cleared');
+  }
+
+  function doUndo(){
+    if(restoreLast()){
+      ops++;
+      setStatus('undid last change');
+    }
+  }
+
+  function doRehash(){
+    const newM = parseInt(capInput.value,10) || m;
+    saveSnapshot();
+    rehash(newM);
+    ops++;
+    draw();
+    setStatus('rehash to m='+newM);
+  }
+
+  function showProbePath(indices, kind){
+    if(!indices || !indices.length) return;
+    const slotsPerRow = Math.max(3, Math.floor((VIEW_W - 2*padX + gapX) / (bucketW + gapX)));
+    const pts = indices.map(i=>{
+      const r = Math.floor(i / slotsPerRow);
+      const c = i % slotsPerRow;
+      const x = padX + c*(bucketW+gapX) + bucketW/2;
+      const y = padY + r*(bucketH+20) + bucketH/2;
+      return [x,y];
+    });
+    let d = `M ${pts[0][0]} ${pts[0][1]}`;
+    for(let i=1;i<pts.length;i++){
+      const [x1,y1] = pts[i-1];
+      const [x2,y2] = pts[i];
+      d += ` Q ${(x1+x2)/2} ${(y1+y2)/2 - 14} ${x2} ${y2}`;
+    }
+    const color = kind==='insert' ? '#8fffda' : '#6ec3ff';
+    overlayG.appendChild(mk('path',{d,stroke:color,fill:'none','stroke-width':2,opacity:.9}));
+  }
+
+  function randomWord(){
+    const syll = ['ba','be','bi','bo','bu','ca','ce','da','de','do','fa','fi','ga','go','ha','ka','la','ma','na','ra','ta','to','za'];
+    const n = Math.floor(Math.random()*2)+2;
+    let s='';
+    for(let i=0;i<n;i++) s += syll[Math.floor(Math.random()*syll.length)];
+    return s + Math.floor(Math.random()*90);
+  }
+
+  stratSel.onchange = ()=>{ resetAll(m); };
+  modeSel.onchange = ()=>{ draw(); };
+  hashSel.onchange = ()=>{ 
+    saveSnapshot();
+    const oldM = m;
+    rehash(oldM);
+    ops++;
+    draw();
+    setStatus('rehashed with new hash function');
+  };
+  rehashBtn.onclick = ()=>{ doRehash(); };
+
+  putBtn.onclick = ()=>{ doPut(); };
+  getBtn.onclick = ()=>{ doGet(); };
+  delBtn.onclick = ()=>{ doDel(); };
+  randomBtn.onclick = ()=>{ doRandom(); };
+  clearBtn.onclick = ()=>{ doClear(); };
+  undoBtn.onclick = ()=>{ doUndo(); };
+
+
+
+  let mInit = parseInt(document.querySelector('#capacity').value,10) || 8;
+  m = mInit;
+  initStructure();
+  draw();
+})();
+</script>
+</body>
+</html>

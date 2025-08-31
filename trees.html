@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trees · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/trees.html" />
+<meta name="description" content="Learn general and binary trees: definitions, traversals (pre/post/level/inorder), time complexities, binary rotations, an interactive simulator, and code in Python/Java/C++." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Trees · learnDataStructures" />
+<meta property="og:description" content="Learn general and binary trees: definitions, traversals (pre/post/level/inorder), time complexities, binary rotations, an interactive simulator, and code in Python/Java/C++." />
+<meta property="og:url" content="https://learndatastructures.org/trees.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Trees overview with interactive simulator and code examples" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Trees · learnDataStructures" />
+<meta name="twitter:description" content="Learn general and binary trees: definitions, traversals (pre/post/level/inorder), time complexities, binary rotations, an interactive simulator, and code in Python/Java/C++." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166; 
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:140px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .kbar{color:var(--muted); font-size:13px}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    svg{display:block; width:100%; height:420px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .node{cursor:pointer}
+    .node text{font-size:12px; fill:#001523; pointer-events:none}
+    .sel circle{stroke:#8fffda; stroke-width:2}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Trees (General)</h2></div>
+      <div class="bd">
+        <p><strong>Trees</strong> model hierarchy: each <em>node</em> may have zero or more <em>children</em>, connected by edges. A tree has a single <strong>root</strong> (no incoming edges), and the route linking two nodes is a <strong>path</strong>. Key terms: <strong>parent</strong>, <strong>child</strong>, <strong>siblings</strong>, <strong>subtree</strong> (a node with all descendants), <strong>leaf</strong> (no children), <strong>depth</strong> (edges from root to node), and <strong>height</strong> (max depth of any node).</p>
+        <p><strong>General (n-ary) trees</strong> allow any number of children; <strong>binary trees</strong> allow at most <code>left</code> and <code>right</code>. Traversals are the workhorses (all <strong>O(n)</strong>): <strong>preorder</strong> (node then children), <strong>postorder</strong> (children then node), and <strong>level-order</strong> (BFS). Binary trees add <strong>inorder</strong> (left, node, right). Local <strong>rotations</strong> are defined only for binary trees and simply rewire a parent/child pair while preserving the left-to-right order of subtrees.</p>
+        <ul>
+          <li><strong>Use cases:</strong> file systems, UI hierarchies, DOM trees, scene graphs, compiler parse trees.</li>
+          <li><strong>Complexity:</strong> insertion/deletion given a node reference is <code>O(1)</code>; traversals and metrics like height are <code>O(n)</code>. Rotation is <code>O(1)</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Trees — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Traversal pseudocode</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          <span class="badgePill">General trees: preorder / postorder / level-order</span>
+          <span class="badgePill">Binary only: inorder / rotations</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive tree simulator</h2>
+        <div class="kbar">nodes: <span id="kNodes">0</span> · height: <span id="kHeight">0</span> · mode: <span id="kMode">general</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="nodeGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+        <g id="edges"></g>
+        <g id="nodes"></g>
+        <g id="overlay"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <select id="treeType">
+            <option value="general">General (n-ary) tree</option>
+            <option value="binary">Binary tree (≤ 2 children)</option>
+          </select>
+          <button class="btn" id="newRandom">random tree</button>
+          <input id="maxArity" type="number" min="2" max="5" value="3" style="width:80px" title="Max children per node (general mode only)">
+          <label class="tiny">max arity</label>
+          <button class="btn" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <input id="labelInput" type="text" placeholder="new label (A..Z or text)">
+          <button class="btn primary" id="addChild">add child</button>
+          <button class="btn" id="renameBtn">rename</button>
+          <button class="btn danger" id="deleteBtn">delete subtree</button>
+          <span class="tiny">(click a node to select)</span>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <button class="btn" id="rotateL">rotate ⟲ left</button>
+          <button class="btn" id="rotateR">rotate ⟳ right</button>
+          <span class="badgePill">binary only</span>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <select id="trav">
+            <option value="pre">Preorder</option>
+            <option value="in">Inorder (binary)</option>
+            <option value="post">Postorder</option>
+            <option value="level">Level-order (BFS)</option>
+          </select>
+          <button class="btn" id="runTrav">run</button>
+          <button class="btn" id="stepTrav">step</button>
+          <button class="btn" id="stopTrav">stop</button>
+          <span class="tiny" id="travOut"></span>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Complexity</h2></div>
+      <div class="bd">
+        <h3>Time complexity (general trees / binary trees)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>General Tree</th>
+              <th>Binary Tree</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>add_child(parent, new)</code></td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+              <td>Given a pointer/handle to parent; allocation cost ignored.</td>
+            </tr>
+            <tr>
+              <td><code>delete_subtree(u)</code></td>
+              <td>O(size(u))</td>
+              <td>O(size(u))</td>
+              <td>Must unlink and free all descendants of <code>u</code>.</td>
+            </tr>
+            <tr>
+              <td><code>preorder / postorder</code></td>
+              <td>O(n)</td>
+              <td>O(n)</td>
+              <td>Each node visited exactly once.</td>
+            </tr>
+            <tr>
+              <td><code>level_order (BFS)</code></td>
+              <td>O(n)</td>
+              <td>O(n)</td>
+              <td>Queue stores up to a full level.</td>
+            </tr>
+            <tr>
+              <td><code>inorder</code></td>
+              <td>–</td>
+              <td>O(n)</td>
+              <td>Defined only for binary trees.</td>
+            </tr>
+            <tr>
+              <td><code>height</code></td>
+              <td>O(n)</td>
+              <td>O(n)</td>
+              <td>Worst-case must inspect all nodes.</td>
+            </tr>
+            <tr>
+              <td><code>rotate_left/right</code></td>
+              <td>–</td>
+              <td>O(1)</td>
+              <td>Local rewiring of pointers; preserves inorder order.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Implementations by Language</h3>
+        <h4>Python</h4>
+        <details open>
+          <summary>General node + traversals + binary rotations</summary>
+<pre>
+class Node:
+    def __init__(self, label):
+        self.label = label
+        self.children = []     # for binary: children[0]=left, children[1]=right
+        self.parent = None
+
+def preorder(u, visit):
+    if not u: return
+    visit(u); [preorder(v, visit) for v in u.children]
+
+def postorder(u, visit):
+    if not u: return
+    for v in u.children: postorder(v, visit)
+    visit(u)
+
+from collections import deque
+def level_order(root, visit):
+    if not root: return
+    q = deque([root])
+    while q:
+        u = q.popleft(); visit(u); q.extend(u.children)
+
+# Binary-only helpers
+def rotate_left(x):
+    y = x.children[1] if len(x.children) &gt; 1 else None
+    if not y: return x
+    yL = y.children[0] if y.children else None
+    if len(x.children) &lt; 2: x.children += [None]*(2-len(x.children))
+    x.children[1] = yL
+    if yL: yL.parent = x
+    parent = x.parent
+    y.parent = parent
+    x.parent = y
+    if parent:
+        idx = 0 if parent.children[0] is x else 1
+        parent.children[idx] = y
+    y.children = [x, y.children[1] if len(y.children)&gt;1 else None]
+    return y if parent is None else parent
+
+def rotate_right(x):
+    y = x.children[0] if x.children else None
+    if not y: return x
+    yR = y.children[1] if len(y.children)&gt;1 else None
+    if len(x.children) &lt; 2: x.children += [None]*(2-len(x.children))
+    x.children[0] = yR
+    if yR: yR.parent = x
+    parent = x.parent
+    y.parent = parent
+    x.parent = y
+    if parent:
+        idx = 0 if parent.children[0] is x else 1
+        parent.children[idx] = y
+    y.children = [y.children[0] if len(y.children)&gt;0 else None, x]
+    return y if parent is None else parent
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>General node + traversals + binary rotations</summary>
+<pre>
+class Node {
+  String label;
+  java.util.List&lt;Node&gt; children = new java.util.ArrayList&lt;&gt;();
+  Node parent;
+}
+
+static void preorder(Node u, java.util.function.Consumer&lt;Node&gt; visit){
+  if(u==null) return; visit.accept(u);
+  for(Node v: u.children) preorder(v, visit);
+}
+static void postorder(Node u, java.util.function.Consumer&lt;Node&gt; visit){
+  if(u==null) return;
+  for(Node v: u.children) postorder(v, visit);
+  visit.accept(u);
+}
+static void levelOrder(Node root, java.util.function.Consumer&lt;Node&gt; visit){
+  if(root==null) return;
+  java.util.ArrayDeque&lt;Node&gt; q = new java.util.ArrayDeque&lt;&gt;();
+  q.add(root);
+  while(!q.isEmpty()){
+    Node u=q.remove(); visit.accept(u);
+    for(Node v: u.children) q.add(v);
+  }
+}
+// Binary rotations (assume children.size()<=2)
+static void rotateLeft(Node x){
+  Node y = x.children.size()&gt;1 ? x.children.get(1) : null;
+  if(y==null) return;
+  Node yL = y.children.size()&gt;0 ? y.children.get(0) : null;
+  if(x.children.size()&lt;2) while(x.children.size()&lt;2) x.children.add(null);
+  x.children.set(1, yL); if(yL!=null) yL.parent = x;
+  Node p = x.parent; y.parent = p; x.parent = y;
+  if(p!=null){
+    int idx = (p.children.get(0)==x) ? 0 : 1;
+    p.children.set(idx, y);
+  }
+  if(y.children.size()&lt;2) while(y.children.size()&lt;2) y.children.add(null);
+  y.children.set(0, x);
+}
+static void rotateRight(Node x){
+  Node y = x.children.size()&gt;0 ? x.children.get(0) : null;
+  if(y==null) return;
+  Node yR = y.children.size()&gt;1 ? y.children.get(1) : null;
+  if(x.children.size()&lt;2) while(x.children.size()&lt;2) x.children.add(null);
+  x.children.set(0, yR); if(yR!=null) yR.parent = x;
+  Node p = x.parent; y.parent = p; x.parent = y;
+  if(p!=null){
+    int idx = (p.children.get(0)==x) ? 0 : 1;
+    p.children.set(idx, y);
+  }
+  if(y.children.size()&lt;2) while(y.children.size()&lt;2) y.children.add(null);
+  y.children.set(1, x);
+}
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>General node + traversals + binary rotations</summary>
+<pre>
+struct Node{
+  std::string label;
+  std::vector&lt;Node*&gt; children; // for binary: [left,right]
+  Node* parent = nullptr;
+};
+
+void preorder(Node* u, auto visit){
+  if(!u) return; visit(u);
+  for(auto v: u-&gt;children) preorder(v, visit);
+}
+void postorder(Node* u, auto visit){
+  if(!u) return;
+  for(auto v: u-&gt;children) postorder(v, visit);
+  visit(u);
+}
+void levelOrder(Node* root, auto visit){
+  if(!root) return;
+  std::queue&lt;Node*&gt; q; q.push(root);
+  while(!q.empty()){
+    Node* u=q.front(); q.pop(); visit(u);
+    for(auto v: u-&gt;children) q.push(v);
+  }
+}
+// Binary rotations (assume children.size()<=2)
+void rotateLeft(Node* x){
+  if(!x || x-&gt;children.size()&lt;2) return;
+  Node* y = x-&gt;children[1];
+  if(!y) return;
+  Node* yL = (y-&gt;children.size()&gt;0)? y-&gt;children[0]: nullptr;
+  x-&gt;children[1] = yL; if(yL) yL-&gt;parent = x;
+  Node* p = x-&gt;parent; y-&gt;parent = p; x-&gt;parent = y;
+  if(p){
+    int idx = (p-&gt;children[0]==x)?0:1;
+    p-&gt;children[idx] = y;
+  }
+  if(y-&gt;children.size()&lt;2) y-&gt;children.resize(2,nullptr);
+  y-&gt;children[0] = x;
+}
+void rotateRight(Node* x){
+  if(!x || x-&gt;children.empty()) return;
+  Node* y = x-&gt;children[0];
+  if(!y) return;
+  Node* yR = (y-&gt;children.size()&gt;1)? y-&gt;children[1]: nullptr;
+  if(x-&gt;children.size()&lt;2) x-&gt;children.resize(2,nullptr);
+  x-&gt;children[0] = yR; if(yR) yR-&gt;parent = x;
+  Node* p = x-&gt;parent; y-&gt;parent = p; x-&gt;parent = y;
+  if(p){
+    int idx = (p-&gt;children[0]==x)?0:1;
+    p-&gt;children[idx] = y;
+  }
+  if(y-&gt;children.size()&lt;2) y-&gt;children.resize(2,nullptr);
+  y-&gt;children[1] = x;
+}
+</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Concept Checks</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Explain depth vs. height and how they are computed.</li>
+          <li>Why does <code>inorder</code> apply only to binary trees?</li>
+          <li>Show that preorder/postorder/level-order each visit all nodes exactly once.</li>
+          <li>Perform a left rotation at a node and prove all subtree relative orders are preserved.</li>
+          <li>Serialize the current tree to a nested list and reconstruct it.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// General tree node (n-ary)
+struct Node {
+  string label;
+  vector<Node*> children; // any arity; for binary: [left,right]
+  Node* parent = nullptr;
+};
+
+// DFS traversals
+void preorder(Node* u){
+  if(!u) return;
+  visit(u);
+  for(Node* v: u->children) preorder(v);
+}
+
+void postorder(Node* u){
+  if(!u) return;
+  for(Node* v: u->children) postorder(v);
+  visit(u);
+}
+
+// Level-order (BFS)
+void levelOrder(Node* root){
+  if(!root) return;
+  queue<Node*> q; q.push(root);
+  while(!q.empty()){
+    Node* u=q.front(); q.pop(); visit(u);
+    for(Node* v: u->children) q.push(v);
+  }
+}`,
+java:`// General tree node (n-ary)
+class Node {
+  String label;
+  java.util.List<Node> children = new java.util.ArrayList<>();
+  Node parent;
+}
+
+// DFS
+void preorder(Node u){
+  if(u==null) return;
+  visit(u);
+  for(Node v: u.children) preorder(v);
+}
+
+void postorder(Node u){
+  if(u==null) return;
+  for(Node v: u.children) postorder(v);
+  visit(u);
+}
+
+// BFS
+void levelOrder(Node root){
+  if(root==null) return;
+  java.util.ArrayDeque<Node> q = new java.util.ArrayDeque<>();
+  q.add(root);
+  while(!q.isEmpty()){
+    Node u = q.remove();
+    visit(u);
+    for(Node v: u.children) q.add(v);
+  }
+}`,
+py:`# General tree node (n-ary)
+class Node:
+    def __init__(self, label):
+        self.label = label
+        self.children = []
+        self.parent = None
+
+def preorder(u, visit):
+    if not u: return
+    visit(u)
+    for v in u.children: preorder(v, visit)
+
+def postorder(u, visit):
+    if not u: return
+    for v in u.children: postorder(v, visit)
+    visit(u)
+
+from collections import deque
+def level_order(root, visit):
+    if not root: return
+    q = deque([root])
+    while q:
+        u = q.popleft(); visit(u)
+        q.extend(u.children)`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const lines = [
+'// Preorder (general): visit node, then children left→right',
+'pre(u): if u=null return; visit(u); for v in u.children: pre(v)',
+'',
+'// Postorder (general): visit all children, then node',
+'post(u): if u=null return; for v in u.children: post(v); visit(u)',
+'',
+'// Level-order (BFS): queue by levels',
+'level(root): if root=null return; push root;',
+'  while q not empty: u←pop(); visit(u); for v in u.children: push v',
+'',
+'// Inorder (binary only): left, node, right',
+'in(u): if u=null return; in(u.left); visit(u); in(u.right)',
+'',
+'// Left rotation (binary): x.right (y) becomes parent of x',
+'rotateLeft(x): y←x.right; x.right←y.left; y.left←x; fix parents'
+  ];
+  function renderPseudo(){ pseudoEl.innerHTML = lines.map(ln=>`<div>${ln}</div>`).join(''); }
+  renderPseudo();
+
+  const edgesG = document.querySelector('#edges');
+  const nodesG = document.querySelector('#nodes');
+  const overlayG = document.querySelector('#overlay');
+
+  const MAX_NODES = 30;
+  const LEVEL_H = 80;
+  const NODE_R = 16;
+
+  const kNodes=document.querySelector('#kNodes');
+  const kHeight=document.querySelector('#kHeight');
+  const kMode=document.querySelector('#kMode');
+  const kOps=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+
+  const treeTypeSel=document.querySelector('#treeType');
+  const maxArityInput=document.querySelector('#maxArity');
+  const newRandomBtn=document.querySelector('#newRandom');
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+  const labelInput=document.querySelector('#labelInput');
+  const addChildBtn=document.querySelector('#addChild');
+  const renameBtn=document.querySelector('#renameBtn');
+  const deleteBtn=document.querySelector('#deleteBtn');
+  const rotateLBtn=document.querySelector('#rotateL');
+  const rotateRBtn=document.querySelector('#rotateR');
+
+  const travSel=document.querySelector('#trav');
+  const runTravBtn=document.querySelector('#runTrav');
+  const stepTravBtn=document.querySelector('#stepTrav');
+  const stopTravBtn=document.querySelector('#stopTrav');
+  const travOut=document.querySelector('#travOut');
+
+  let ops=0;
+  let hist=[];         
+  let root = null;
+  let selected = null;
+  let isBinary = (treeTypeSel.value==='binary');
+
+  let anim = { list:[], i:0, timer:null };
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+  function childCount(u){ if(!u) return 0; ensure2(u); return (u.children[0]?1:0) + (u.children[1]?1:0); }           
+  function firstOpenSlot(u){ ensure2(u); return (u.children[0]==null) ? 0 : ((u.children[1]==null) ? 1 : -1); }      
+
+  function compactChildren(u){
+    if(!u) return;
+    u.children = u.children.filter(Boolean);
+    for(const v of u.children) compactChildren(v);
+  }
+
+  function ensure2(u){
+    if(!u) return;
+    const L = u.children[0] ?? null;
+    const R = u.children[1] ?? null;
+    u.children = [L, R];       
+  }
+  function left(u){ return u ? (u.children[0] ?? null) : null; }
+  function right(u){ return u ? (u.children[1] ?? null) : null; }
+  function setLeft(u, ch){ ensure2(u); u.children[0] = ch; if(ch) ch.parent = u; }
+  function setRight(u, ch){ ensure2(u); u.children[1] = ch; if(ch) ch.parent = u; }
+
+  function normalizeBinary(u){
+    if(!u) return;
+    ensure2(u);
+    if(u.children[0]) normalizeBinary(u.children[0]);
+    if(u.children[1]) normalizeBinary(u.children[1]);
+  }
+
+
+  function mkNode(label){
+    return { id: genId(), label: label || genLabel(), children: [], parent: null };
+  }
+  let nextId = 1;
+  function genId(){ return nextId++; }
+  function genLabel(){
+    const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return base[(nextId-1) % base.length];
+  }
+
+  function walk(u, fn, seen=new Set()){
+    if(!u || seen.has(u)) return;
+    seen.add(u);
+    fn(u);
+    for(const v of u.children) walk(v, fn, seen);
+  }
+
+  function height(u){
+    if(!u) return 0;
+    if(u.children.length===0) return 1;
+    let h=0; for(const v of u.children) h=Math.max(h, height(v));
+    return h+1;
+  }
+  function count(u){
+    if(!u) return 0;
+    let n=1; for(const v of u.children) n+=count(v);
+    return n;
+  }
+  function exists(u,t){
+    if(!u) return false;
+    if(u===t) return true;
+    for(const v of u.children) if(exists(v,t)) return true;
+    return false;
+  }
+  function serialize(u){
+    if(!u) return null;
+    return [u.label, u.children.map(serialize)];
+  }
+  function deserialize(s, parent=null){
+    if(s===null) return null;
+    const n = mkNode(String(s[0]));
+    n.parent = parent;
+    n.children = (s[1]||[]).map(ch => deserialize(ch, n));
+    return n;
+  }
+  function saveSnapshot(){ hist.push(serialize(root)); if(hist.length>20) hist.shift(); }
+  function restoreLast(){
+    const s = hist.pop();
+    if(s===undefined) return false;
+    root = deserialize(s);
+    selected = null;
+    draw();
+    return true;
+  }
+
+  function ensureBinary(node){
+    if(!node) return;
+    if(node.children.length>2){
+      node.children = node.children.slice(0,2);
+      node.children.forEach(c=>c && (c.parent=node));
+    }
+    node.children.forEach(ensureBinary);
+  }
+
+  /* ---- Layout ---- */
+  function layout(){
+    if(!root) return {pos:new Map(), height:0, maxX:0, maxY:0};
+    const pos = new Map();
+    const h = height(root);
+    let maxX = 0, maxY = 0;
+
+    if(isBinary){
+      let x=0;
+      (function dfs(u, d){
+        const L = u.children[0]||null, R = u.children[1]||null;
+        if(L) dfs(L, d+1);
+        const px = 40 + x*34;
+        const py = 30 + d*LEVEL_H;
+        pos.set(u, {x: px, y: py});
+        maxX = Math.max(maxX, px);
+        maxY = Math.max(maxY, py);
+        x++;
+        if(R) dfs(R, d+1);
+      })(root,0);
+      return {pos, height:h, maxX, maxY};
+    } else {
+      let x=0;
+      (function dfs(u,d){
+        if(u.children.length===0){
+          const px = 40 + (x++)*34, py = 30 + d*LEVEL_H;
+          pos.set(u,{x:px, y:py});
+          maxX = Math.max(maxX, px);
+          maxY = Math.max(maxY, py);
+          return px;
+        }
+        let minX=Infinity, maxXX=-Infinity;
+        for(const v of u.children){
+          const cx=dfs(v,d+1);
+          minX=Math.min(minX,cx); maxXX=Math.max(maxXX,cx);
+        }
+        const mid=(minX+maxXX)/2;
+        const py = 30 + d*LEVEL_H;
+        pos.set(u,{x:mid,y:py});
+        maxX = Math.max(maxX, mid);
+        maxY = Math.max(maxY, py);
+        return mid;
+      })(root,0);
+      return {pos, height:h, maxX, maxY};
+    }
+  }
+
+  function draw(){
+    isBinary = (treeTypeSel.value==='binary');
+    kMode.textContent = isBinary ? 'binary' : 'general';
+
+    edgesG.innerHTML=''; nodesG.innerHTML=''; overlayG.innerHTML='';
+    edgesG.removeAttribute('transform'); nodesG.removeAttribute('transform'); overlayG.removeAttribute('transform');
+
+    kNodes.textContent = String(count(root));
+    kHeight.textContent = String(Math.max(0,height(root)-1));
+    kOps.textContent = String(ops);
+
+    if(selected && !exists(root, selected)) selected = null;
+    if(!root){ setStatus('tree is empty — “random tree” or “add child” (select root first)'); updateButtons(); return; }
+
+    if(isBinary){ ensureBinary(root); normalizeBinary(root); }
+
+    const L = layout();
+
+    const VIEW_W = 760, VIEW_H = 420;                            
+    const margin = 20;
+    const neededW = (L.maxX + NODE_R + margin);
+    const neededH = (L.maxY + NODE_R + margin);
+    const scaleX = Math.min(1, (VIEW_W - margin) / Math.max(margin, neededW));
+    const scaleY = Math.min(1, (VIEW_H - margin) / Math.max(margin, neededH));
+    const S = Math.min(scaleX, scaleY);                         
+    edgesG.setAttribute('transform', `scale(${S})`);
+    nodesG.setAttribute('transform', `scale(${S})`);
+    overlayG.setAttribute('transform', `scale(${S})`);
+
+    walk(root, u=>{
+      for(const v of u.children){
+        if(!v) continue;                             
+        const a = L.pos.get(u), b = L.pos.get(v);
+        if(!a || !b) continue;                       
+        const e = mk('path', {
+          d:`M ${a.x} ${a.y+NODE_R} C ${a.x} ${(a.y+b.y)/2} ${b.x} ${(a.y+b.y)/2} ${b.x} ${b.y-NODE_R}`,
+          stroke:'#37507f', fill:'none'
+        });
+        edgesG.appendChild(e);
+      }
+    });
+
+    walk(root, u=>{
+      const p = L.pos.get(u);
+      if(!p) return;                                  
+      const g = mk('g',{class:'node'+(selected===u?' sel':''), transform:`translate(${p.x},${p.y})`});
+      const c = mk('circle',{r:NODE_R, fill:'url(#nodeGrad)', stroke:'#214064'});
+      const t = mk('text',{y:4,'text-anchor':'middle', fill:'#001523'}); t.textContent=u.label;
+      g.appendChild(c); g.appendChild(t);
+      g.addEventListener('click', ev=>{ ev.stopPropagation(); selected=u; draw(); });
+      nodesG.appendChild(g);
+    });
+
+    updateButtons();
+    setStatus(selected ? `selected: ${selected.label}` : 'no node selected');
+  }
+
+  function preorder(u,out){ if(!u) return; out.push(u); for(const v of u.children) preorder(v,out); }
+  function postorder(u,out){ if(!u) return; for(const v of u.children) postorder(v,out); out.push(u); }
+  function levelorder(u,out){
+    if(!u) return; const q=[u];
+    while(q.length){ const x=q.shift(); out.push(x); for(const v of x.children) q.push(v); }
+  }
+  function inorder(u,out){ if(!u) return; inorder(left(u),out); out.push(u); inorder(right(u),out); }
+
+  function runTraversal(kind){
+    if(!root){ setStatus('build or randomize a tree first'); return; }
+    const arr=[];
+    if(kind==='pre') preorder(root,arr);
+    else if(kind==='post') postorder(root,arr);
+    else if(kind==='level') levelorder(root,arr);
+    else if(kind==='in'){ if(!isBinary){ setStatus('Inorder requires binary mode'); return; } inorder(root,arr); }
+    anim.list=arr; anim.i=0;
+    travOut.textContent='order: '+arr.map(x=>x.label).join(' → ');
+    stepOnce(true);
+    if(anim.timer) clearInterval(anim.timer);
+    anim.timer=setInterval(()=>{ if(!stepOnce(false)) stopAnim(); }, 500);
+  }
+  function stepOnce(reset){
+    if(reset) overlayG.innerHTML='';
+    if(anim.i>=anim.list.length) return false;
+    const u=anim.list[anim.i++]; pulse(u); return true;
+  }
+  function stopAnim(){ if(anim.timer){ clearInterval(anim.timer); anim.timer=null; } }
+  function pulse(u){
+    const L=layout(), p=L.pos.get(u);
+    const r=mk('circle',{cx:p.x, cy:p.y, r:7, fill:'var(--pulse)', stroke:'#222', 'stroke-width':1, opacity:.95});
+    overlayG.appendChild(r);
+    setTimeout(()=>r.remove(), 420);
+  }
+
+  function updateButtons(){
+    rotateLBtn.disabled = !isBinary || !selected;
+    rotateRBtn.disabled = !isBinary || !selected;
+    maxArityInput.disabled = isBinary;
+    [...travSel.options].forEach(o=>{ if(o.value==='in') o.disabled = !isBinary; });
+
+    const hasSel = !!selected;
+    renameBtn.disabled = !hasSel;
+    addChildBtn.disabled = !hasSel ||
+      (isBinary ? (childCount(selected)>=2)
+                : (selected.children.length>=Number(maxArityInput.value||3)));
+    deleteBtn.disabled = !hasSel;
+  }
+
+  function addChild(){
+    if(count(root)>=MAX_NODES){ setStatus('node cap reached (30)'); return; }
+    const lbl = labelInput.value.trim() || genLabel();
+    if(!root){
+      saveSnapshot(); root = mkNode(lbl); selected=root; ops++; draw(); setStatus('created root'); return;
+    }
+    if(!selected){ setStatus('select a node first'); return; }
+
+    if(isBinary){
+      if(childCount(selected)>=2){ setStatus('binary node already has 2 children'); return; }
+      const slot = firstOpenSlot(selected);
+      const n = mkNode(lbl); n.parent = selected;
+      saveSnapshot();
+      if(slot===0) setLeft(selected, n); else if(slot===1) setRight(selected, n);
+      ops++; draw(); setStatus(`added ${slot===0?'left':'right'} child ${n.label}`);
+    } else {
+      const maxA = Number(maxArityInput.value||3);
+      if(selected.children.length>=maxA){ setStatus('max arity reached for this node'); return; }
+      saveSnapshot();
+      const n=mkNode(lbl); n.parent=selected; selected.children.push(n);
+      ops++; draw(); setStatus(`added child ${n.label}`);
+    }
+  }
+
+  function renameNode(){
+    if(!selected){ setStatus('select a node to rename'); return; }
+    const lbl = labelInput.value.trim(); if(!lbl){ setStatus('enter a label'); return; }
+    saveSnapshot(); selected.label=lbl; ops++; draw(); setStatus('renamed');
+  }
+
+  function deleteSubtree(){
+    if(!selected){ setStatus('select a node to delete'); return; }
+    saveSnapshot();
+    if(selected===root){ root=null; selected=null; }
+    else{
+      const p=selected.parent;
+      p.children = p.children.map(c=>c===selected?null:c).filter(c=>c!==undefined);
+      if(!isBinary) compactChildren(root);
+      selected=null;
+    }
+    ops++; draw(); setStatus('deleted subtree');
+  }
+
+  function replaceChild(p, oldCh, newCh){
+    const idx = p.children.indexOf(oldCh);
+    if(idx>=0) p.children[idx]=newCh;
+  }
+
+  function rotateLeft(){
+    if(!isBinary || !selected){ setStatus('binary mode + selection required'); return; }
+    normalizeBinary(root);
+    const x = selected;
+    const y = right(x);
+    if(!y){ setStatus('no right child to rotate with'); return; }
+
+    saveSnapshot();
+
+    const B = left(y);          
+    const p = x.parent;
+
+    setRight(x, B);
+    setLeft(y, x);
+
+    y.parent = p;
+    if(!p){ root = y; }
+    else{
+      if(left(p) === x) setLeft(p, y);
+      else              setRight(p, y);
+    }
+
+    selected = x; ops++; draw(); setStatus('rotated left');
+  }
+
+  function rotateRight(){
+    if(!isBinary || !selected){ setStatus('binary mode + selection required'); return; }
+    normalizeBinary(root);
+    const x = selected;
+    const y = left(x);
+    if(!y){ setStatus('no left child to rotate with'); return; }
+
+    saveSnapshot();
+
+    const B = right(y);          
+    const p = x.parent;
+
+    setLeft(x, B);
+    setRight(y, x);
+
+    y.parent = p;
+    if(!p){ root = y; }
+    else{
+      if(left(p) === x) setLeft(p, y);
+      else              setRight(p, y);
+    }
+
+    selected = x; ops++; draw(); setStatus('rotated right');
+  }
+
+  function newRandom(){
+    saveSnapshot();
+    const wantBinary = (treeTypeSel.value==='binary');
+    isBinary = wantBinary;
+    const maxAr = wantBinary ? 2 : Math.max(2, Math.min(5, Number(maxArityInput.value)||3));
+    const n = Math.floor(8 + Math.random()*8); 
+    nextId = 1;
+    root = mkNode('A'); const nodes=[root];
+    while(nodes.length < n){
+      const parent = nodes[Math.floor(Math.random()*nodes.length)];
+      if(parent.children.length >= maxAr) continue;
+      const child = mkNode(); child.parent = parent; parent.children.push(child);
+      nodes.push(child);
+    }
+    if(isBinary){ ensureBinary(root); normalizeBinary(root); }
+    selected = root; ops++; draw(); setStatus('random tree created');
+  }
+
+  function clearAll(){ saveSnapshot(); root=null; selected=null; ops++; draw(); setStatus('cleared'); }
+
+  document.querySelector('#vis').addEventListener('click', ()=>{ selected=null; draw(); });
+  addChildBtn.onclick = addChild;
+  renameBtn.onclick = renameNode;
+  deleteBtn.onclick = deleteSubtree;
+  rotateLBtn.onclick = rotateLeft;
+  rotateRBtn.onclick = rotateRight;
+  newRandomBtn.onclick = newRandom;
+  clearBtn.onclick = clearAll;
+  undoBtn.onclick = ()=>{ if(restoreLast()){ ops++; setStatus('undid last change'); } };
+  treeTypeSel.onchange = ()=>{
+    isBinary = (treeTypeSel.value==='binary');
+    saveSnapshot();
+    if(isBinary && root){ ensureBinary(root); normalizeBinary(root); }
+    else if(!isBinary && root){ compactChildren(root); }
+    ops++; draw();
+    setStatus(isBinary ? 'binary mode (≤2 children per node)' : 'general mode (n-ary)');
+  };
+
+  maxArityInput.addEventListener('input', ()=>{ if(!isBinary) { draw(); setStatus(`max arity set to ${maxArityInput.value}`); } });
+
+  runTravBtn.onclick = ()=> runTraversal(travSel.value);
+  stepTravBtn.onclick = ()=> { if(anim.list.length===0) runTraversal(travSel.value); else stepOnce(false); };
+  stopTravBtn.onclick = ()=> { stopAnim(); overlayG.innerHTML=''; };
+
+  newRandom();
+  if(isBinary){ normalizeBinary(root); }
+
+})();
+</script>
+</body>
+</html>

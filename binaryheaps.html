@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Binary Heap · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/binaryheaps.html" />
+<meta name="description" content="Interactive Binary Heap (min/max) tutorial and simulator: insert, extract-root, decrease/increase-key, delete-index, and O(n) build-heap (Floyd). Includes reference code in C++, Java, and Python." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Binary Heap · learnDataStructures" />
+<meta property="og:description" content="Learn heaps with an interactive visualizer. Practice inserts, extractions, key updates, deletes, and Floyd’s heapify with an array-based tree." />
+<meta property="og:url" content="https://learndatastructures.org/binaryheaps.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Min-heap tree drawn over an array layout, highlighting a sift-down step" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Binary Heap · learnDataStructures" />
+<meta name="twitter:description" content="Hands-on binary heap simulator (min/max): insert, extract-root, key updates, delete-index, and O(n) build-heap." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"], select{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:120px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    pre .kw{color:#8fffda;font-weight:600}
+    pre .fn{color:#6ec3ff}
+    pre .cm{color:#7a8db7}
+    pre .st{color:#ffd38e}
+    pre .ty{color:#ffd26e}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0; flex-wrap:wrap}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    svg{display:block; width:100%; height:520px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .node{cursor:pointer}
+    .node text{font-size:12px; fill:#001523; pointer-events:none}
+    .edgeLabel{font-size:11px; fill:#dbe7ff; paint-order:stroke; stroke:#0a1630; stroke-width:2px}
+    .swapPulse{stroke:#ffd166; stroke-width:3}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <!-- EXPLANATION -->
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Binary Heap (array-based)</h2></div>
+      <div class="bd">
+        <h3>What is a Binary Heap?</h3>
+        <p>A <strong>Binary Heap</strong> is a complete binary tree stored in an <em>array</em> that obeys the <strong>heap property</strong>:</p>
+        <ul>
+          <li><strong>Min-heap:</strong> each node ≤ its children → the <em>minimum</em> is at the root (index 0).</li>
+          <li><strong>Max-heap:</strong> each node ≥ its children → the <em>maximum</em> is at the root.</li>
+        </ul>
+        <p>Because the tree is <em>complete</em>, we can map nodes to indices: for index <code>i</code>, parent <code>p=(i-1)//2</code>, left child <code>2i+1</code>, right child <code>2i+2</code>. No pointers required.</p>
+
+        <h3>Operations (high level)</h3>
+        <ul>
+          <li><strong>Insert(x)</strong>: append to the array, then <em>sift up</em> while parent violates property. <code>O(log n)</code></li>
+          <li><strong>Extract-root</strong> (min or max): pop the root, move the last element to index 0, then <em>sift down</em>. <code>O(log n)</code></li>
+          <li><strong>Decrease-key(i, new)</strong> (min-heap): assign <code>a[i]=new</code> then sift up. (For max-heap, increase-key.) <code>O(log n)</code></li>
+          <li><strong>Delete-index(i)</strong>: swap with last, remove last, then sift up or down as needed. <code>O(log n)</code></li>
+          <li><strong>Build-heap</strong> from array: run <em>Floyd’s heapify</em> from the last parent down to 0. <code>O(n)</code></li>
+        </ul>
+
+        <h3>Complexities</h3>
+        <table>
+          <thead><tr><th>Operation</th><th>Time</th><th>Space</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>insert</td><td>O(log n)</td><td>O(1)</td><td>sift up path length ≤ height</td></tr>
+            <tr><td>extract-min/max</td><td>O(log n)</td><td>O(1)</td><td>sift down</td></tr>
+            <tr><td>decrease/increase-key</td><td>O(log n)</td><td>O(1)</td><td>moves along a root–leaf path</td></tr>
+            <tr><td>delete-index</td><td>O(log n)</td><td>O(1)</td><td>swap-with-last then fix</td></tr>
+            <tr><td>build-heap (Floyd)</td><td>O(n)</td><td>O(1)</td><td>many nodes are near leaves ⇒ cheaper</td></tr>
+            <tr><td>peek</td><td>O(1)</td><td>—</td><td>root at index 0</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Common pitfalls</h3>
+        <ul>
+          <li>Remember the array mapping: children at <code>2i+1</code>, <code>2i+2</code>; parent at <code>(i-1)//2</code>.</li>
+          <li>During <strong>delete-index</strong>, after replacing a slot you must decide whether to sift up or down (or both). We fix by comparing with parent first.</li>
+          <li><strong>Build-heap</strong> via repeated insert is <code>O(n log n)</code>; Floyd’s method is <code>O(n)</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- MAIN -->
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Binary Heap — reference & pseudocode</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Pseudocode (insert, siftUp, siftDown, extract, build-heap, decrease-key, delete-index)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">
+          <span class="badgePill">Array representation</span>
+          <span class="badgePill">Complete binary tree</span>
+          <span class="badgePill">Min/Max toggle</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive Binary Heap simulator</h2>
+        <div class="tiny">size: <span id="kSize">0</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="nodeGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="overlay"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <label class="tiny">mode</label>
+          <select id="modeSel">
+            <option value="min">min-heap</option>
+            <option value="max">max-heap</option>
+          </select>
+          <input id="valInput" type="number" min="0" max="10000" placeholder="value (0..10000)" />
+          <button class="btn primary" id="insertBtn">insert</button>
+          <button class="btn" id="extractBtn">extract-root</button>
+          <button class="btn danger" id="clearBtn">clear</button>
+          <button class="btn" id="undoBtn">undo</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <input id="idxInput" type="number" min="0" placeholder="index i"/>
+          <input id="newValInput" type="number" min="0" max="10000" placeholder="new value"/>
+          <button class="btn" id="decBtn">decrease/increase-key</button>
+          <button class="btn" id="delBtn">delete-index</button>
+        </div>
+
+        <div class="row" style="margin:6px 0">
+          <input id="listInput" type="text" placeholder="build from list e.g. 7,3,9,1"/>
+          <button class="btn" id="buildBtn">build-heap (Floyd)</button>
+          <button class="btn" id="stepHeapifyBtn">heapify step</button>
+          <input id="randN" type="number" min="1" max="25" value="8" style="width:80px"/>
+          <button class="btn" id="randBtn">random N</button>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="tiny" id="status"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Variants</h2></div>
+      <div class="bd">
+        <h3>Array-based Binary Heap</h3>
+
+        <h4>Python</h4>
+        <details open>
+          <summary>Min-heap (array)</summary>
+<pre>
+class Heap:
+    def __init__(self): self.a=[]  # 0-indexed
+    def _less(self,i,j): return self.a[i] &lt; self.a[j]
+    def _swap(self,i,j): self.a[i],self.a[j]=self.a[j],self.a[i]
+    def _up(self,i):
+        while i&gt;0:
+            p=(i-1)//2
+            if self._less(i,p): self._swap(i,p); i=p
+            else: break
+    def _down(self,i):
+        n=len(self.a)
+        while True:
+            l=2*i+1; r=l+1; s=i
+            if l&lt;n and self._less(l,s): s=l
+            if r&lt;n and self._less(r,s): s=r
+            if s==i: break
+            self._swap(i,s); i=s
+    def push(self,x):
+        self.a.append(x); self._up(len(self.a)-1)
+    def pop(self):
+        if not self.a: return None
+        x=self.a[0]; self.a[0]=self.a[-1]; self.a.pop()
+        if self.a: self._down(0)
+        return x
+    def build(self, arr):
+        self.a=list(arr)
+        for i in range((len(self.a)//2)-1, -1, -1): self._down(i)
+</pre>
+        </details>
+
+        <details>
+          <summary>Max-heap (flip comparator)</summary>
+<pre>
+class MaxHeap(Heap):
+    def _less(self,i,j): return self.a[i] &gt; self.a[j]
+</pre>
+        </details>
+
+        <h4>Java</h4>
+        <details>
+          <summary>Min-heap (arraylist)</summary>
+<pre>
+import java.util.*;
+class MinHeap {
+  ArrayList&lt;Integer&gt; a = new ArrayList&lt;&gt;();
+  boolean less(int i,int j){ return a.get(i) &lt; a.get(j); }
+  void swap(int i,int j){ int t=a.get(i); a.set(i,a.get(j)); a.set(j,t); }
+  void up(int i){
+    while(i&gt;0){
+      int p=(i-1)/2;
+      if(less(i,p)){ swap(i,p); i=p; } else break;
+    }
+  }
+  void down(int i){
+    int n=a.size();
+    while(true){
+      int l=2*i+1, r=l+1, s=i;
+      if(l&lt;n && less(l,s)) s=l;
+      if(r&lt;n && less(r,s)) s=r;
+      if(s==i) break;
+      swap(i,s); i=s;
+    }
+  }
+  void push(int x){ a.add(x); up(a.size()-1); }
+  Integer pop(){
+    if(a.isEmpty()) return null;
+    int x=a.get(0);
+    int last=a.remove(a.size()-1);
+    if(!a.isEmpty()){ a.set(0,last); down(0); }
+    return x;
+  }
+  void build(List&lt;Integer&gt; arr){
+    a.clear(); a.addAll(arr);
+    for(int i=a.size()/2-1;i&gt;=0;--i) down(i);
+  }
+}
+</pre>
+        </details>
+
+        <h4>C++</h4>
+        <details>
+          <summary>Min-heap (vector)</summary>
+<pre>
+#include &lt;vector&gt;
+using namespace std;
+struct MinHeap{
+  vector&lt;int&gt; a;
+  bool less_(int i,int j){ return a[i] &lt; a[j]; }
+  void swap_(int i,int j){ int t=a[i]; a[i]=a[j]; a[j]=t; }
+  void up(int i){
+    while(i&gt;0){ int p=(i-1)/2; if(less_(i,p)){ swap_(i,p); i=p; } else break; }
+  }
+  void down(int i){
+    int n=a.size();
+    while(true){
+      int l=2*i+1, r=l+1, s=i;
+      if(l&lt;n && less_(l,s)) s=l;
+      if(r&lt;n && less_(r,s)) s=r;
+      if(s==i) break;
+      swap_(i,s); i=s;
+    }
+  }
+  void push(int x){ a.push_back(x); up((int)a.size()-1); }
+  int pop(){
+    int x=a.front(); a[0]=a.back(); a.pop_back(); if(!a.empty()) down(0); return x;
+  }
+  void build(const vector&lt;int&gt;&amp; arr){
+    a=arr; for(int i=(int)a.size()/2-1;i&gt;=0;--i) down(i);
+  }
+};
+</pre>
+        </details>
+
+        <h3>“Library” / Idiomatic alternatives</h3>
+        <ul>
+          <li><strong>Python</strong>: <code>heapq</code> (min-heap). For max-heap, push negatives or use a wrapper.</li>
+          <li><strong>Java</strong>: <code>PriorityQueue&lt;Integer&gt;</code> (min-heap by default; custom comparator for max-heap).</li>
+          <li><strong>C++</strong>: <code>std::priority_queue&lt;T&gt;</code> is max-heap by default; use <code>greater&lt;T&gt;</code> for min-heap.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Concept Checks</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Prove that after <em>sift up</em> or <em>sift down</em>, the heap property is restored along the path with at most <code>O(log n)</code> swaps.</li>
+          <li>What is the difference between a min-heap and a max-heap?</li>
+          <li>Is a binary heap always a complete binary tree?</li>
+          <li>Show how to adapt to a <em>max-heap</em> (comparator flip or negating values).</li>
+          <li>How can a binary heap be used to implement a priority queue?</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// Minimal heap API (vector-based)
+struct MinHeap{
+  std::vector<int> a;
+  void push(int x);     // O(log n)
+  int  pop();           // O(log n), returns min
+  void build(const std::vector<int>& arr); // O(n)
+  int  top() const { return a.empty()?INT_MAX:a[0]; }
+};`,
+java:`// Minimal heap API (ArrayList-based)
+class MinHeap{
+  java.util.ArrayList<Integer> a = new java.util.ArrayList<>();
+  void push(int x); Integer pop(); void build(java.util.List<Integer> arr);
+  Integer top(){ return a.isEmpty()?null:a.get(0); }
+}`,
+py:`# Minimal heap API (list-based)
+class Heap:
+    def __init__(self): self.a=[]
+    def push(self,x): ...
+    def pop(self): ...
+    def build(self, arr): ...`
+  };
+ function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const ps = [
+'// 0-indexed array representation',
+'parent(i)=(i-1)//2, left(i)=2*i+1, right(i)=2*i+2',
+'less(i,j): return a[i] < a[j]   // flip for max-heap',
+'',
+'insert(x):',
+'  a.append(x); i = len(a)-1',
+'  while i>0 and less(i, parent(i)):',
+'    swap(i, parent(i)); i = parent(i)',
+'',
+'extract_root():',
+'  if empty: return null',
+'  root = a[0]; a[0] = a.back(); a.pop_back()',
+'  siftDown(0); return root',
+'',
+'siftDown(i):',
+'  while true:',
+'    s = i',
+'    l = left(i); r = right(i)',
+'    if l<n and less(l,s): s = l',
+'    if r<n and less(r,s): s = r',
+'    if s==i: break',
+'    swap(i,s); i = s',
+'',
+'decrease_key(i, new):  // increase_key for max-heap',
+'  if new > a[i]: error',
+'  a[i] = new; siftUp(i)',
+'',
+'delete_index(i):',
+'  swap(i, last); remove last',
+'  if i < n:',
+'    if i>0 and less(i,parent(i)): siftUp(i)',
+'    else siftDown(i)',
+'',
+'build_heap(A):  // Floyd, O(n)',
+'  a = A',
+'  for i in reverse(0..n//2-1): siftDown(i)'
+  ];
+  function renderPseudo(){ pseudoEl.innerHTML = ps.map(ln=>`<div>${ln}</div>`).join(''); }
+  renderPseudo();
+
+  const edgesG = document.querySelector('#edges');
+  const nodesG = document.querySelector('#nodes');
+  const overlayG = document.querySelector('#overlay');
+  const VIEW_W=760, VIEW_H=520, NODE_R=15, LEVEL_H=86;
+
+  const kSize=document.querySelector('#kSize');
+  const kOps=document.querySelector('#kOps');
+  const statusEl=document.querySelector('#status');
+
+  const modeSel=document.querySelector('#modeSel');
+  const valInput=document.querySelector('#valInput');
+  const insertBtn=document.querySelector('#insertBtn');
+  const extractBtn=document.querySelector('#extractBtn');
+  const clearBtn=document.querySelector('#clearBtn');
+  const undoBtn=document.querySelector('#undoBtn');
+
+  const idxInput=document.querySelector('#idxInput');
+  const newValInput=document.querySelector('#newValInput');
+  const decBtn=document.querySelector('#decBtn');
+  const delBtn=document.querySelector('#delBtn');
+
+  const listInput=document.querySelector('#listInput');
+  const buildBtn=document.querySelector('#buildBtn');
+  const stepHeapifyBtn=document.querySelector('#stepHeapifyBtn');
+  const randN=document.querySelector('#randN');
+  const randBtn=document.querySelector('#randBtn');
+
+  let ops=0, A=[], isMin=true, hist=[];
+  let q=[], busy=false;
+
+  let heapifyState = { running:false, i:-1 };
+
+  function saveSnap(){
+    hist.push({A: A.slice(), isMin});
+    if(hist.length>40) hist.shift();
+  }
+  function undo(){
+    const s=hist.pop(); if(!s) return false;
+    A = s.A.slice(); isMin = s.isMin;
+    modeSel.value = isMin ? 'min' : 'max';
+    draw(); return true;
+  }
+
+  function setStatus(msg){ statusEl.textContent = msg||''; }
+  function less(i,j){ return isMin ? (A[i] < A[j]) : (A[i] > A[j]); }
+  function swap(i,j){
+    const t=A[i]; A[i]=A[j]; A[j]=t;
+    pulseSwap(i,j);
+  }
+  function parent(i){ return Math.floor((i-1)/2); }
+  function left(i){ return i*2+1; }
+  function right(i){ return i*2+2; }
+
+  function siftUp(i){
+    while(i>0){
+      const p=parent(i);
+      if(less(i,p)){ swap(i,p); i=p; } else break;
+    }
+  }
+  function siftDown(i){
+    const n=A.length;
+    while(true){
+      let s=i;
+      const l=left(i), r=l+1;
+      if(l<n && less(l,s)) s=l;
+      if(r<n && less(r,s)) s=r;
+      if(s===i) break;
+      swap(i,s); i=s;
+    }
+  }
+
+  function insert(x){
+    A.push(x); siftUp(A.length-1);
+  }
+  function extractRoot(){
+    if(A.length===0) return null;
+    const root=A[0];
+    const last=A.pop();
+    if(A.length){ A[0]=last; siftDown(0); }
+    return root;
+  }
+  function decreaseOrIncrease(i, nv){
+    if(!(i>=0 && i<A.length)) return 'bad-index';
+    const old=A[i]; A[i]=nv;
+    if(isMin){
+      if(nv>old){ siftDown(i); } else { siftUp(i); }
+    } else {
+      if(nv<old){ siftDown(i); } else { siftUp(i); }
+    }
+    return 'ok';
+  }
+  function deleteIndex(i){
+    if(!(i>=0 && i<A.length)) return false;
+    const last=A.pop();
+    if(i<A.length){
+      const old=A[i]; A[i]=last;
+      if(i>0 && less(i,parent(i))) siftUp(i);
+      else siftDown(i);
+    }
+    return true;
+  }
+  function buildFromList(arr){
+    A = arr.slice();
+    for(let i=Math.floor(A.length/2)-1;i>=0;--i) siftDown(i);
+  }
+
+  function enqueue(fn){ q.push(fn); drain(); }
+  function drain(){
+    if(busy) return; busy=true;
+    (function loop(){
+      const fn=q.shift();
+      if(!fn){ busy=false; return; }
+      try{ fn(); } catch(e){ console.error(e); setStatus('error: '+e.message); }
+      setTimeout(loop, 0);
+    })();
+  }
+
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+  function layout(){
+    const pos=new Map();
+    if(A.length===0) return {pos, maxX:20, maxY:20};
+    let idx=0, level=0, nextBreak=1, xSlots=1;
+    const H = Math.floor(Math.log2(A.length))+1;
+    for(let i=0;i<A.length;i++){
+      level = Math.floor(Math.log2(i+1));
+      const levelSize = 1<<level;
+      const posInLevel = i - (levelSize-1);
+      const gapX = 760/(levelSize+1);
+      const x = gapX*(posInLevel+1);
+      const y = 30 + level*86;
+      pos.set(i,{x,y});
+    }
+    const maxY = 30 + (H-1)*86;
+    return {pos, maxX:740, maxY};
+  }
+
+  function pulseSwap(i,j){
+    const L=layout();
+    const pi=L.pos.get(i), pj=L.pos.get(j);
+    if(!pi||!pj) return;
+    const a=mk('circle',{cx:pi.x,cy:pi.y,r:NODE_R+3,fill:'none',class:'swapPulse'});
+    const b=mk('circle',{cx:pj.x,cy:pj.y,r:NODE_R+3,fill:'none',class:'swapPulse'});
+    overlayG.appendChild(a); overlayG.appendChild(b);
+    setTimeout(()=>{ a.remove(); b.remove(); }, 300);
+  }
+
+  function draw(){
+    edgesG.innerHTML=''; nodesG.innerHTML=''; overlayG.innerHTML='';
+    const n=A.length;
+    kSize.textContent=String(n);
+    kOps.textContent=String(ops);
+
+    const L=layout();
+    const margin=20;
+    const needW=760, needH=L.maxY + NODE_R + margin;
+    const scaleY=Math.min(1,(VIEW_H-margin)/Math.max(margin,needH));
+    const S=scaleY;
+    edgesG.setAttribute('transform',`scale(${S})`);
+    nodesG.setAttribute('transform',`scale(${S})`);
+    overlayG.setAttribute('transform',`scale(${S})`);
+
+    for(let i=0;i<n;i++){
+      const p=L.pos.get(i);
+      const l=left(i), r=right(i);
+      if(l<n){
+        const c=L.pos.get(l);
+        const path=mk('path',{d:`M ${p.x} ${p.y+NODE_R} C ${p.x} ${(p.y+c.y)/2} ${c.x} ${(p.y+c.y)/2} ${c.x} ${c.y-NODE_R}`, stroke:'#37507f', fill:'none'});
+        edgesG.appendChild(path);
+      }
+      if(r<n){
+        const c=L.pos.get(r);
+        const path=mk('path',{d:`M ${p.x} ${p.y+NODE_R} C ${p.x} ${(p.y+c.y)/2} ${c.x} ${(p.y+c.y)/2} ${c.x} ${c.y-NODE_R}`, stroke:'#37507f', fill:'none'});
+        edgesG.appendChild(path);
+      }
+    }
+
+    for(let i=0;i<n;i++){
+      const p=L.pos.get(i);
+      const g=mk('g',{class:'node', transform:`translate(${p.x},${p.y})`});
+      const c=mk('circle',{r:NODE_R, fill:'url(#nodeGrad)', stroke:'#214064'});
+      const t=mk('text',{y:4, 'text-anchor':'middle'});
+      t.textContent=String(A[i]);
+      g.appendChild(c); g.appendChild(t);
+      nodesG.appendChild(g);
+    }
+  }
+
+  function getNumber(el, name){
+    const v = Number(el.value);
+    if(!Number.isFinite(v)) { setStatus(`enter ${name}`); return null; }
+    if(name!=='index' && (!Number.isInteger(v) || v<0 || v>10000)){ setStatus(`${name} must be integer 0..10000`); return null; }
+    return Math.trunc(v);
+  }
+
+  modeSel.onchange = ()=>enqueue(()=>{
+    saveSnap();
+    isMin = (modeSel.value==='min');
+    for(let i=Math.floor(A.length/2)-1;i>=0;--i) siftDown(i);
+    ops++; draw(); setStatus(isMin?'mode: min-heap':'mode: max-heap');
+  });
+
+  insertBtn.onclick = ()=>enqueue(()=>{
+    const x=getNumber(valInput,'value'); if(x===null) return;
+    saveSnap();
+    insert(x); ops++; draw(); setStatus(`inserted ${x}`);
+  });
+
+  extractBtn.onclick = ()=>enqueue(()=>{
+    if(A.length===0){ setStatus('empty'); return; }
+    saveSnap();
+    const x=extractRoot(); ops++; draw(); setStatus(`extracted ${x}`);
+  });
+
+  clearBtn.onclick = ()=>enqueue(()=>{
+    saveSnap(); A=[]; heapifyState.running=false; ops++; draw(); setStatus('cleared');
+  });
+
+  undoBtn.onclick = ()=>enqueue(()=>{
+    if(undo()){ ops++; setStatus('undid last change'); }
+    else setStatus('nothing to undo');
+  });
+
+  decBtn.onclick = ()=>enqueue(()=>{
+    const i=getNumber(idxInput,'index'); if(i===null) return;
+    if(!(i>=0 && i<A.length)){ setStatus(`index must be 0..${A.length-1}`); return; }
+    const nv=getNumber(newValInput,'new value'); if(nv===null) return;
+    saveSnap();
+    const r=decreaseOrIncrease(i,nv);
+    ops++; draw(); setStatus(r==='ok' ? (isMin?'decrease/increase-key done':'decrease/increase-key done') : 'bad index');
+  });
+
+  delBtn.onclick = ()=>enqueue(()=>{
+    const i=getNumber(idxInput,'index'); if(i===null) return;
+    if(!(i>=0 && i<A.length)){ setStatus(`index must be 0..${A.length-1}`); return; }
+    saveSnap();
+    deleteIndex(i); ops++; draw(); setStatus(`deleted index ${i}`);
+  });
+
+  buildBtn.onclick = ()=>enqueue(()=>{
+    const txt = (listInput.value||'').trim();
+    if(!txt){ setStatus('enter a list like 7,3,9,1'); return; }
+    const arr = txt.split(/[,\s]+/).map(s=>Number(s)).filter(v=>Number.isFinite(v)).map(v=>Math.max(0, Math.min(10000, Math.trunc(v))));
+    saveSnap();
+    A = arr; 
+    for(let i=Math.floor(A.length/2)-1;i>=0;--i) siftDown(i);
+    heapifyState.running=false;
+    ops++; draw(); setStatus('built (Floyd) from list');
+  });
+
+  stepHeapifyBtn.onclick = ()=>enqueue(()=>{
+    if(A.length===0){ setStatus('empty'); return; }
+    if(!heapifyState.running){ heapifyState.running=true; heapifyState.i=Math.floor(A.length/2)-1; }
+    if(heapifyState.i<0){ setStatus('heapify done'); heapifyState.running=false; return; }
+    siftDown(heapifyState.i--);
+    ops++; draw(); setStatus(`heapify step: i=${heapifyState.i+1}`);
+  });
+
+  randBtn.onclick = ()=>enqueue(()=>{
+    const n = Number(randN.value)|0;
+    if(!(n>=1 && n<=25)){ setStatus('N must be 1..25'); return; }
+    saveSnap();
+    A=[]; for(let i=0;i<n;i++) A.push(Math.floor(Math.random()*10001));
+    for(let i=Math.floor(A.length/2)-1;i>=0;--i) siftDown(i);
+    heapifyState.running=false;
+    ops++; draw(); setStatus(`random ${n} (replaced)`);
+  });
+
+  valInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') insertBtn.click(); });
+
+  (function preload(){
+    A = [7, 19, 12, 25, 30, 18, 40];
+    isMin = true; modeSel.value='min';
+    for(let i=Math.floor(A.length/2)-1;i>=0;--i) siftDown(i);
+    draw();
+    setStatus('preloaded small min-heap');
+  })();
+})();
+</script>
+</body>
+</html>

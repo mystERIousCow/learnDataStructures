@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+<meta name="theme-color" content="#00BFA6">
+<meta name="msapplication-TileColor" content="#00BFA6">
+<meta name="msapplication-TileImage" content="./mstile-150x150.png?v=2">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/" />
+<meta name="description" content="Interactive data structures and algorithms: stacks, queues, linked lists, trees, heaps, hash tables, graphs, tries, sorting, and pathfinding. Visual simulators, step-by-step pseudocode, and compact code snippets." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="learnDataStructures" />
+<meta property="og:description" content="Interactive data structures and algorithms: stacks, queues, linked lists, trees, heaps, hash tables, graphs, tries, sorting, and pathfinding. Visual simulators, step-by-step pseudocode, and compact code snippets." />
+<meta property="og:url" content="https://learndatastructures.org/" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Interactive modules for data structures and algorithms with diagrams and pseudocode" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="learnDataStructures" />
+<meta name="twitter:description" content="Interactive data structures and algorithms with visual simulators, pseudocode, and code snippets." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --ink:#f0f4ff; --muted:#a9b4cc;
+      --accent:#6ec3ff; --accent2:#8fffda; --panel:#121a33; --panel2:#0f1730;
+      --line:#223059;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1020,#0c1530);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Inter,Arial}
+
+    header{padding:18px 20px;border-bottom:1px solid #1f2a52;background:#0b1020}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    header h1{margin:0;font-size:22px}
+    header p{margin:6px 0 0;color:var(--muted)}
+    nav a{color:#cfe3ff;text-decoration:none;border:1px solid var(--line);padding:6px 10px;border-radius:10px;background:#0f1730}
+    nav a:hover{border-color:#3a5d99}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0 16px}
+    .toolbar input[type="search"]{flex:1 1 420px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0f1730;color:var(--ink)}
+
+    .section{margin:18px 0 8px}
+    .section h2{margin:0 0 8px;font-size:16px;color:#d9e6ff;font-weight:750}
+    .gallery{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
+    a.card, .card{
+      display:block; text-decoration:none; color:inherit;
+      background:var(--panel); border:1px solid #253056; border-radius:16px;
+      padding:12px; box-shadow:0 2px 24px rgba(0,0,0,.25); position:relative;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    a.card:hover{ transform:translateY(-2px); box-shadow:0 6px 28px rgba(0,0,0,.32); border-color:#3050a0; }
+    .thumb{background:var(--panel2); border:1px solid var(--line); border-radius:12px; height:140px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; overflow:hidden}
+    .thumb svg{width:100%; height:100%}
+    .title{font-weight:700; margin:0 0 4px}
+    .desc{margin:0; color:var(--muted); font-size:12px}
+    footer{color:var(--muted); font-size:12px; text-align:center; padding:20px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div>
+        <h1>learnDataStructures</h1>
+        <p>Interactive diagrams + step-by-step pseudocode. Filter below and click a tile to open the module.</p>
+      </div>
+      <nav>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Search (e.g. time, stack, queue, deque, heap, hash, graph, sort)…" />
+    </div>
+
+    <!-- BASICS -->
+    <div class="section"><h2>Basics</h2></div>
+    <div id="grid-basics" class="gallery">
+      <!-- Time Complexity -->
+      <a class="card" href="time-complexity.html" data-tags="time complexity big o omega theta notation reference asymptotic">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <path d="M28 108 H172 M28 108 V28" stroke="#2b3b6e"/>
+            <path d="M32 100 C 60 98, 90 92, 168 60" stroke="#6ec3ff" fill="none"/>
+            <path d="M32 104 C 80 102, 120 96, 168 92" stroke="#8fffda" fill="none" opacity=".8"/>
+            <path d="M32 106 L 168 106" stroke="#6ec3ff" opacity=".7"/>
+            <text x="160" y="116" font-size="9" fill="#cfe3ff">n</text>
+            <text x="18" y="34" font-size="9" fill="#cfe3ff" transform="rotate(-90 18,34)">time</text>
+            <text x="150" y="54" font-size="9" fill="#cfe3ff">n²</text>
+            <text x="150" y="88" font-size="9" fill="#cfe3ff">n</text>
+            <text x="150" y="106" font-size="9" fill="#cfe3ff">1</text>
+          </svg>
+        </div>
+        <h3 class="title">Time Complexity</h3>
+        <p class="desc">Big-O/Ω/Θ cheatsheet and calculations.</p>
+      </a>
+    </div>
+
+     <!-- ALGORITHMS -->
+    <div class="section"><h2>Algorithms</h2></div>
+    <div id="grid-algo" class="gallery">
+      <!-- Sorting Lab -->
+      <a class="card" href="sorting-lab.html" data-tags="sort insertion selection merge quick heap bubble shell quick algorithm">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <g fill="#6ec3ff">
+              <rect x="30" y="90" width="16" height="30"/><rect x="52" y="70" width="16" height="50"/>
+              <rect x="74" y="100" width="16" height="20"/><rect x="96" y="60" width="16" height="60"/>
+              <rect x="118" y="80" width="16" height="40"/><rect x="140" y="50" width="16" height="70"/>
+            </g>
+          </svg>
+        </div>
+        <h3 class="title">Sorting Lab</h3>
+        <p class="desc">Sorting methods visualized.</p>
+    </a>
+
+    <!-- Pathfinding Lab -->
+<a class="card" href="dijkstra.html" 
+   data-tags="graph shortest path dijkstra bellman-ford bfs a* pathfinding algorithm">
+  <div class="thumb" aria-hidden="true">
+    <svg viewBox="0 0 200 140">
+      <g stroke="#8fffda" stroke-width="2" opacity="0.8">
+        <line x1="60" y1="40" x2="100" y2="70"/>
+        <line x1="60" y1="40" x2="40" y2="90"/>
+        <line x1="100" y1="70" x2="150" y2="60"/>
+        <line x1="150" y1="60" x2="130" y2="100"/>
+        <line x1="40" y1="90" x2="100" y2="70"/>
+      </g>
+      <g fill="#6ec3ff" stroke="#0d2c4a">
+        <circle cx="60" cy="40" r="8"/>
+        <circle cx="100" cy="70" r="8"/>
+        <circle cx="150" cy="60" r="8"/>
+        <circle cx="130" cy="100" r="8"/>
+        <circle cx="40" cy="90" r="8"/>
+      </g>
+      <text x="100" y="126" font-size="9" fill="#cfe3ff" text-anchor="middle">shortest paths</text>
+    </svg>
+  </div>
+  <h3 class="title">Pathfinding Lab</h3>
+  <p class="desc">Dijkstra, Bellman-Ford, BFS, and A* visualized.</p>
+</a>
+
+    </div>
+
+    <!-- DATA STRUCTURES -->
+    <div class="section"><h2>Data Structures</h2></div>
+    <div id="grid-ds" class="gallery">
+      <!-- Stacks -->
+      <a class="card" href="stacks.html" data-tags="stack lifo array call stack frame linear">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#6ec3ff"/><stop offset="100%" stop-color="#8fffda"/>
+              </linearGradient>
+            </defs>
+            <rect x="24" y="12" width="80" height="116" rx="12" fill="#0f1730" stroke="#2b3b6e"/>
+            <g fill="url(#g1)" stroke="#0d2c4a">
+              <rect x="40" y="98" width="48" height="16" rx="6"/>
+              <rect x="40" y="78" width="48" height="16" rx="6"/>
+              <rect x="40" y="58" width="48" height="16" rx="6"/>
+              <rect x="40" y="38" width="48" height="16" rx="6"/>
+            </g>
+            <text x="64" y="26" fill="#cfe3ff" font-size="10" text-anchor="middle">Top</text>
+          </svg>
+        </div>
+        <h3 class="title">Stacks</h3>
+        <p class="desc">LIFO, Call Stacks.</p>
+      </a>
+
+      <!-- Queues -->
+      <a class="card" href="queues.html" data-tags="queue fifo circular buffer linked linear">
+        <div class="thumb">
+          <svg viewBox="0 0 200 140">
+            <g fill="#6ec3ff" opacity="0.85">
+              <rect x="30" y="60" width="28" height="18" rx="6"/>
+              <rect x="64" y="60" width="28" height="18" rx="6"/>
+              <rect x="98" y="60" width="28" height="18" rx="6"/>
+              <rect x="132" y="60" width="28" height="18" rx="6"/>
+            </g>
+            <path d="M28,50 h140" stroke="#8fffda" />
+            <path d="M170,50 l-8,-6 M170,50 l-8,6" stroke="#8fffda" />
+            <text x="28" y="46" font-size="10" fill="#cfe3ff">front</text>
+            <text x="160" y="46" font-size="10" fill="#cfe3ff" text-anchor="end">rear</text>
+          </svg>
+        </div>
+        <h3 class="title">Queues</h3>
+        <p class="desc">FIFO, circular buffer vs linked.</p>
+      </a>
+
+     <!-- Deque  -->
+<a class="card" href="deques.html"
+   data-tags="deque double-ended queue circular buffer head tail front back">
+  <div class="thumb" aria-hidden="true">
+    <svg viewBox="0 0 200 140">
+      <defs>
+        <linearGradient id="dqA" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6ec3ff"/><stop offset="100%" stop-color="#8fffda"/>
+        </linearGradient>
+        <linearGradient id="dqB" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#63a9ff"/><stop offset="100%" stop-color="#6ec3ff"/>
+        </linearGradient>
+        <marker id="dqArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="#6ec3ff"/>
+        </marker>
+      </defs>
+
+      <g stroke="#0d2c4a">
+        <rect x="34"  y="52" width="26" height="40" rx="10" fill="url(#dqB)"/>
+        <rect x="64"  y="52" width="26" height="40" rx="10" fill="url(#dqA)"/>
+        <rect x="94"  y="52" width="26" height="40" rx="10" fill="url(#dqB)"/>
+        <rect x="124" y="52" width="26" height="40" rx="10" fill="url(#dqA)"/>
+        <rect x="154" y="52" width="26" height="40" rx="10" fill="url(#dqB)"/>
+      </g>
+
+      <path d="M28 36 C 12 44, 12 60, 28 70"  fill="none" stroke="#6ec3ff" stroke-width="2"
+            marker-end="url(#dqArrow)"/>
+      <path d="M182 36 C 196 44, 196 60, 182 70" fill="none" stroke="#6ec3ff" stroke-width="2"
+            marker-end="url(#dqArrow)"/>
+
+      <path d="M28 80  C 12 80, 12 96, 28 104"  fill="none" stroke="#6ec3ff" stroke-width="2"
+            marker-end="url(#dqArrow)"/>
+      <path d="M182 80 C 196 80, 196 96, 182 104" fill="none" stroke="#6ec3ff" stroke-width="2"
+            marker-end="url(#dqArrow)"/>
+    </svg>
+  </div>
+  <h3 class="title">Deque</h3>
+  <p class="desc">Double-ended queue</p>
+</a>
+
+
+
+<!-- Linked Lists -->
+<a class="card" href="linkedlists.html"
+   data-tags="list linked singly doubly nodes pointers">
+  <div class="thumb" aria-hidden="true">
+    <svg viewBox="0 0 200 140">
+            <rect x="24" y="60" width="36" height="18" rx="6" fill="#6ec3ff"/>
+            <rect x="70" y="60" width="36" height="18" rx="6" fill="#6ec3ff"/>
+            <rect x="116" y="60" width="36" height="18" rx="6" fill="#6ec3ff"/>
+            <path d="M60,69 L70,69" stroke="#8fffda"/>
+            <path d="M106,69 L116,69" stroke="#8fffda"/>
+            <path d="M70,69 l-6,-4 M70,69 l-6,4" stroke="#8fffda"/>
+            <path d="M116,69 l-6,-4 M116,69 l-6,4" stroke="#8fffda"/>
+    </svg>
+  </div>
+  <h3 class="title">Linked Lists</h3>
+  <p class="desc">Singly/Doubly; pointer visualizer.</p>
+</a>
+
+
+      <!-- Hash Tables -->
+      <a class="card" href="hashtables.html" data-tags="hash table map dictionary chaining probing open addressing buckets">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <rect x="24" y="28" width="50" height="84" rx="8" fill="#0f1730" stroke="#2b3b6e"/>
+            <g fill="#203055" stroke="#2b3b6e">
+              <rect x="28" y="34" width="42" height="16" rx="4"/>
+              <rect x="28" y="54" width="42" height="16" rx="4"/>
+              <rect x="28" y="74" width="42" height="16" rx="4"/>
+              <rect x="28" y="94" width="42" height="16" rx="4"/>
+            </g>
+            <circle cx="100" cy="42" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <circle cx="120" cy="42" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <line x1="70" y1="42" x2="94" y2="42" stroke="#8fffda"/>
+            <line x1="106" y1="42" x2="114" y2="42" stroke="#8fffda"/>
+
+            <circle cx="100" cy="62" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <line x1="70" y1="62" x2="94" y2="62" stroke="#8fffda"/>
+
+            <circle cx="100" cy="82" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <circle cx="120" cy="82" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <circle cx="140" cy="82" r="6" fill="#6ec3ff" stroke="#0d2c4a"/>
+            <line x1="70" y1="82" x2="94" y2="82" stroke="#8fffda"/>
+            <line x1="106" y1="82" x2="114" y2="82" stroke="#8fffda"/>
+            <line x1="126" y1="82" x2="134" y2="82" stroke="#8fffda"/>
+
+            <text x="76" y="116" font-size="9" fill="#cfe3ff">chaining</text>
+          </svg>
+        </div>
+        <h3 class="title">Hash Tables</h3>
+        <p class="desc">Hashset/Hashmap, Chaining vs open addressing.</p>
+    </a>
+
+    <!-- General Trees -->
+<a class="card" href="trees.html" 
+   data-tags="tree general n-ary arity children parent hierarchy">
+  <div class="thumb" aria-hidden="true">
+    <svg viewBox="0 0 200 140">
+      <g stroke="#8fffda" stroke-width="2">
+        <line x1="100" y1="30" x2="60" y2="70"/>
+        <line x1="100" y1="30" x2="100" y2="70"/>
+        <line x1="100" y1="30" x2="140" y2="70"/>
+        <line x1="60" y1="70" x2="40" y2="110"/>
+        <line x1="60" y1="70" x2="80" y2="110"/>
+        <line x1="100" y1="70" x2="100" y2="110"/>
+        <line x1="140" y1="70" x2="120" y2="110"/>
+        <line x1="140" y1="70" x2="160" y2="110"/>
+      </g>
+      <g fill="#6ec3ff" stroke="#0d2c4a">
+        <circle cx="100" cy="30" r="10"/>
+        <circle cx="60" cy="70" r="9"/>
+        <circle cx="100" cy="70" r="9"/>
+        <circle cx="140" cy="70" r="9"/>
+        <circle cx="40" cy="110" r="7"/>
+        <circle cx="80" cy="110" r="7"/>
+        <circle cx="100" cy="110" r="7"/>
+        <circle cx="120" cy="110" r="7"/>
+        <circle cx="160" cy="110" r="7"/>
+      </g>
+    </svg>
+  </div>
+  <h3 class="title">General Trees</h3>
+  <p class="desc">N-ary trees with arbitrary arity per node.</p>
+</a>
+
+      <!-- BST -->
+      <a class="card" href="binarysearchtrees.html" data-tags="tree bst binary search insert delete rotate traversal">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <g stroke="#8fffda" stroke-width="2">
+              <line x1="100" y1="30" x2="60" y2="70"/><line x1="100" y1="30" x2="140" y2="70"/>
+              <line x1="60" y1="70" x2="40" y2="110"/><line x1="60" y1="70" x2="80" y2="110"/>
+              <line x1="140" y1="70" x2="120" y2="110"/><line x1="140" y1="70" x2="160" y2="110"/>
+            </g>
+            <g fill="#6ec3ff" stroke="#0d2c4a">
+              <circle cx="100" cy="30" r="10"/><circle cx="60" cy="70" r="10"/><circle cx="140" cy="70" r="10"/>
+              <circle cx="40" cy="110" r="8"/><circle cx="80" cy="110" r="8"/><circle cx="120" cy="110" r="8"/><circle cx="160" cy="110" r="8"/>
+            </g>
+          </svg>
+        </div>
+        <h3 class="title">Binary Search Tree</h3>
+        <p class="desc">BST basics, operations, traversals</p>
+    </a>
+
+      <!-- Balanced BST Tree -->
+      <a class="card" href="balancedBSTs.html" data-tags="tree rbt red black balanced bst">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <g stroke="#8fffda" stroke-width="2"><line x1="100" y1="30" x2="60" y2="80"/><line x1="100" y1="30" x2="140" y2="80"/></g>
+            <circle cx="100" cy="30" r="10" fill="#ff6b6b" stroke="#0d2c4a"/>
+            <circle cx="60" cy="80" r="10" fill="#1e293b" stroke="#0d2c4a"/>
+            <circle cx="140" cy="80" r="10" fill="#ff6b6b" stroke="#0d2c4a"/>
+          </svg>
+        </div>
+        <h3 class="title">Balanced BSTs</h3>
+        <p class="desc">Red-Black Trees & AVL Trees.</p>
+    </a>
+
+    <!-- Tries (prefix tree) -->
+<a class="card" href="tries.html"
+   data-tags="trie prefix tree radix string dictionary autocomplete startswith search">
+  <div class="thumb" aria-hidden="true">
+    <svg viewBox="0 0 200 140">
+      <g stroke="#8fffda" stroke-width="2" opacity="0.9">
+        <line x1="100" y1="30" x2="60" y2="70"/>
+        <line x1="100" y1="30" x2="100" y2="70"/>
+        <line x1="100" y1="30" x2="140" y2="70"/>
+
+        <line x1="60" y1="70" x2="40" y2="110"/>
+        <line x1="60" y1="70" x2="80" y2="110"/>
+        <line x1="100" y1="70" x2="100" y2="110"/>
+        <line x1="140" y1="70" x2="120" y2="110"/>
+        <line x1="140" y1="70" x2="160" y2="110"/>
+      </g>
+
+      <g fill="#6ec3ff" stroke="#0d2c4a">
+        <circle cx="100" cy="30" r="10"/>
+        <circle cx="60"  cy="70" r="9"/>
+        <circle cx="100" cy="70" r="9"/>
+        <circle cx="140" cy="70" r="9"/>
+        <circle cx="40"  cy="110" r="7"/>
+        <circle cx="80"  cy="110" r="7"/>
+        <circle cx="100" cy="110" r="7"/>
+        <circle cx="120" cy="110" r="7"/>
+        <circle cx="160" cy="110" r="7"/>
+      </g>
+
+      <g font-size="9" fill="#001523" text-anchor="middle">
+        <text x="100" y="33">b</text>
+        <text x="60"  y="73">a</text>
+        <text x="100" y="73">o</text>
+        <text x="140" y="73">u</text>
+
+        <text x="40"  y="113">g</text>
+        <text x="80"  y="113">d</text>
+        <text x="100" y="113">y</text>
+        <text x="120" y="113">s</text>
+        <text x="160" y="113">t</text>
+      </g>
+
+      <text x="100" y="132" font-size="9" fill="#cfe3ff" text-anchor="middle">prefix tree</text>
+    </svg>
+  </div>
+  <h3 class="title">Tries</h3>
+  <p class="desc">Prefix tree for strings</p>
+</a>
+
+
+      <!-- Binary Heap -->
+      <a class="card" href="binaryheaps.html" heap binary priority queue array representation">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <g fill="#0f1730" stroke="#2b3b6e">
+              <rect x="24" y="86" width="20" height="16" rx="3"/>
+              <rect x="48" y="86" width="20" height="16" rx="3"/>
+              <rect x="72" y="86" width="20" height="16" rx="3"/>
+              <rect x="96" y="86" width="20" height="16" rx="3"/>
+              <rect x="120" y="86" width="20" height="16" rx="3"/>
+              <rect x="144" y="86" width="20" height="16" rx="3"/>
+              <rect x="168" y="86" width="20" height="16" rx="3"/>
+            </g>
+            <g fill="#6ec3ff" font-size="9">
+              <text x="34" y="97" text-anchor="middle">1</text>
+              <text x="58" y="97" text-anchor="middle">8</text>
+              <text x="82" y="97" text-anchor="middle">5</text>
+              <text x="106" y="97" text-anchor="middle">6</text>
+              <text x="130" y="97" text-anchor="middle">3</text>
+              <text x="154" y="97" text-anchor="middle">4</text>
+              <text x="178" y="97" text-anchor="middle">2</text>
+            </g>
+            <g stroke="#8fffda" opacity="0.9">
+              <path d="M34 86 L58 70 L82 86" fill="none"/>
+              <path d="M58 86 L106 60 L130 86" fill="none"/>
+              <path d="M82 86 L154 60 L178 86" fill="none"/>
+            </g>
+            <text x="24" y="120" font-size="9" fill="#cfe3ff">array view</text>
+          </svg>
+        </div>
+        <h3 class="title">Binary Heap</h3>
+        <p class="desc">Min/Max-heap operations.</p>
+    </a>
+
+      <!-- Graphs -->
+      <a class="card" href="graphs.html" data-tags="graph bfs dfs dijkstra">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 200 140">
+            <g stroke="#8fffda" stroke-width="2" opacity="0.8">
+              <line x1="60" y1="40" x2="100" y2="70"/><line x1="60" y1="40" x2="40" y2="90"/>
+              <line x1="100" y1="70" x2="150" y2="60"/><line x1="150" y1="60" x2="130" y2="100"/>
+              <line x1="40" y1="90" x2="100" y2="70"/>
+            </g>
+            <g fill="#6ec3ff" stroke="#0d2c4a">
+              <circle cx="60" cy="40" r="8"/><circle cx="100" cy="70" r="8"/><circle cx="150" cy="60" r="8"/>
+              <circle cx="130" cy="100" r="8"/><circle cx="40" cy="90" r="8"/>
+            </g>
+          </svg>
+        </div>
+        <h3 class="title">Graphs</h3>
+        <p class="desc">Adjacency list/matrix + traversals.</p>
+    </a>
+    </div>
+
+    <footer>Tip: type to filter any section.</footer>
+  </div>
+
+  <script>
+    const filter = document.getElementById('filter');
+    const cards = Array.from(document.querySelectorAll('.gallery .card, .gallery a.card'));
+    const norms = s => (s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ');
+    function applyFilter(q){
+      const nq = norms(q);
+      cards.forEach(c => {
+        const hay = norms((c.querySelector('.title')?.textContent || '') + ' ' + (c.dataset.tags || ''));
+        c.style.display = hay.includes(nq) ? '' : 'none';
+      });
+    }
+    filter.addEventListener('input', () => applyFilter(filter.value));
+  </script>
+</body>
+</html>

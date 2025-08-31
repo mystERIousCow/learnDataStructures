@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linked Lists · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/linkedlists.html" />
+<meta name="description" content="Linked lists explained: singly, doubly, and circular variants; sentinels, tail pointers, big-O tradeoffs, and when to use them. Interactive simulator + C++/Java/Python code and pseudocode for core ops." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Linked Lists · learnDataStructures" />
+<meta property="og:description" content="Linked lists explained: singly, doubly, and circular variants; sentinels, tail pointers, big-O tradeoffs, and when to use them. Interactive simulator + C++/Java/Python code and pseudocode for core ops." />
+<meta property="og:url" content="https://learndatastructures.org/linkedlists.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Linked list overview with nodes and pointers and an interactive simulator" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Linked Lists · learnDataStructures" />
+<meta name="twitter:description" content="Linked lists explained: singly, doubly, and circular variants; sentinels, tail pointers, big-O tradeoffs, and when to use them. Interactive simulator + C++/Java/Python code and pseudocode for core ops." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <style>
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+
+
+
+
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu h4{margin:12px 0 6px; color:#c9ddff; font-size:15px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:var(--pane2)}
+    .edu code{background:#0e1630; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type="text"], input[type="number"]{
+      background:var(--pane2); color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:140px;
+    }
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#001523; border:0; font-weight:700}
+    .btn.danger{background:linear-gradient(90deg,#ff7a7a,#ffa07a); color:#2b0b0b; border:0}
+    .tiny{font-size:12px; color:var(--muted)}
+    .kbar{color:var(--muted); font-size:13px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .hl{background:rgba(255,255,255,.06)}
+
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f1730; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+
+    .impl details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1732; margin:10px 0;}
+    .impl details>summary{cursor:pointer; color:#dbe7ff; font-weight:700; margin:4px 0 8px}
+    .impl pre{background:#091433; border-color:#1f2d55}
+
+    svg{display:block; width:100%; height:340px; border:1px solid var(--stroke); border-radius:10px; background:rgba(255,255,255,0.02)}
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+    label.switch{display:inline-flex;align-items:center;gap:6px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <!-- EXPLANATION -->
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Linked Lists (Singly, Doubly, & Circular)</h2></div>
+      <div class="bd">
+        <p>
+          A <strong>linked list</strong> stores values in <em>nodes</em>. Each node holds a value and references to neighbors.
+          You access the structure via a <strong>head</strong> pointer; a <strong>tail</strong> pointer (optional) makes appends O(1).
+        </p>
+        <ul>
+          <li><strong>Array list vs Linked list</strong>:
+            array list has O(1) random access but O(n) insert/delete near the front (shifts);
+            linked lists have O(1) insert/delete once you know the position but <em>O(n)</em> random access.</li>
+          <li><strong>Singly linked list (SLL):</strong> node has <code>next</code>. O(1) at the front; removing in the middle needs the predecessor.</li>
+          <li><strong>Doubly linked list (DLL):</strong> node has <code>prev</code> and <code>next</code>. O(1) at both ends and O(1) delete if you already have the node.</li>
+          <li><strong>Circular lists:</strong> tail points back to head (singly or doubly). Useful for round-robin scheduling or continuously cycling structures.</li>
+          <li><strong>Sentinel (dummy) node:</strong> a non-data node that standardizes edge cases; often one at head and/or tail.</li>
+        </ul>
+
+        <h3>Core Functions</h3>
+<ul>
+  <li><strong>push_front(x):</strong> Insert x at the front (head) of the list.</li>
+  <li><strong>push_back(x):</strong> Insert x at the back (tail) of the list.</li>
+  <li><strong>insert_at(i, x):</strong> Insert x at index i (0-based).</li>
+  <li><strong>remove_at(i):</strong> Remove the element at index i (0-based).</li>
+  <li><strong>find(x):</strong> Return the index of the first occurrence of x; return -1 if not found.</li>
+  <li><strong>front():</strong> Return the element at the head of the list.</li>
+  <li><strong>back():</strong> Return the element at the tail of the list.</li>
+  <li><strong>reverse():</strong> Reverse the order of the elements in the list.</li>
+</ul>
+
+
+        <h3>When to choose a linked list</h3>
+        <ul>
+          <li>Frequent insert/remove in the middle with stable iterators/references.</li>
+          <li>Queues/deques where constant-time ends are needed and block deques aren’t available.</li>
+          <li>Implementing other structures (LRU lists, adjacency lists, intrusive lists).</li>
+          <li>Avoid when you need random indexing or extremely tight iteration performance.</li>
+        </ul>
+
+        <h3>Real-world Examples</h3>
+        <ul>
+          <li>Music playlists</li>
+          <li>LRU Cache</li>
+          <li>Browser back/forward navigation</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- MAIN: same 2-column layout as queue/deque -->
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Linked List — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Operations (pseudocode)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+        <div class="tiny" style="margin-top:6px">Pseudocode shows SLL with optional <code>tail</code>; DLL & circular differences are noted inline.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive linked-list simulator</h2>
+        <div class="kbar">size: <span id="kSize">0</span> · head: <span id="kHead">—</span> · tail: <span id="kTail">—</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 760 340" preserveAspectRatio="xMidYMid meet">
+          <g id="links"></g>
+          <g id="nodes"></g>
+          <g id="labels"></g>
+        </svg>
+
+        <div class="row" style="margin:8px 0">
+          <input id="val" type="text" placeholder="value (e.g., 42)">
+          <input id="idx" type="number" min="0" value="0" style="width:90px">
+          <label class="tiny" for="idx">index</label>
+          <button class="btn primary" id="pushFront">push_front</button>
+          <button class="btn primary" id="pushBack">push_back</button>
+          <button class="btn" id="insertAt">insert_at</button>
+          <button class="btn" id="removeAt">remove_at</button>
+          <button class="btn" id="removeVal">remove_value</button>
+          <button class="btn" id="findBtn">find</button>
+        </div>
+
+        
+
+        <div class="row">
+          <button class="btn" id="peekFront">front</button>
+          <button class="btn" id="peekBack">back</button>
+          <button class="btn" id="reverseBtn">reverse</button>
+          <button class="btn" id="undoBtn">undo</button>
+          <button class="btn danger" id="clearBtn">clear</button>
+          <button class="btn" id="randomBtn">randomize</button>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <span class="badgePill">O(1) at ends (with tail)</span>
+          <span class="badgePill">O(n) random access</span>
+          <span class="badgePill">Sentinel slot reserved</span>
+          <span class="badgePill" id="capInfo"></span>
+        </div>
+
+        <div class="row" style="margin:6px 0 2px">
+          <label class="switch tiny"><input type="checkbox" id="isDLL"> doubly-linked</label>
+          <label class="switch tiny"><input type="checkbox" id="useTail" checked> tail pointer</label>
+          <label class="switch tiny"><input type="checkbox" id="sentinel" checked> show sentinel</label>
+        </div>
+
+        <div id="status" class="tiny" style="margin-top:6px; min-height:18px"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu impl">
+      <div class="hd"><h2>Implementations & Complexity</h2></div>
+      <div class="bd">
+        <h3>Time complexity</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Array list</th>
+      <th>Singly LL (no tail)</th>
+      <th>Singly LL (with tail)</th>
+      <th>Doubly LL (head+tail)</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>push_front(x)</code></td>
+      <td>O(n)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>Array shifts; lists just relink</td>
+    </tr>
+    <tr>
+      <td><code>push_back(x)</code></td>
+      <td>Amortized O(1)</td>
+      <td>O(n)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>Tail pointer gives O(1) appends</td>
+    </tr>
+    <tr>
+      <td><code>insert_at(i, x)</code></td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>Traversal needed for LL</td>
+    </tr>
+    <tr>
+      <td><code>remove_at(i)</code></td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>Need predecessor for SLL</td>
+    </tr>
+    <tr>
+      <td><code>find(x)</code></td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>Linear search in all</td>
+    </tr>
+    <tr>
+      <td><code>front()</code></td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>Direct access to head</td>
+    </tr>
+    <tr>
+      <td><code>back()</code></td>
+      <td>O(1)</td>
+      <td>O(n)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>No tail in plain SLL</td>
+    </tr>
+    <tr>
+      <td><code>reverse()</code></td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>O(n)</td>
+      <td>Needs traversal/pointer rewiring</td>
+    </tr>
+    <tr>
+      <td><code>size()</code></td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>O(1)</td>
+      <td>Maintain a count field</td>
+    </tr>
+  </tbody>
+</table>
+
+
+                   <h3>Implementations by Language</h3>
+        <h3>Python</h3>
+        <details open>
+          <summary>Classic node-per-element SLL (educational)</summary>
+<pre>
+from dataclasses import dataclass
+from typing import Generic, Optional, TypeVar, Iterable, Iterator
+T = TypeVar("T")
+
+@dataclass
+class _Node(Generic[T]):
+    val: T
+    next: Optional["_Node[T]"] = None
+
+class SinglyLinkedList(Generic[T]):
+    def __init__(self, it: Optional[Iterable[T]] = None, use_tail: bool = True):
+        self.head: Optional[_Node[T]] = None
+        self.tail: Optional[_Node[T]] = None if use_tail else None
+        self._n = 0; self._use_tail = use_tail
+        if it:
+            for x in it: self.push_back(x)
+
+    def __len__(self) -> int: return self._n
+    def __iter__(self) -> Iterator[T]:
+        cur = self.head
+        while cur: 
+            yield cur.val; cur = cur.next
+
+    def push_front(self, x: T) -> None:
+        self.head = _Node(x, self.head)
+        if self._n == 0 and self._use_tail: self.tail = self.head
+        self._n += 1
+
+    def push_back(self, x: T) -> None:
+        n = _Node(x)
+        if not self.head:
+            self.head = n; 
+            if self._use_tail: self.tail = n
+        elif self._use_tail:
+            self.tail.next = n  # type: ignore
+            self.tail = n
+        else:
+            cur = self.head
+            while cur.next: cur = cur.next
+            cur.next = n
+        self._n += 1
+
+    def remove_after(self, prev: Optional[_Node[T]]) -> None:
+        if prev is None:
+            # remove head
+            if not self.head: return
+            self.head = self.head.next
+            if self._use_tail and self.head is None: self.tail = None
+        else:
+            victim = prev.next
+            if not victim: return
+            prev.next = victim.next
+            if self._use_tail and prev.next is None: self.tail = prev
+        self._n -= 1
+</pre>
+</details>
+
+
+<details open>
+<summary>Doubly-linked (circular with sentinel)</summary>
+<pre>
+@dataclass
+class _DNode(Generic[T]):
+    val: T
+    prev: Optional["_DNode[T]"] = None
+    next: Optional["_DNode[T]"] = None
+
+class CircularDLL(Generic[T]):
+    def __init__(self):
+        self.sentinel = _DNode[T](val=None)  # type: ignore
+        self.sentinel.prev = self.sentinel.next = self.sentinel
+        self._n = 0
+
+    def __len__(self): return self._n
+
+    def _insert_between(self, x: T, a: _DNode[T], b: _DNode[T]):
+        n = _DNode(x, prev=a, next=b); a.next = n; b.prev = n; self._n += 1
+
+    def push_front(self, x: T): self._insert_between(x, self.sentinel, self.sentinel.next) # type: ignore
+    def push_back(self, x: T): self._insert_between(x, self.sentinel.prev, self.sentinel)  # type: ignore
+
+    def remove_node(self, n: _DNode[T]):
+        if n is self.sentinel: return
+        n.prev.next = n.next; n.next.prev = n.prev  # type: ignore
+        self._n -= 1</pre>
+        </details>
+        <p>
+            Note: Python has no general-purpose built-in linked list. <code>collections.deque</code> is a highly optimized
+            block-linked deque (amortized O(1) ends), great for queues/stacks but not node-addressable.
+            Reference cycles are GC’d, but avoid custom <code>__del__</code> on nodes.
+          </p>
+          <h3>Java</h3>
+
+        <details>
+          
+          <summary>java.util.LinkedList<E> (DLL + Deque)</summary>
+<pre>
+import java.util.*;
+LinkedList&lt;Integer&gt; L = new LinkedList&lt;&gt;();
+L.addFirst(1); L.addLast(2);    // O(1) ends
+L.removeFirst(); L.removeLast();
+</pre>
+        </details>
+        <details open>
+<summary>Circular DLL with sentinel (educational)</summary>
+<pre>
+class CDLL&lt;T&gt; {
+  static class Node&lt;T&gt; { T v; Node&lt;T&gt; p,n; Node(T v){this.v=v;} }
+  private final Node&lt;T&gt; s = new Node&lt;&gt;(null); // sentinel
+  private int n=0;
+  public CDLL(){ s.p=s.n=s; }
+  public int size(){ return n; }
+  public void pushFront(T x){ insertBetween(new Node&lt;&gt;(x), s, s.n); }
+  public void pushBack(T x){ insertBetween(new Node&lt;&gt;(x), s.p, s); }
+  public void remove(Node&lt;T&gt; x){ if(x!=s){ x.p.n=x.n; x.n.p=x.p; n--; } }
+  private void insertBetween(Node&lt;T&gt; x, Node&lt;T&gt; a, Node&lt;T&gt; b){ x.p=a; x.n=b; a.n=x; b.p=x; n++; }
+}</pre>
+
+        </details>
+<ul>
+            <li><strong>Fail-fast iterators:</strong> <code>LinkedList</code> iterators detect concurrent structural changes.</li>
+            <li><strong>Index ops:</strong> <code>get(i)</code> runs from the closer end; still O(n).</li>
+            <li><strong>Deque vs LinkedList:</strong> For pure queue/deque APIs, prefer <code>ArrayDeque</code> for speed/cache-locality. Use <code>LinkedList</code> if you truly need node-like semantics or frequent middle removals via iterators.</li>
+          </ul>
+
+          <h3>C++</h3>
+        <details>
+          <summary>Simple SLL (educational)</summary>
+<pre>#include &lt;iostream&gt;
+using namespace std;
+
+// Node structure
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int val) {
+        data = val;
+        next = nullptr;
+    }
+};
+
+// Singly Linked List class
+class SinglyLinkedList {
+private:
+    Node* head;
+
+public:
+    SinglyLinkedList() {
+        head = nullptr;
+    }
+
+    // Insert at the beginning
+    void insertAtHead(int val) {
+        Node* newNode = new Node(val);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    // Insert at the end
+    void insertAtTail(int val) {
+        Node* newNode = new Node(val);
+        if (!head) {
+            head = newNode;
+            return;
+        }
+        Node* temp = head;
+        while (temp->next) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+
+    // Delete a node by value
+    void deleteNode(int val) {
+        if (!head) return;
+
+        // If head node is to be deleted
+        if (head->data == val) {
+            Node* toDelete = head;
+            head = head->next;
+            delete toDelete;
+            return;
+        }
+
+        Node* temp = head;
+        while (temp->next && temp->next->data != val) {
+            temp = temp->next;
+        }
+
+        if (temp->next) {
+            Node* toDelete = temp->next;
+            temp->next = temp->next->next;
+            delete toDelete;
+        }
+    }
+
+    // Search for a value
+    bool search(int val) {
+        Node* temp = head;
+        while (temp) {
+            if (temp->data == val) return true;
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    // Display the linked list
+    void display() {
+        Node* temp = head;
+        while (temp) {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        }
+        cout << "NULL" << endl;
+    }
+
+    // Destructor to free memory
+    ~SinglyLinkedList() {
+        Node* temp = head;
+        while (temp) {
+            Node* nextNode = temp->next;
+            delete temp;
+            temp = nextNode;
+        }
+    }
+};</pre>
+          
+        </details>
+
+        <details>
+          <summary>SLL with std::forward_list</summary>
+          <pre>
+#include &lt;iostream&gt;
+#include &lt;forward_list&gt;
+using namespace std;
+
+int main() {
+    forward_list&lt;int&gt; sll;
+
+    // Insert at front (O(1))
+    sll.push_front(10);
+    sll.push_front(20);
+    sll.push_front(30);
+
+    cout << "Singly Linked List: ";
+    for (int x : sll) cout << x << " -> ";
+    cout << "NULL\n";
+
+    // Insert after a position
+    auto it = sll.begin();
+    sll.insert_after(it, 15);  // after first element
+
+    cout << "After insert_after: ";
+    for (int x : sll) cout << x << " -> ";
+    cout << "NULL\n";
+
+    // Erase an element
+    sll.erase_after(it); // removes 15
+    cout << "After erase_after: ";
+    for (int x : sll) cout << x << " -> ";
+    cout << "NULL\n";
+
+    return 0;
+}
+</pre>
+        </details>
+
+<details>
+  <summary>DLL using std::list</summary>
+  <pre>
+#include &lt;iostream&gt;
+#include &lt;list&gt;
+using namespace std;
+
+int main() {
+    list&lt;int&gt; dll;
+
+    // Insert at back (O(1))
+    dll.push_back(10);
+    dll.push_back(20);
+    dll.push_back(30);
+
+    // Insert at front (O(1))
+    dll.push_front(5);
+
+    cout << "Doubly Linked List: ";
+    for (int x : dll) cout << x << " <-> ";
+    cout << "NULL\n";
+
+    // Insert in the middle
+    auto it = dll.begin();
+    advance(it, 2);  // move iterator 2 steps
+    dll.insert(it, 15);
+
+    cout << "After insert: ";
+    for (int x : dll) cout << x << " <-> ";
+    cout << "NULL\n";
+
+    // Remove a value
+    dll.remove(20);
+
+    cout << "After remove(20): ";
+    for (int x : dll) cout << x << " <-> ";
+    cout << "NULL\n";
+
+    return 0;
+}
+  </pre>
+</details>
+
+        <ul>
+            <li><strong>Iterator invalidation:</strong> For <code>std::list</code>/<code>forward_list</code>, insert/erase doesn’t invalidate other iterators (except erased). Splice is O(1).</li>
+            <li><strong>Performance:</strong> Iteration is generally slower than <code>std::vector</code> due to poor locality and extra indirections.</li>
+            <li><strong>Intrusive lists:</strong> Libraries like Boost.Intrusive offer node-embedded lists for allocator-friendly, zero-overhead linking (advanced).</li>
+          </ul>
+      </div>
+    </section>
+  </div>
+
+
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Conceptual Questions</h2></div>
+      <div class="bd">
+        <ol>
+          <li>Why is random access O(1) in an array list but O(n) in linked lists?</li>
+          <li>Show why <code>push_front</code> is O(1) for both SLL and DLL. Which pointers change?</li>
+          <li>In an SLL without a tail, why is <code>push_back</code> O(n)? How does adding a tail make it O(1)?</li>
+          <li>Given a DLL node reference, how can you remove it in O(1) without traversal?</li>
+          <li>What edge cases disappear when using a sentinel (dummy) head and/or tail? What trade-off is there?</li>
+          <li>When would you choose a linked list over an array list in practice?</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const codeEl = document.querySelector('#code');
+  const snippets = {
+cpp:`// std::list (DLL) & std::forward_list (SLL)
+#include <list>
+#include <forward_list>
+std::list<int> dll;
+dll.push_front(1); dll.push_back(2);
+dll.pop_front(); dll.pop_back();
+
+std::forward_list<int> sll;
+sll.push_front(3); // front ops are O(1)`,
+java:`// java.util.LinkedList (doubly-linked)
+import java.util.*;
+LinkedList<String> list = new LinkedList<>();
+list.addFirst("A"); list.addLast("B");
+String f = list.getFirst(); String b = list.getLast();
+list.removeFirst(); list.removeLast();`,
+py:`# Educational singly linked list (Python)
+class Node:
+    __slots__=("v","n")
+    def __init__(self,v,n=None): self.v=v; self.n=n
+
+class SLL:
+    def __init__(self, tail=True):
+        self.head=None; self.tail=None if tail else None
+        self.size=0; self.use_tail=tail
+    def push_front(self,x):
+        self.head=Node(x,self.head)
+        if self.use_tail and self.size==0: self.tail=self.head
+        self.size+=1
+    def push_back(self,x):
+        if not self.use_tail:
+            if not self.head: self.head=Node(x); self.size=1; return
+            cur=self.head
+            while cur.n: cur=cur.n
+            cur.n=Node(x); self.size+=1; return
+        node=Node(x)
+        if not self.head: self.head=self.tail=node
+        else: self.tail.n=node; self.tail=node
+        self.size+=1`
+  };
+  function highlight(lang, s) {
+    s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const stash=[]; const STX='\u0002', ETX='\u0003';
+    const put=(m,type)=>{const id=stash.push({type,text:m})-1; return STX+id+ETX;};
+    if (lang==='cpp' || lang==='java'){
+      s = s
+        .replace(/\/\*[\s\S]*?\*\//g,m=>put(m,'cm'))
+        .replace(/\/\/.*$/gm,m=>put(m,'cm'))
+        .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import|interface)\b/g,'<span class="kw">$1</span>')
+        .replace(/\b(vector|ArrayDeque|Queue|deque|queue)\b/g,'<span class="ty">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    } else {
+      s = s
+        .replace(/#[^\n]*$/gm,m=>put(m,'cm'))
+        .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,m=>put(m,'st'));
+      s = s
+        .replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+        .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    }
+    s = s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+    return s;
+  }
+  let currentLang='cpp';
+  function renderCode(){ codeEl.innerHTML = highlight(currentLang, snippets[currentLang]); }
+  document.querySelectorAll('.codeTabs button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); currentLang=b.dataset.lang; renderCode(); };
+  });
+  renderCode();
+
+  const pseudoEl=document.querySelector('#pseudo');
+  const lines = [
+'// Singly linked list with optional tail; circular & DLL notes inline',
+'push_front(x):',
+'  n ← new Node(x)',
+'  n.next ← head',
+'  head ← n',
+'  if tail is null: tail ← n',
+'',
+'push_back(x):',
+'  n ← new Node(x)',
+'  if head = null: head ← tail ← n',
+'  else if tail exists:',
+'    tail.next ← n; tail ← n',
+'  else:',
+'    cur ← head; while cur.next ≠ null: cur ← cur.next',
+'    cur.next ← n',
+'// circular SLL: after push_back, set tail.next ← head',
+'',
+'insert_at(i, x):',
+'  assert 0 ≤ i ≤ size',
+'  if i = 0: push_front(x); return',
+'  prev ← node_at(i-1)',
+'  n ← new Node(x); n.next ← prev.next; prev.next ← n',
+'  if n.next = null: tail ← n',
+'',
+'remove_at(i):',
+'  assert 0 ≤ i < size',
+'  if i = 0:',
+'    head ← head.next',
+'    if head = null: tail ← null',
+'    // circular SLL: if removing head, also set tail.next ← head', 
+'    //  (or null when last)',
+'    return',
+'  prev ← node_at(i-1); target ← prev.next',
+'  prev.next ← target.next',
+'  if prev.next = null: tail ← prev',
+'',
+'// DLL differences: nodes have prev & next; remove(node) is O(1):',
+'// node.prev.next ← node.next; node.next.prev ← node.prev',
+'// Circular DLL with sentinel S: empty iff S.next = S',
+  ];
+  function renderPseudo(){ pseudoEl.innerHTML = lines.map(ln=>`<div>${ln}</div>`).join(''); }
+  renderPseudo();
+
+  const nodesG = document.querySelector('#nodes'), linksG = document.querySelector('#links'), labelsG = document.querySelector('#labels');
+  const kSize=document.querySelector('#kSize'), kHead=document.querySelector('#kHead'), kTail=document.querySelector('#kTail'), kOpsLbl=document.querySelector('#kOps'), statusEl=document.querySelector('#status'), capInfo=document.querySelector('#capInfo');
+  const val=document.querySelector('#val'), idx=document.querySelector('#idx'), isDLL=document.querySelector('#isDLL'), useTail=document.querySelector('#useTail'), sentinel=document.querySelector('#sentinel');
+
+  let vals = ['17','26','31','54','77','93'];
+  let ops = 0, hist = [];
+
+  const VIEW_W = 760, VIEW_H = 340;
+  const padX = 24, padTop = 54, padBottom = 28;
+  const cellW = 86, cellH = 36, gapX = 14, rowGap = 28;
+
+  function gridMetrics(){
+    const cols = Math.max(1, Math.floor((VIEW_W - 2*padX + gapX) / (cellW + gapX)));
+    const rows = Math.max(1, Math.floor((VIEW_H - padTop - padBottom + rowGap) / (cellH + rowGap)));
+    const capacity = rows * cols;
+    const dataCap = Math.max(0, capacity - 1); 
+    return {cols, rows, capacity, dataCap};
+  }
+  function idxToXY(i, cols){
+    const r = Math.floor(i / cols);
+    const c = i % cols;
+    const dirLTR = (r % 2 === 0);
+    const col = dirLTR ? c : (cols - 1 - c);
+    const x = padX + col * (cellW + gapX);
+    const y = padTop + r * (cellH + rowGap);
+    return {x,y,dirLTR};
+  }
+
+  function draw(){
+    nodesG.innerHTML=''; linksG.innerHTML=''; labelsG.innerHTML='';
+    const {cols, dataCap} = gridMetrics();
+    capInfo.textContent = `capacity: ${dataCap} items (+1 sentinel)`;
+
+    const sPos = idxToXY(0, cols);
+    drawNode(sPos.x, sPos.y, 'S', '#ff6b6b', '#5a1e1e', sentinel.checked ? 1 : .25);
+    label('sentinel', sPos.x + cellW/2, sPos.y - 8, 11);
+
+    const pos = [];
+    for(let i=0;i<vals.length;i++){
+      const gridIdx = i + 1;
+      const p = idxToXY(gridIdx, cols);
+      pos.push(p);
+      drawNode(p.x, p.y, vals[i], 'url(#gLinear)', '#0d2c4a', 1);
+    }
+
+    for(let i=0;i<pos.length-1;i++){
+      const a=pos[i], b=pos[i+1];
+      drawArrow(a.x+cellW, a.y+cellH/2, b.x, b.y+cellH/2, 'right', '#8fffda');
+    }
+    if(sentinel.checked && pos.length){
+      drawArrow(sPos.x+cellW, sPos.y+cellH/2, pos[0].x, pos[0].y+cellH/2, 'right', '#8fffda', true);
+    }
+    if(isDLL.checked){
+      for(let i=1;i<pos.length;i++){
+        const a=pos[i], b=pos[i-1];
+        drawArrow(a.x, a.y+cellH/2+10, b.x+cellW, b.y+cellH/2+10, 'left', '#6ec3ff');
+      }
+    }
+
+    if(pos.length){
+      label('head', pos[0].x+cellW/2, pos[0].y-8, 12);
+      label('tail', pos[pos.length-1].x+cellW/2, pos[pos.length-1].y-8, 12);
+    }
+
+    ensureGradient();
+    kSize.textContent = vals.length;
+    kHead.textContent = vals.length ? vals[0] : '—';
+    kTail.textContent = vals.length ? vals[vals.length-1] : '—';
+    kOpsLbl.textContent = String(ops);
+  }
+  function drawNode(x,y,text,fill,stroke,opacity=1){
+    const r=mk('rect',{x,y,rx:8,ry:8,width:cellW,height:cellH,fill,stroke,opacity}); nodesG.appendChild(r);
+    const t=mk('text',{x:x+cellW/2,y:y+cellH/2+5,'text-anchor':'middle','font-size':12,fill:'#001523'}); t.textContent=text; nodesG.appendChild(t);
+  }
+  function drawArrow(x1,y1,x2,y2,dir,color,curved=false){
+    const d = curved ? `M ${x1} ${y1} Q ${(x1+x2)/2} ${(y1+y2)/2 - 18} ${x2} ${y2}` : `M ${x1} ${y1} L ${x2} ${y2}`;
+    linksG.appendChild(mk('path',{d,stroke:color,fill:'none','stroke-width':2}));
+    const ah = dir==='right' ? `M ${x2} ${y2} l -7 -4 m 7 4 l -7 4` : `M ${x2} ${y2} l 7 -4 m -7 4 l 7 4`;
+    linksG.appendChild(mk('path',{d:ah,stroke:color,fill:'none'}));
+  }
+  function label(txt,x,y,fs){
+    const t=mk('text',{x,y,'text-anchor':'middle','font-size':fs||12,fill:'#cfe3ff'}); t.textContent=txt; labelsG.appendChild(t);
+  }
+  function ensureGradient(){
+    if(document.getElementById('gLinear')) return;
+    const svg=document.querySelector('#vis');
+    const defs=mk('defs',{}); const lg=mk('linearGradient',{id:'gLinear',x1:0,x2:1});
+    lg.appendChild(mk('stop',{'offset':'0%','stop-color':'#6ec3ff'}));
+    lg.appendChild(mk('stop',{'offset':'100%','stop-color':'#8fffda'}));
+    defs.appendChild(lg); svg.insertBefore(defs, svg.firstChild);
+  }
+  function mk(tag,attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs){ e.setAttribute(k,attrs[k]); } return e; }
+
+  const status = msg => statusEl.textContent = msg||'';
+  const snapshot = () => hist.push({vals: vals.slice()});
+  function full(){ const {dataCap}=gridMetrics(); return vals.length >= dataCap; }
+  function ensureRoom(){ if(full()){ status('list is full (grid capacity; 1 cell kept for sentinel)'); return false; } return true; }
+  const S = s => String(s ?? '');
+
+  function push_front(x){ if(!ensureRoom()) return; snapshot(); vals.unshift(S(x)); ops++; draw(); }
+  function push_back(x){ if(!ensureRoom()) return; snapshot(); vals.push(S(x)); ops++; draw(); }
+  function insert_at(i,x){ i=Math.max(0,Math.min(i,vals.length)); if(i===vals.length){ push_back(x); return; } if(!ensureRoom()) return; snapshot(); vals.splice(i,0,S(x)); ops++; draw(); }
+  function remove_at(i){ if(i<0||i>=vals.length){ status('index out of range'); return; } snapshot(); vals.splice(i,1); ops++; draw(); }
+  function remove_value(x){ const i=vals.indexOf(S(x)); if(i===-1){ status('value not found'); return; } remove_at(i); status(''); }
+  function find_val(x){ const i=vals.indexOf(S(x)); status(i===-1?'not found':`found at index ${i}`); if(i>=0) idx.value=i; }
+  function reverse_list(){ snapshot(); vals.reverse(); ops++; draw(); }
+  function clear_list(){ snapshot(); vals=[]; ops++; draw(); status('cleared'); }
+  function randomize_same_size(){ if(!vals.length){ status('nothing to randomize'); return; } snapshot(); for(let i=0;i<vals.length;i++){ vals[i]=String(Math.floor(Math.random()*90)+10);} ops++; draw(); status('randomized values'); }
+
+  document.querySelector('#pushFront').onclick=()=>{ const x=val.value||String(Math.floor(Math.random()*90+10)); push_front(x); };
+  document.querySelector('#pushBack').onclick=()=>{ const x=val.value||String(Math.floor(Math.random()*90+10)); push_back(x); };
+  document.querySelector('#insertAt').onclick=()=>{ const x=val.value||String(Math.floor(Math.random()*90+10)); insert_at(parseInt(idx.value,10)||0,x); };
+  document.querySelector('#removeAt').onclick=()=>{ remove_at(parseInt(idx.value,10)||0); };
+  document.querySelector('#removeVal').onclick=()=>{ remove_value(val.value); };
+  document.querySelector('#findBtn').onclick=()=>{ find_val(val.value); };
+  document.querySelector('#peekFront').onclick=()=>{ status(vals.length?`front = ${vals[0]}`:'empty'); };
+  document.querySelector('#peekBack').onclick=()=>{ status(vals.length?`back = ${vals[vals.length-1]}`:'empty'); };
+  document.querySelector('#reverseBtn').onclick=()=>{ reverse_list(); };
+  document.querySelector('#undoBtn').onclick=()=>{ const s=hist.pop(); if(!s) return; vals=s.vals.slice(); ops++; draw(); status('undid last change'); };
+  document.querySelector('#clearBtn').onclick=()=>{ clear_list(); };
+  document.querySelector('#randomBtn').onclick=()=>{ randomize_same_size(); };
+  [document.querySelector('#isDLL'), document.querySelector('#useTail'), document.querySelector('#sentinel')].forEach(el=> el.onchange=()=>draw());
+
+  draw();
+})();
+</script>
+</body>
+</html>

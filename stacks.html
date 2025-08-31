@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <title>Stacks · learnDataStructures</title>
+  <link rel="canonical" href="https://learndatastructures.org/stacks.html" />
+<meta name="description" content="Learn stacks (LIFO): push, pop, peek; call stack behavior; time complexities, pros/cons, and implementations. Interactive simulator + C++/Java/Python snippets." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="Stacks · learnDataStructures" />
+<meta property="og:description" content="Learn stacks (LIFO): push, pop, peek; call stack behavior; time complexities, pros/cons, and implementations. Interactive simulator + C++/Java/Python snippets." />
+<meta property="og:url" content="https://learndatastructures.org/stacks.html" />
+<meta property="og:image" content="https://learndatastructures.org/open.png" />
+<meta property="og:image:alt" content="Stacks overview with simulator and code examples" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Stacks · learnDataStructures" />
+<meta name="twitter:description" content="Learn stacks (LIFO): push, pop, peek; call stack behavior; time complexities, pros/cons, and implementations. Interactive simulator + C++/Java/Python snippets." />
+<meta name="twitter:image" content="https://learndatastructures.org/open.png" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <style>
+    :root{
+      --bg:#0e1224;
+      --panel:#121836;
+      --panel-2:#0f1a2e;
+      --ink:#e9f2ff;
+      --muted:#a8b4d9;
+      --accent:#7be3d1;
+      --accent-2:#7ab7ff;
+      --stroke:#2a355e;
+      --ok:#41d39e;
+      --warn:#ffcc66;
+    }
+    html,body{height:100%}
+    body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .wrap{display:grid; grid-template-columns: 1.1fr 1fr; gap:14px; padding:14px; max-width:1200px; margin:0 auto;}
+    @media (max-width: 900px){ .wrap{grid-template-columns:1fr} }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h2{font-size:14px; margin:0; color:#d9e6ff}
+    .card .bd{padding:12px}
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--panel-2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .codeTabs{display:flex; gap:6px; margin:8px 0 10px 0}
+    .codeTabs button{
+      background:#0f2237; border:1px solid var(--stroke); color:#dbe7ff;
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    .codeTabs button[aria-pressed="true"]{
+      background:linear-gradient(180deg, #193a5e, #0f2237);
+      border-color:#29588e; color:white;
+    }
+    .kw{color:#80ffd8}
+    .ty{color:#ffd26e}
+    .fn{color:#89b8ff}
+    .cm{color:#9fb0d6; font-style:italic}
+    .st{color:#ffc5a1}
+
+    .controls{display:flex; flex-wrap:wrap; gap:6px}
+    .controls .group{display:flex; gap:6px; align-items:center}
+    input[type="text"]{
+      background:#0b1a2e; color:var(--ink); border:1px solid var(--stroke);
+      padding:6px 8px; border-radius:8px; min-width:140px;
+    }
+    button{
+      background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke);
+      padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit;
+    }
+    button:hover{border-color:#3a5d99}
+    .btn-ok{background:#10342b; border-color:#215b4d}
+    .btn-warn{background:#3c2a02; border-color:#7a5a1d}
+    .kbar{color:var(--muted); font-size:13px}
+    svg{display:block; width:100%; height:340px; border:1px solid var(--stroke); border-radius:10px}
+    .helper{color:var(--muted); font-size:13px; margin-top:6px}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .edu-card .hd{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);}
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu p{margin:0 0 10px 0; color:#dfe9ff}
+    .edu ul{margin:6px 0 12px 18px}
+    .edu li{margin:6px 0}
+    .edu table{width:100%; border-collapse:collapse; margin:8px 0 14px}
+    .edu th,.edu td{border:1px solid var(--stroke); padding:8px; text-align:left}
+    .edu th{background:#0f1a2e}
+    .edu code{background:#0e1a31; padding:0 4px; border:1px solid var(--stroke); border-radius:4px}
+    .edu details{border:1px solid var(--stroke); border-radius:8px; padding:10px; background:#0f1a2e; margin:10px 0;}
+    .edu details > summary{cursor:pointer; color:#dbe7ff; font-weight:600; margin:4px 0 8px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge"> CSC/CPE 202</span>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd"><h2>Stacks (LIFO)</h2></div>
+      <div class="bd">
+        <p>A stack is a Last-In, First-Out (LIFO) structure: the last thing you push is the first thing you pop. Think of a pile of plates or the browser’s back-history—new plates go on the top and you always remove from the top. Because only one end is visible, stacks are tiny to reason about and very fast to use.</p>
+        <p>The essential operations are straightforward. <em>push(x)</em> places a value on top of the stack. <em>pop()</em> removes and returns the value on top (and is undefined or throws an error if the stack is empty). <em>peek()</em> reads the top item without removing it, while <em>isEmpty()</em> and <em>size()</em> tell you if there’s anything to read and how many items are currently stored. These operations map directly onto many real tasks: undo/redo in editors, parsing and expression evaluation, and depth-first search all naturally use stacks.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h2>Stack — tiny reference snippets</h2>
+      </div>
+      <div class="bd">
+        <div class="codeTabs">
+          <button data-lang="cpp" aria-pressed="true">C++</button>
+          <button data-lang="java" aria-pressed="false">Java</button>
+          <button data-lang="py" aria-pressed="false">Python</button>
+        </div>
+        <pre id="code"></pre>
+
+        <div class="helper">Minimal, readable LIFO examples; focus on the idea, not boilerplate.</div>
+
+        <div style="height:14px"></div>
+        <div class="hd" style="border-radius:8px; margin:-4px 0 8px 0; border:1px solid var(--stroke)">
+          <h2 style="padding-left:6px">Operations (pseudocode)</h2>
+        </div>
+        <pre id="pseudo"></pre>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Interactive stack simulator</h2>
+        <div class="kbar">size: <span id="kSize">0</span> · top: <span id="kTop">—</span> · ops: <span id="kOps">0</span></div>
+      </div>
+      <div class="bd">
+        <svg id="vis" viewBox="0 0 640 360">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#6ec3ff"/>
+              <stop offset="100%" stop-color="#8fffda"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="24" width="180" height="300" rx="12" ry="12" fill="#e4f3ff" stroke="#98a4c2" fill-opacity="0.06"></rect>
+          <text x="130" y="44" text-anchor="middle" fill="#9fb0d6" font-size="12">Top →</text>
+          <rect x="260" y="24" width="330" height="300" rx="12" ry="12" fill="#e4f3ff" stroke="#98a4c2" fill-opacity="0.06"></rect>
+          <text x="425" y="44" text-anchor="middle" fill="#9fb0d6" font-size="12">Call Stack (factorial)</text>
+          <g id="itemsG"></g>
+          <g id="framesG"></g>
+        </svg>
+        <div class="controls">
+          <div class="group">
+            <input id="val" type="text" placeholder="value (e.g., 42)">
+            <button class="btn-ok" id="pushBtn">push</button>
+            <button id="popBtn">pop</button>
+            <button id="peekBtn">peek</button>
+            <button id="isEmptyBtn">isEmpty</button>
+            <button id="sizeBtn">size</button>
+            <button id="clearBtn" class="btn-warn">clear</button>
+          </div>
+        </div>
+        <div class="helper">Try: push values, then pop/peek to see LIFO. Use isEmpty/size to query the stack.</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="edu-wrap">
+    <section class="edu-card edu">
+      <div class="hd">
+        <h2 style="padding-left:6px">Call stack, Complexity, Pros/Cons, and Implementations</h2>
+      </div>
+      <div class="bd">
+        <h3>Call stack (what happens during function calls)</h3>
+        <p>Every function call creates a stack frame that stores parameters, locals, and a return address. New calls push a frame and become the active one; when a function returns, its frame is popped and control resumes in the caller. Recursion grows the call stack until a base case; then frames unwind in reverse order. A stack overflow occurs when too many frames are pushed (for example, in deep or unbounded recursion). Prefer iterative solutions when appropriate, or ensure base cases are reached quickly.</p>
+
+        <h3>Typical time complexity</h3>
+        <table>
+          <thead>
+            <tr><th>Operation</th><th>Array-backed</th><th>Linked-list-backed</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>push(x)</code></td><td>Amortized O(1)</td><td>O(1)</td><td>Array may occasionally resize → one O(n) copy</td></tr>
+            <tr><td><code>pop()</code></td><td>O(1)</td><td>O(1)</td><td>Remove the top</td></tr>
+            <tr><td><code>peek()</code></td><td>O(1)</td><td>O(1)</td><td>Read top element</td></tr>
+            <tr><td><code>isEmpty()</code></td><td>O(1)</td><td>O(1)</td><td>Check size/head</td></tr>
+            <tr><td><code>size()</code></td><td>O(1)</td><td>O(1)</td><td>Keep a counter</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Pros and cons</h3>
+        <p>Stacks have a tiny, easy API and provide O(1) operations, which makes them a great fit for undo/redo, parsing, and search. The limitation is that only the top is visible; array-backed stacks sometimes pay a resizing cost, while linked-list stacks add per-node memory overhead.</p>
+
+        <h3 id="impl">Implementations by language — how to create &amp; use</h3>
+
+        <h4>Python</h4>
+
+        <details>
+          <summary>Python list as a stack (recommended)</summary>
+          <p>Best for everyday Python. Lists provide <em>append</em> and <em>pop</em> at the end in amortized O(1), plus easy <em>peek</em> with <em>s[-1]</em>.</p>
+<pre>s = []
+s.append(10)     # push
+s.append(20)
+top = s[-1]      # peek -> 20
+x = s.pop()      # pop -> 20
+empty = (len(s) == 0)
+n = len(s)</pre>
+        </details>
+
+        <details>
+          <summary>collections.deque used as a stack</summary>
+          <p>Also O(1) for push/pop on the right; implemented in C and memory efficient under heavy churn.</p>
+<pre>from collections import deque
+s = deque()
+s.append("A")    # push
+s.append("B")
+print(s[-1])     # peek -> "B"
+print(s.pop())   # pop  -> "B"
+print(len(s))</pre>
+        </details>
+
+        <details>
+          <summary>Educational: minimal array-backed Stack class</summary>
+          <p>Fixed-capacity example to show the core logic; raises on overflow/underflow.</p>
+<pre>class ArrayStack:
+    def __init__(self, capacity=8):
+        self._a = [None] * capacity
+        self._n = 0
+    def push(self, x):
+        if self._n == len(self._a):
+            raise IndexError("stack full")
+        self._a[self._n] = x
+        self._n += 1
+    def pop(self):
+        if self._n == 0:
+            raise IndexError("stack empty")
+        self._n -= 1
+        x = self._a[self._n]
+        self._a[self._n] = None
+        return x
+    def peek(self):
+        if self._n == 0:
+            raise IndexError("stack empty")
+        return self._a[self._n-1]
+    def isEmpty(self): return self._n == 0
+    def size(self):    return self._n</pre>
+        </details>
+
+        <h4>Java</h4>
+
+        <details>
+          <summary>ArrayDeque as a stack (recommended)</summary>
+          <p>Modern, fast stack API: <em>push</em>, <em>pop</em>, <em>peek</em>, <em>isEmpty</em>, <em>size</em>. Prefer over legacy <em>Stack</em>.</p>
+<pre>import java.util.*;
+public class JStackDemo {
+  public static void main(String[] args) {
+    ArrayDeque&lt;Integer&gt; s = new ArrayDeque&lt;&gt;();
+    s.push(1); s.push(2); s.push(3);
+    System.out.println(s.peek()); // 3
+    System.out.println(s.pop());  // 3
+    System.out.println(s.size()); // 2
+  }
+}</pre>
+        </details>
+
+        <details>
+          <summary>Educational: minimal linked-list stack</summary>
+          <p>Shows how a stack can be built by hand; all operations O(1).</p>
+<pre>public class LinkedStack&lt;T&gt; {
+  private static class Node&lt;T&gt; { T v; Node&lt;T&gt; next; Node(T v){ this.v=v; } }
+  private Node&lt;T&gt; top; private int n = 0;
+
+  public void push(T x){ Node&lt;T&gt; t = new Node&lt;&gt;(x); t.next = top; top = t; n++; }
+  public T pop(){
+    if (n == 0) throw new java.util.NoSuchElementException();
+    T v = top.v; top = top.next; n--; return v;
+  }
+  public T peek(){
+    if (n == 0) throw new java.util.NoSuchElementException();
+    return top.v;
+  }
+  public boolean isEmpty(){ return n==0; }
+  public int size(){ return n; }
+}</pre>
+        </details>
+
+        <details>
+          <summary>Legacy java.util.Stack (for completeness)</summary>
+          <p>Older synchronized class; API is fine but <em>ArrayDeque</em> is the modern choice.</p>
+<pre>import java.util.Stack;
+Stack&lt;String&gt; s = new Stack&lt;&gt;();
+s.push("x"); s.push("y");
+System.out.println(s.peek());
+System.out.println(s.pop());</pre>
+        </details>
+
+        <h4>C++</h4>
+
+        <details>
+          <summary>std::stack (standard adapter)</summary>
+          <p>Simple <strong>LIFO</strong> adapter over another container (defaults to <em>std::deque&lt;T&gt;</em>).</p>
+<pre>#include &lt;stack&gt;
+#include &lt;iostream&gt;
+int main(){
+  std::stack&lt;int&gt; s;
+  s.push(10); s.push(20); s.push(30);
+  std::cout &lt;&lt; s.top() &lt;&lt; "\n"; // 30
+  s.pop();
+  std::cout &lt;&lt; s.size() &lt;&lt; "\n"; // 2
+}</pre>
+        </details>
+
+        <details>
+          <summary>DIY with std::vector (fast and cache-friendly)</summary>
+          <p>When you want full control and no abstraction overhead.</p>
+<pre>#include &lt;vector&gt;
+#include &lt;iostream&gt;
+int main(){
+  std::vector&lt;int&gt; s;
+  s.push_back(1); s.push_back(2); s.push_back(3);
+  std::cout &lt;&lt; s.back() &lt;&lt; "\n"; // 3
+  s.pop_back();
+  std::cout &lt;&lt; s.size() &lt;&lt; "\n"; // 2
+}</pre>
+        </details>
+
+        <h3>Conceptual Questions</h3>
+        <ol>
+          <li>What does LIFO mean in the context of stacks?</li>
+          <li>If you push 1, then 2, then 3, which number will be removed first if you pop once?</li>
+          <li>Why might an array-backed stack sometimes take more than constant time for a push?</li>
+          <li>How does the call stack allow recursion to work?</li>
+          <li>Why can deep recursion lead to a stack overflow?</li>
+          <li>Give one real-world example of a stack.</li>
+        </ol>
+
+        <p><em>Answers:</em> (1) Last-In, First-Out — the last pushed is the first popped. (2) 3. (3) The array may need to resize and copy elements when it runs out of capacity. (4) Each call pushes a new frame with its locals and return address; returns pop frames to resume the caller. (5) Too many frames exhaust the fixed stack space. (6) Examples include a pile of plates, browser back button history, or undo/redo in an editor.</p>
+      </div>
+    </section>
+  </div>
+
+<script>
+AOS.init({ duration: 400, easing: "ease-out-quart" });
+
+const qs  = sel => document.querySelector(sel);
+const qsa = sel => Array.from(document.querySelectorAll(sel));
+
+const code     = qs('#code');
+const pseudoEl = qs('#pseudo');
+const itemsG   = qs('#itemsG');
+const framesG  = qs('#framesG');
+const val      = qs('#val');
+const kSize    = qs('#kSize');
+const kTop     = qs('#kTop');
+const kOps     = qs('#kOps');
+
+function highlightStack(lang, s) {
+  s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const stash = []; const STX = '\u0002', ETX = '\u0003';
+  const put = (m,type)=>{ const id=stash.push({type,text:m})-1; return STX+id+ETX; };
+
+  if (lang === 'cpp' || lang === 'java') {
+    s = s.replace(/\/\*[\s\S]*?\*\//g, m => put(m, 'cm'))
+         .replace(/\/\/.*$/gm,         m => put(m, 'cm'))
+         .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, m => put(m, 'st'));
+    s = s.replace(/\b(class|struct|public|private|protected|static|void|int|long|double|float|boolean|char|new|return|if|else|for|while|assert|extends|import)\b/g,'<span class="kw">$1</span>')
+         .replace(/\b(vector|ArrayDeque|Stack)\b/g,'<span class="ty">$1</span>')
+         .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  } else {
+    s = s.replace(/#[^\n]*$/gm, m => put(m, 'cm'))
+         .replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, m => put(m, 'st'));
+    s = s.replace(/\b(class|def|return|if|elif|else|for|while|assert|in|not|and|or|import|from)\b/g,'<span class="kw">$1</span>')
+         .replace(/([A-Za-z_][A-Za-z0-9_]*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  }
+  return s.replace(new RegExp(STX+'(\\d+)'+ETX,'g'),(_,i)=>`<span class="${stash[+i].type}">${stash[+i].text}</span>`);
+}
+
+const stackSnippets = {
+cpp:`// Minimal LIFO with a dynamic array (std::vector)
+#include <vector>
+#include <string>
+std::vector<std::string> s;
+s.push_back("red");
+s.push_back("blue");
+auto top = s.back();   // "blue" (peek)
+s.pop_back();          // removes "blue"
+bool empty = s.empty();
+auto n = s.size();`,
+java:`// Minimal LIFO using ArrayDeque
+import java.util.ArrayDeque;
+ArrayDeque<String> s = new ArrayDeque<>();
+s.push("red");
+s.push("blue");
+String top = s.peek(); // "blue"
+s.pop();               // removes "blue"
+boolean empty = s.isEmpty();
+int n = s.size();`,
+py:`# Minimal LIFO with a Python list
+s = []
+s.append("red")
+s.append("blue")
+top = s[-1]    # "blue" (peek)
+s.pop()        # removes "blue"
+empty = (len(s) == 0)
+n = len(s)`
+};
+
+let stackLang = 'cpp';
+function renderStackCode(){ code.innerHTML = highlightStack(stackLang, stackSnippets[stackLang]); }
+
+qsa('.codeTabs button').forEach(b=>{
+  b.onclick = ()=>{
+    qsa('.codeTabs button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    stackLang = b.dataset.lang;
+    renderStackCode();
+  };
+});
+
+const tracer = { idx:0, timer:null, lines:[
+'function push(x):',
+'  A[size] ← x',
+'  size ← size + 1','',
+'function pop():',
+'  assert size > 0',
+'  size ← size - 1',
+'  return A[size]','',
+'function peek():',
+'  assert size > 0',
+'  return A[size-1]','',
+'function isEmpty():',
+'  return size == 0','',
+'function size():',
+'  return size'
+]};
+function renderPseudo(){
+  pseudoEl.innerHTML = tracer.lines
+    .map((ln,i)=> i===tracer.idx ? `<div style="background:rgba(255,255,255,.06)">${ln}</div>` : `<div>${ln}</div>`)
+    .join('');
+}
+
+let stack=[], ops=0;
+
+function drawStack(mode){
+  itemsG.innerHTML='';
+  const cellH=28, baseY=300, x=70, w=140;
+  const topIdx = stack.length - 1;
+
+  stack.forEach((v,i)=>{
+    const y=baseY-cellH*(i+1);
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    if (mode === 'push' && i === topIdx) {
+      g.setAttribute('data-aos','fade-down');
+      g.setAttribute('data-aos-duration','400');
+    }
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',x);rect.setAttribute('y',y);rect.setAttribute('rx',6);rect.setAttribute('ry',6);
+    rect.setAttribute('width',w);rect.setAttribute('height',cellH-2);
+    rect.setAttribute('fill','url(#g1)');rect.setAttribute('stroke','#0d2c4a');
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',x+w/2);text.setAttribute('y',y+18);
+    text.setAttribute('text-anchor','middle');text.setAttribute('font-size','12');text.setAttribute('fill','#001523');
+    text.textContent=v;
+    g.appendChild(rect); g.appendChild(text); itemsG.appendChild(g);
+  });
+
+  if (mode === 'push') AOS.refresh();
+}
+
+function drawFrames(n){
+  framesG.innerHTML='';
+  const baseX=270,baseY=290,w=300,h=26,off=28;
+  for(let i=n;i>=1;i--){
+    const y=baseY-(n-i+1)*off;
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',baseX);rect.setAttribute('y',y);rect.setAttribute('rx',6);rect.setAttribute('ry',6);
+    rect.setAttribute('width',w);rect.setAttribute('height',h);
+    rect.setAttribute('fill','#152246');rect.setAttribute('stroke','#2a3b6f');
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',baseX+10);text.setAttribute('y',y+17);text.setAttribute('font-size','12');text.setAttribute('fill','#cfe3ff');
+    text.textContent=`factorial(${i}) – waiting for factorial(${i-1})`;
+    framesG.appendChild(rect);framesG.appendChild(text);
+  }
+  if(n===0){
+    const y=baseY-off/2;const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',420);text.setAttribute('y',y);text.setAttribute('text-anchor','middle');text.setAttribute('font-size','12');text.setAttribute('fill','#cfe3ff');
+    text.textContent='Base case reached (n=0)';framesG.appendChild(text);
+  }
+}
+
+function push(x){
+  stack.push(x);
+  ops++; animatePseudo('push');
+  refresh('push');
+}
+function pop(){
+  if(stack.length===0) return;
+  const g = itemsG.lastChild;
+  if (g) { g.setAttribute('data-aos','fade-up'); g.setAttribute('data-aos-duration','300'); AOS.refresh(); }
+  const v = stack.pop();
+  ops++; animatePseudo('pop');
+  setTimeout(()=>{ refresh(); }, 300);
+  return v;
+}
+function peek(){ if(!stack.length) return; ops++; animatePseudo('peek'); refresh(); return stack[stack.length-1]; }
+
+function refresh(mode){
+  drawStack(mode);
+  kSize.textContent=stack.length;
+  kTop.textContent=stack.length?stack[stack.length-1]:'—';
+  kOps.textContent=ops;
+  drawFrames(Math.min(stack.length,6));
+}
+
+function animatePseudo(kind){
+  const ranges={push:[0,2],pop:[4,7],peek:[9,11]}[kind];
+  tracer.idx=ranges[0]; renderPseudo();
+  let i=ranges[0]; clearInterval(tracer.timer);
+  tracer.timer=setInterval(()=>{
+    i++; tracer.idx=i; renderPseudo();
+    if(i>=ranges[1]) clearInterval(tracer.timer);
+  },280);
+}
+
+qs('#pushBtn').onclick=()=>{const x=val.value||String(Math.floor(Math.random()*90+10)); push(x);};
+qs('#popBtn').onclick =()=>{const v=pop(); if(v!==undefined){ val.value=v; }};
+qs('#peekBtn').onclick=()=>{const v=peek(); if(v!==undefined){ val.value=v; }};
+qs('#isEmptyBtn').onclick=()=>{ val.value = (stack.length===0) ? 'true' : 'false'; };
+qs('#sizeBtn').onclick=()=>{ val.value = String(stack.length); };
+qs('#clearBtn').onclick=()=>{ stack.length=0; ops=0; refresh(); };
+
+renderStackCode();
+renderPseudo();
+stack=[1,2,3];
+refresh();
+</script>
+</body>
+</html>

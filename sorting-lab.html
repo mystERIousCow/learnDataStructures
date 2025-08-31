@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="manifest" href="./site.webmanifest?v=2">
+  <title>Sorting Lab — learnDataStructures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#0d1020; --panel:#131733; --panel-2:#161c3f; --ink:#e9ecf4; --muted:#aeb7cf; --accent:#7dd3fc; --accent-2:#a78bfa; --accent-3:#34d399; --accent-4:#f472b6; --amber:#fbbf24; --danger:#fb7185; --ok:#4ade80; --shadow:0 18px 60px rgba(0,0,0,.35); --r:16px; }
+    *{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+    url("bg.jpg") center / cover no-repeat fixed,
+    var(--bg); 
+  color:var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+}    h1,h2,h3{margin:0 0 .6rem} h1{font-size:clamp(22px,2.8vw,32px);font-weight:800;letter-spacing:.2px} h2{font-size:18px;color:var(--muted);font-weight:700}
+    a{color:var(--accent);text-decoration:none}
+
+    .topbar{background:linear-gradient(180deg,var(--panel),var(--panel-2));border-bottom:1px solid rgba(255,255,255,.08);}
+    .wrap{max-width:1200px;margin:18px auto;padding:0 16px;display:grid;gap:14px;grid-template-columns: 1.05fr 2fr}
+    .full{grid-column:1/-1}
+
+    .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;position:relative}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .title{display:flex;align-items:center;gap:12px}
+    .badge{background:rgba(125,211,252,.15);color:var(--accent);border:1px solid rgba(125,211,252,.35);padding:2px 8px;border-radius:999px;font-size:12px}
+
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+    .ctl{display:flex;flex-direction:column;gap:6px;min-width:160px} .ctl.wide{min-width:260px}
+    label{font-size:12px;color:var(--muted)}
+
+    .btn{height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#101430;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:.2s filter,.2s transform}
+    .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px) scale(.98)}
+    .btn.primary{background:linear-gradient(180deg,#1b2a5b,#16214b);border-color:rgba(80,130,255,.35)}
+    .btn.ghost{background:#0f1330;border-color:rgba(255,255,255,.08)}
+
+    input[type="number"]{height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#101430;color:var(--ink);padding:0 10px;min-width:120px}
+    input[type="range"]{ -webkit-appearance:none;height:28px;background:transparent;min-width:180px }
+    input[type="range"]::-webkit-slider-runnable-track{height:6px;background:#232a5a;border-radius:100px}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);margin-top:-6px;box-shadow:0 0 0 4px rgba(125,211,252,.15)}
+
+    .select{position:relative;min-width:180px}
+    .select button{width:100%}
+    .select .menu{position:absolute;z-index:20;left:0;right:0;top:42px;background:#0f1330;border:1px solid rgba(255,255,255,.12);border-radius:12px;box-shadow:var(--shadow);display:none;max-height:280px;overflow:auto}
+    .select.open .menu{display:block}
+    .select .opt{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
+    .select .opt:hover{background:#121a46}
+
+    #sim{height:380px;background:#0a0e2b;border:1px solid rgba(255,255,255,.07);border-radius:12px;position:relative;overflow:hidden}
+    #sim canvas{width:100%;height:100%;display:block}
+    .simHUD{position:absolute;top:10px;left:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .chip{font-size:12px;background:#0f1330;border:1px solid rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
+    .chip.good{color:var(--ok)} .chip.warn{color:var(--amber)}
+
+    #mini{height:190px;background:#0b0f2d;border:1px solid rgba(255,255,255,.07);border-radius:12px;position:relative;overflow:hidden}
+    .circle{position:absolute;width:36px;height:36px;border-radius:999px;background:linear-gradient(180deg,#2b3e92,#1b2a70);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font:600 13px/1 Inter;will-change:transform;transition:transform var(--dur) cubic-bezier(.22,.9,.2,1)}
+    .circle.active{background:linear-gradient(180deg,#34d399,#166b5c)} .circle.b{background:linear-gradient(180deg,#fbbf24,#8a5a00)} .circle.c{background:linear-gradient(180deg,#f472b6,#6b123d)}
+    .pivot{outline:2px solid var(--accent-4)}
+
+    pre{background:#0e1233;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;overflow:auto}
+    code{font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12.5px}
+    table{border-collapse:collapse;width:100%;background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    th,td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left} th{color:var(--muted);font-weight:600}
+    .tabs{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+    .tab{padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);cursor:pointer;background:#0f1330} .tab.active{background:linear-gradient(180deg,#1b2a5b,#16214b);border-color:rgba(80,130,255,.35)}
+    #bigOChart{width:100%;height:240px;background:#0f1330;border:1px solid rgba(255,255,255,.08);border-radius:12px}
+    @media (max-width: 980px){ .wrap{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+      <a href="index.html" class="btn" style="text-decoration:none;padding:6px 10px;border-radius:10px">⬅ Home</a>
+      <a href="about.html" class="btn" style="text-decoration:none;padding:6px 10px;border-radius:10px">About</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card full">
+      <div class="header">
+        <div class="title">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 17c3.5-2.5 7.5-2.5 12 0 2 .9 4 .9 6 0" stroke="var(--accent)" stroke-width="1.4"/><path d="M3 7c3.5 2.5 7.5 2.5 12 0 2-.9 4-.9 6 0" stroke="var(--accent-2)" stroke-width="1.4"/></svg>
+          <h1>Sorting Lab</h1>
+        </div>
+      </div>
+      <p style="margin:.25rem 0 0;color:var(--muted)">Pick an algorithm, choose <span class="badge">N ≤ 10,000</span>, then play the simulation. Below you’ll find deep explanations, complexity table & chart, and code in C++ / Java / Python. A 16-element mini sim mirrors the chosen algorithm with clear, intuitive animations.</p>
+    </div>
+
+    <div class="card">
+      <h2>Controls</h2>
+      <div class="controls" style="margin-top:8px">
+        <div class="ctl">
+          <label>Algorithm</label>
+          <div class="select" id="algoSelect">
+            <button class="btn" id="algoBtn">Bubble ▾</button>
+            <div class="menu">
+              <div class="opt">Bubble</div>
+              <div class="opt">Insertion</div>
+              <div class="opt">Selection</div>
+              <div class="opt">Merge</div>
+              <div class="opt">Quick</div>
+              <div class="opt">Heap</div>
+              <div class="opt">Shell</div>
+            </div>
+          </div>
+        </div>
+        <div class="ctl"><label for="n">N (≤ 10000)</label><input id="n" type="number" min="5" max="10000" value="128" /></div>
+        <div class="ctl wide"><label for="speed">Big Speed</label><input id="speed" type="range" min="0" max="1000" value="850" /></div>
+        <div class="ctl"><label>&nbsp;</label><button class="btn" id="shuffle">Shuffle</button></div>
+        <div class="ctl"><label>&nbsp;</label><button class="btn primary" id="play">▶ Play</button></div>
+        <div class="ctl"><label>&nbsp;</label><button class="btn ghost" id="pause">⏸ Pause</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="header"><h2>Simulation</h2>
+        <div class="badge" id="perfBadge" style="display:none">Performance mode</div>
+      </div>
+      <div id="sim">
+        <canvas id="simCanvas"></canvas>
+        <div class="simHUD">
+          <div class="chip">Comparisons: <span id="metricComps" class="mono">0</span></div>
+          <div class="chip">Swaps/Writes: <span id="metricWrites" class="mono">0</span></div>
+          <div class="chip">N: <span id="metricN" class="mono">128</span></div>
+          <div class="chip warn" id="status">Ready</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card full">
+      <div class="header"><h2>Mini Simulation (16 elements)</h2></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 8px 0">
+        <button class="btn" id="miniShuffle">Shuffle</button>
+        <button class="btn primary" id="miniPlay">▶ Play</button>
+        <button class="btn ghost" id="miniPause">⏸ Pause</button>
+        <div class="ctl" style="min-width:220px"><label for="miniSpeed">Speed</label><input id="miniSpeed" type="range" min="0" max="1000" value="600" /></div>
+        <span class="badge" id="miniLabel">Algo: Bubble</span>
+        <div class="chip warn" id="miniStatus">Ready</div>
+      </div>
+      <div id="mini"></div>
+    </div>
+
+    <div class="card full">
+      <div class="header"><h2 id="sectionTitle">About: Bubble Sort</h2></div>
+      <p id="explain" style="color:var(--ink);opacity:.9"></p>
+      <table style="margin-top:8px">
+        <thead><tr><th>Case</th><th>Time</th><th>Space</th><th>Stable</th></tr></thead>
+        <tbody id="complexRows"></tbody>
+      </table>
+      <div style="height:10px"></div>
+      <canvas id="bigOChart"></canvas>
+      <div class="tabs"><div class="tab active" data-lang="cpp">C++</div><div class="tab" data-lang="java">Java</div><div class="tab" data-lang="py">Python</div></div>
+      <pre><code id="codeBlock" class="language-cpp"></code></pre>
+    </div>
+
+    <div class="card full" style="text-align:center;color:var(--muted)"><small>For huge N on O(n²) sorts, the big sim uses a fast preview. The mini sim is independent with its own speed and play/pause.</small></div>
+  </div>
+
+<script>
+const $ = sel => document.querySelector(sel);
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+function clamp(v,a,b){ return Math.min(b, Math.max(a,v)); }
+function formatBig(n){ return n.toLocaleString(); }
+function makeArray(N){ const a=Array.from({length:N},(_,i)=>i+1); for(let i=N-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+const state = { algo:'Bubble', N:128, arr:[], playing:false, gen:null, metrics:{comps:0,writes:0}, perfMode:false, mini:{ arr:[], nodes:[], playing:false, gen:null, animDur:500, range:null, pivotIndex:null } };
+
+const canvas=$('#simCanvas'); const ctx=canvas.getContext('2d');
+function resizeCanvas(){ const bb=$('#sim').getBoundingClientRect(); const dpr=devicePixelRatio||1; canvas.width=Math.floor(bb.width*dpr); canvas.height=Math.floor(bb.height*dpr); canvas.style.width=bb.width+'px'; canvas.style.height=bb.height+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); drawBars(); }
+window.addEventListener('resize', resizeCanvas);
+function drawBars(ha=-1,hb=-1){ const a=state.arr; const w=canvas.clientWidth,h=canvas.clientHeight; ctx.clearRect(0,0,w,h); if(!a||!a.length) return; const n=a.length, maxV=n; const perf=n>2048||((['Bubble','Insertion','Selection'].includes(state.algo))&&n>800); state.perfMode=perf; $('#perfBadge').style.display=perf?'inline-block':'none'; const px=w/n, sample=Math.max(1,Math.floor(1/px)), barW=Math.max(1,Math.floor(px)); for(let i=0;i<n;i+=sample){ const val=a[i]; const hh=Math.max(1,Math.floor((val/maxV)*(h-2))); const x=Math.floor((i/n)*w); ctx.fillStyle=(i===ha||i===hb)?css('--accent-4'):'#2b3e92'; ctx.fillRect(x,h-hh,barW,hh); } }
+
+function initMini(){ const box=$('#mini'); box.innerHTML=''; const n=16; state.mini.arr=makeArray(n); const gap=Math.min(48,Math.max(36,Math.floor(box.clientWidth/18))); const startX=(box.clientWidth-gap*(n-1)-36)/2; const y=80; box.style.setProperty('--dur',(state.mini.animDur/1000)+'s'); state.mini.nodes=[]; for(let i=0;i<n;i++){ const el=document.createElement('div'); el.className='circle'; el.textContent=state.mini.arr[i]; el.style.transform=`translate(${Math.round(startX+i*gap)}px, ${y}px)`; el.dataset.index=i; box.appendChild(el); state.mini.nodes.push(el);} }
+function miniPos(i){ const box=$('#mini'); const n=16; const gap=Math.min(48,Math.max(36,Math.floor(box.clientWidth/18))); const startX=(box.clientWidth-gap*(n-1)-36)/2; const y=80; return {x:Math.round(startX+i*gap),y}; }
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function miniSwap(i,j){
+  const nodes=state.mini.nodes; const A=nodes[i],B=nodes[j];
+  if(!A||!B) return;
+  const ai=+A.dataset.index, bi=+B.dataset.index;
+  const aPos=miniPos(ai), bPos=miniPos(bi);
+  const up=-28;
+  A.style.zIndex=3; B.style.zIndex=3;
+  A.classList.add('active'); B.classList.add('b');
+  A.style.transitionTimingFunction=B.style.transitionTimingFunction='cubic-bezier(.2,.8,.2,1)';
+
+  A.style.transform=`translate(${aPos.x}px, ${aPos.y+up}px)`;
+  B.style.transform=`translate(${bPos.x}px, ${bPos.y-up}px)`;
+  await wait(state.mini.animDur*0.45);
+
+  A.style.transform=`translate(${bPos.x}px, ${bPos.y+up}px)`;
+  B.style.transform=`translate(${aPos.x}px, ${aPos.y-up}px)`;
+  await wait(state.mini.animDur*0.35);
+
+  A.style.transform=`translate(${bPos.x}px, ${bPos.y}px)`;
+  B.style.transform=`translate(${aPos.x}px, ${aPos.y}px)`;
+  await wait(state.mini.animDur*0.25);
+
+  A.classList.remove('active'); B.classList.remove('b');
+  A.style.zIndex=''; B.style.zIndex='';    
+
+  [state.mini.nodes[i],state.mini.nodes[j]]=[state.mini.nodes[j],state.mini.nodes[i]];
+  state.mini.nodes[i].dataset.index=i;
+  state.mini.nodes[j].dataset.index=j;
+}
+async function miniSet(i,val){ const node=state.mini.nodes[i]; if(!node) return; node.classList.add('c'); node.textContent=val; await wait(state.mini.animDur*0.6); node.classList.remove('c'); }
+function miniHighlight(i,j){ const nodes=state.mini.nodes; if(!nodes[i]||!nodes[j]) return; nodes[i].classList.add('active'); nodes[j].classList.add('b'); setTimeout(()=>{ nodes[i]&&nodes[i].classList.remove('active'); nodes[j]&&nodes[j].classList.remove('b'); }, clamp(state.mini.animDur*0.6,180,800)); }
+function miniLiftRange(l,r,up){ for(let k=l;k<=r;k++){ const el=state.mini.nodes[k]; if(!el) continue; const p=miniPos(+el.dataset.index); el.style.transform=`translate(${p.x}px, ${p.y + (up?-32:0)}px)`; } }
+function miniMarkPivot(idx,on){ const el=state.mini.nodes[idx]; if(el){ el.classList.toggle('pivot',!!on); } }
+
+function* bubbleOps(a){ const n=a.length; let swapped; for(let i=0;i<n-1;i++){ swapped=false; for(let j=0;j<n-i-1;j++){ yield {type:'compare', i:j, j:j+1}; if(a[j]>a[j+1]){ [a[j],a[j+1]]=[a[j+1],a[j]]; swapped=true; yield {type:'swap', i:j, j:j+1}; } } if(!swapped) break; } }
+function* insertionOps(a){ const n=a.length; for(let i=1;i<n;i++){ const key=a[i]; let j=i-1; while(j>=0){ yield {type:'compare', i:j, j:j+1}; if(a[j]>key){ a[j+1]=a[j]; yield {type:'set', i:j+1, val:a[j]}; j--; } else break; } a[j+1]=key; yield {type:'set', i:j+1, val:key}; } }
+function* selectionOps(a){ const n=a.length; for(let i=0;i<n-1;i++){ let min=i; for(let j=i+1;j<n;j++){ yield {type:'compare', i:min, j:j}; if(a[j]<a[min]) min=j; } if(min!==i){ [a[i],a[min]]=[a[min],a[i]]; yield {type:'swap', i, j:min}; } } }
+function* mergeOps(a){ const n=a.length; const aux=new Array(n); function* merge(lo,mid,hi){ yield {type:'mark', l:lo, r:hi, tag:'merge'}; let i=lo,j=mid+1,k=lo; while(i<=mid && j<=hi){ yield {type:'compare', i, j}; if(a[i]<=a[j]) aux[k++]=a[i++]; else aux[k++]=a[j++]; } while(i<=mid) aux[k++]=a[i++]; while(j<=hi) aux[k++]=a[j++]; for(let t=lo;t<=hi;t++){ a[t]=aux[t]; yield {type:'set', i:t, val:a[t]}; } yield {type:'unmark', l:lo, r:hi, tag:'merge'}; } function* sort(lo,hi){ if(lo>=hi) return; const mid=(lo+hi>>1); yield* sort(lo,mid); yield* sort(mid+1,hi); yield* merge(lo,mid,hi);} return yield* sort(0,n-1);}
+function* quickOps(a){ const n=a.length; function* partition(lo,hi){ yield {type:'mark', l:lo, r:hi, tag:'pivot'}; const pivot=a[hi]; let i=lo; for(let j=lo;j<hi;j++){ yield {type:'compare', i:j, j:hi}; if(a[j]<=pivot){ [a[i],a[j]]=[a[j],a[i]]; if(i!==j) yield {type:'swap', i, j}; i++; } } [a[i],a[hi]]=[a[hi],a[i]]; if(i!==hi) yield {type:'swap', i, j:hi}; yield {type:'unmark', l:lo, r:hi, tag:'pivot', p:i}; return i; } function* sort(lo,hi){ if(lo>=hi) return; const p=yield* partition(lo,hi); yield* sort(lo,p-1); yield* sort(p+1,hi);} return yield* sort(0,n-1);}
+function* heapOps(a){ const n=a.length; function* heapify(n,i){ let largest=i; const l=2*i+1,r=2*i+2; if(l<n){ yield {type:'compare', i:largest, j:l}; if(a[l]>a[largest]) largest=l; } if(r<n){ yield {type:'compare', i:largest, j:r}; if(a[r]>a[largest]) largest=r; } if(largest!==i){ [a[i],a[largest]]=[a[largest],a[i]]; yield {type:'swap', i, j:largest}; yield* heapify(n,largest); } } for(let i=(n>>1)-1;i>=0;i--){ yield* heapify(n,i);} for(let i=n-1;i>0;i--){ [a[0],a[i]]=[a[i],a[0]]; yield {type:'swap', i:0, j:i}; yield* heapify(i,0);} }
+function* shellOps(a){ const n=a.length; let h=1; while(h<n/3) h=3*h+1; while(h>=1){ for(let i=h;i<n;i++){ const v=a[i]; let j=i; while(j>=h && a[j-h]>v){ yield {type:'compare', i:j-h, j:j}; a[j]=a[j-h]; yield {type:'set', i:j, val:a[j-h]}; j-=h; } a[j]=v; yield {type:'set', i:j, val:v}; } h=Math.floor(h/3); } }
+const Algo={Bubble:bubbleOps,Insertion:insertionOps,Selection:selectionOps,Merge:mergeOps,Quick:quickOps,Heap:heapOps,Shell:shellOps};
+
+function setStatus(msg,kind='warn'){ const el=$('#status'); el.textContent=msg; el.className='chip '+(kind==='good'?'good':'warn'); }
+function setMiniStatus(msg,kind='warn'){ const el=$('#miniStatus'); el.textContent=msg; el.className='chip '+(kind==='good'?'good':'warn'); }
+function resetArray(){ state.arr=makeArray(state.N); state.metrics.comps=state.metrics.writes=0; state.gen=Algo[state.algo](state.arr.slice()); drawBars(); updateMetrics(); setStatus('Ready'); }
+function updateMetrics(){ $('#metricComps').textContent=formatBig(state.metrics.comps); $('#metricWrites').textContent=formatBig(state.metrics.writes); $('#metricN').textContent=formatBig(state.N); }
+function msPerStep(){ const s=+$('#speed').value; return 400 - s*0.398; }
+let rafId=0,lastStepTime=0;
+function loop(ts){
+  if(!state.playing){ rafId=0; return; }
+  if(!lastStepTime) lastStepTime=ts;
+  const elapsed=ts-lastStepTime;
+  const stepEvery=Math.max(2,msPerStep());
+  if(elapsed>=stepEvery){
+    let stepsBudget=state.perfMode?Math.max(50,Math.floor(500-msPerStep())):Math.max(1,Math.floor(50-msPerStep()/8));
+    while(stepsBudget-- >0){
+      const {done}=stepOnce();
+      if(done){ state.playing=false; $('#play').textContent='▶ Play'; setStatus('Sorted','good'); break; }
+      if(!state.perfMode) break;
+    }
+    lastStepTime=ts;
+  }
+  drawBars();
+  rafId=requestAnimationFrame(loop);
+}
+function stepOnce(){ const it=state.gen; if(!it) return {done:true}; const nx=it.next(); if(nx.done) return {done:true}; const ev=nx.value; switch(ev.type){ case 'compare': state.metrics.comps++; break; case 'swap': state.metrics.writes++; { const t=state.arr[ev.i]; state.arr[ev.i]=state.arr[ev.j]; state.arr[ev.j]=t; } break; case 'set': state.metrics.writes++; state.arr[ev.i]=ev.val; break; } updateMetrics(); return {done:false}; }
+function play(){ if(!state.gen) resetArray(); state.playing=true; $('#play').textContent='⏸ Pause'; cancelAnimationFrame(rafId); rafId=requestAnimationFrame(loop); setStatus('Sorting...'); }
+function pause(){ state.playing=false; $('#play').textContent='▶ Play'; setStatus('Paused'); }
+
+let miniRaf = 0, lastMiniTime = 0, miniBusy = false;
+function miniReset(){ state.mini.arr=makeArray(16); initMini(); state.mini.gen=Algo[state.algo](state.mini.arr.slice()); state.mini.range=null; state.mini.pivotIndex=null; $('#miniLabel').textContent='Algo: '+state.algo; setMiniStatus('Ready','warn'); }
+
+async function miniLoop(ts){
+  if(!state.mini.playing){ miniRaf = 0; return; }
+
+  if(miniBusy){ miniRaf = requestAnimationFrame(miniLoop); return; }
+
+  if(!lastMiniTime) lastMiniTime = ts;
+  const elapsed = ts - lastMiniTime;
+  const delay = clamp(state.mini.animDur, 150, 1000);
+
+  if(elapsed >= delay){
+    miniBusy = true;
+    const res = state.mini.gen.next();
+    if(res.done){
+      state.mini.playing=false; $('#miniPlay').textContent='▶ Play Mini';
+      state.mini.range=null; miniLiftRange(0,15,false); miniMarkPivot(state.mini.pivotIndex,false);
+      setMiniStatus('Sorted','good');
+      miniBusy = false;
+      return;
+    }
+
+    const ev = res.value;
+    if(ev.type === 'compare'){
+      miniHighlight(ev.i, ev.j);
+    } else if(ev.type === 'swap'){
+      await miniSwap(ev.i, ev.j);          
+    } else if(ev.type === 'set'){
+      await miniSet(ev.i, ev.val);         
+    } else if(ev.type === 'mark'){
+      if(ev.tag==='merge'){ state.mini.range=[ev.l,ev.r]; miniLiftRange(ev.l,ev.r,true); }
+      if(ev.tag==='pivot'){ state.mini.range=[ev.l,ev.r]; state.mini.pivotIndex=ev.r; miniMarkPivot(ev.r,true); }
+    } else if(ev.type === 'unmark'){
+      if(ev.tag==='merge'){ miniLiftRange(ev.l,ev.r,false); state.mini.range=null; }
+      if(ev.tag==='pivot'){ miniMarkPivot(state.mini.pivotIndex,false); state.mini.pivotIndex=null; }
+    }
+
+    lastMiniTime = performance.now();
+    miniBusy = false;
+  }
+
+  miniRaf = requestAnimationFrame(miniLoop);
+}
+
+function miniPlay(){ if(!state.mini.gen) miniReset(); state.mini.playing=true; $('#miniPlay').textContent='⏸ Pause Mini'; setMiniStatus('Sorting...','warn'); cancelAnimationFrame(miniRaf); miniRaf=requestAnimationFrame(miniLoop); }
+function miniPause(){ state.mini.playing=false; $('#miniPlay').textContent='▶ Play Mini'; }
+
+const CONTENT = {
+  Bubble: {
+    explain: "Bubble Sort is one of the simplest sorting algorithms to understand, often introduced as a “first” sorting method. It works by repeatedly stepping through the list, comparing two neighboring elements, and swapping them if they are in the wrong order. With each full pass through the list, the largest remaining element gradually “bubbles up” to its correct position at the end.<br><br>The process then repeats on the smaller, unsorted portion of the list until no swaps are needed and the entire structure is sorted. If the data is already sorted, Bubble Sort can detect this quickly and finish early, making it efficient for best-case scenarios.<br><br>Because it only swaps adjacent elements, Bubble Sort is a <b>stable</b> algorithm: equal values stay in the same relative order they started with. This makes it useful for teaching concepts like algorithmic stability and sorting invariants.<br><br>In practice, however, Bubble Sort is not efficient for large datasets. Its average and worst-case running time is quadratic, which means performance drops quickly as input size grows. Other algorithms like Quick Sort, Merge Sort, or Insertion Sort are almost always preferred in real-world applications. Bubble Sort remains popular mainly for its educational value and its simplicity when visualized. (Try running Bubble Sort with N = 10,000 above. It's excruciatingly slow.)",
+    bullets: [
+      "Compares and swaps adjacent elements until the list is sorted.",
+      "After pass k, the k largest elements are fixed at the end.",
+      "Early exit optimization allows best case of O(n).",
+      "Average and worst case require O(n²) time.",
+      "Uses constant extra space and is stable."
+    ],
+    complexity: {
+      best: 'O(n)',
+      avg: 'O(n²)',
+      worst: 'O(n²)',
+      space: 'O(1)',
+      stable: 'Yes'
+    },
+    code: {
+      cpp: `void bubble(std::vector<int>& a) {
+    int n = (int)a.size();
+    bool swapped = true;
+    for (int i = 0; i < n - 1 && swapped; ++i) {
+        swapped = false;
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (a[j] > a[j + 1]) {
+                std::swap(a[j], a[j + 1]);
+                swapped = true;
+            }
+        }
+    }
+}`,
+      java: `static void bubble(int[] a) {
+    int n = a.length;
+    boolean swapped = true;
+    for (int i = 0; i < n - 1 && swapped; i++) {
+        swapped = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (a[j] > a[j + 1]) {
+                int t = a[j]; a[j] = a[j + 1]; a[j + 1] = t;
+                swapped = true;
+            }
+        }
+    }
+}`,
+      py: `def bubble(a):
+    n = len(a)
+    swapped = True
+    i = 0
+    while i < n - 1 and swapped:
+        swapped = False
+        for j in range(0, n - i - 1):
+            if a[j] > a[j + 1]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+                swapped = True
+        i += 1`
+    },
+    curves: { best: 'n', avg: 'n2', worst: 'n2' }
+  },
+
+
+
+
+  Insertion: {
+    explain: "Insertion Sort builds the array the way you might sort playing cards: keep a <b>sorted prefix</b> on the left, take the next item, and <b>insert</b> it into its proper place by shifting larger elements one step to the right. This makes it very fast when the data is already close to sorted—each item moves only a little—and it’s <b>stable</b> because equal values never leap over one another. In practice it shines on <b>tiny arrays</b>, on <b>nearly sorted</b> inputs, and as a <b>base case</b> inside divide-and-conquer sorts (e.g., merge/quick). <br><br> However, Insertion Sort is not a good general-purpose sorting algorithm. On average and in the worst case, it performs O(n²), which grows a lot faster than the O(n log n) lower bound achieved by heap, merge, and quick sorts.",
+
+  bullets: [
+    "Maintains a sorted prefix; inserts the next key by shifting.",
+    "Best case O(n) when the array is already sorted.",
+    "Average / worst case O(n²) shifts and comparisons.",
+    "In-place (O(1) extra space) and stable.",
+    "Great for small N; often used as a base case."
+  ],
+    complexity:{best:'O(n)',avg:'O(n²)',worst:'O(n²)',space:'O(1)',stable:'Yes'},
+    code:{
+cpp:`void insertion(std::vector<int>& a) {
+    for (int i = 1; i < (int)a.size(); ++i) {
+        int key = a[i], j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            --j;
+        }
+        a[j + 1] = key;
+    }
+}`,
+java:`static void insertion(int[] a) {
+    for (int i = 1; i < a.length; i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
+    }
+}`,
+py:`def insertion(a):
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key`
+    },
+    curves:{best:'n',avg:'n2',worst:'n2'}
+  },
+  Selection: {
+    explain: "Selection Sort repeatedly <b>selects the minimum</b> from the remaining (unsorted) suffix and places it at the boundary. The number of comparisons is fixed—about <i>n(n-1)/2</i>—regardless of the input order, which makes it predictable but slow.<br><br>It performs <b>few writes</b> (at most one swap per position), which can matter on devices where writes are expensive. However, it is <b>not stable</b>, and it is almost always slower than insertion sort in practice.",
+  bullets: [
+    "Always does Θ(n²) comparisons; at most n−1 swaps.",
+    "Not stable: selecting a minimum can reorder equals.",
+    "In-place (O(1) extra space).",
+    "Useful only when minimizing writes matters; otherwise slow."
+  ],
+    complexity:{best:'O(n²)',avg:'O(n²)',worst:'O(n²)',space:'O(1)',stable:'No'},
+    code:{
+cpp:`void selection(std::vector<int>& a) {
+    int n = (int)a.size();
+    for (int i = 0; i < n - 1; ++i) {
+        int m = i;
+        for (int j = i + 1; j < n; ++j)
+            if (a[j] < a[m]) m = j;
+        if (m != i) std::swap(a[i], a[m]);
+    }
+}`,
+java:`static void selection(int[] a) {
+    for (int i = 0; i < a.length - 1; i++) {
+        int m = i;
+        for (int j = i + 1; j < a.length; j++)
+            if (a[j] < a[m]) m = j;
+        if (m != i) {
+            int t = a[i]; a[i] = a[m]; a[m] = t;
+        }
+    }
+}`,
+py:`def selection(a):
+    n = len(a)
+    for i in range(n - 1):
+        m = i
+        for j in range(i + 1, n):
+            if a[j] < a[m]:
+                m = j
+        if m != i:
+            a[i], a[m] = a[m], a[i]`
+    },
+    curves:{best:'n2',avg:'n2',worst:'n2'}
+  },
+  Merge: {
+     explain: "Merge Sort uses <b>divide & conquer</b>: split the array, sort each half, then <b>merge</b> the two sorted halves in linear time. The merge step preserves the order of equal elements, so the algorithm is <b>stable</b>.<br><br>Its running time is <b>O(n log n)</b> in the best, average, and worst cases—very reliable. The trade-off is extra memory for the temporary array when used on arrays; on linked lists it can be done in O(1) extra space.",
+  bullets: [
+    "Guaranteed O(n log n) time (all cases).",
+    "Stable: equal keys keep their original order.",
+    "Merging is linear; recursion depth is Θ(log n).",
+    "Needs O(n) extra space on arrays (common implementation)."
+  ],
+    complexity:{best:'O(n log n)',avg:'O(n log n)',worst:'O(n log n)',space:'O(n)',stable:'Yes'},
+    code:{
+cpp:`void merge_sort(std::vector<int>& a) {
+    std::vector<int> aux(a.size());
+    std::function<void(int,int)> sort = [&](int lo, int hi) {
+        if (lo >= hi) return;
+        int mid = (lo + hi) / 2;
+        sort(lo, mid);
+        sort(mid + 1, hi);
+        int i = lo, j = mid + 1, k = lo;
+        while (i <= mid && j <= hi) aux[k++] = (a[i] <= a[j]) ? a[i++] : a[j++];
+        while (i <= mid) aux[k++] = a[i++];
+        while (j <= hi)  aux[k++] = a[j++];
+        for (int t = lo; t <= hi; ++t) a[t] = aux[t];
+    };
+    sort(0, (int)a.size() - 1);
+}`,
+java:`static void mergeSort(int[] a) {
+    int[] aux = new int[a.length];
+    sort(a, aux, 0, a.length - 1);
+}
+static void sort(int[] a, int[] aux, int lo, int hi) {
+    if (lo >= hi) return;
+    int mid = (lo + hi) / 2;
+    sort(a, aux, lo, mid);
+    sort(a, aux, mid + 1, hi);
+    int i = lo, j = mid + 1, k = lo;
+    while (i <= mid && j <= hi) aux[k++] = (a[i] <= a[j]) ? a[i++] : a[j++];
+    while (i <= mid) aux[k++] = a[i++];
+    while (j <= hi)  aux[k++] = a[j++];
+    for (int t = lo; t <= hi; ++t) a[t] = aux[t];
+}`,
+py:`def merge_sort(a):
+    aux = a[:]
+    def sort(lo, hi):
+        if lo >= hi:
+            return
+        mid = (lo + hi) // 2
+        sort(lo, mid)
+        sort(mid + 1, hi)
+        i, j, k = lo, mid + 1, lo
+        while i <= mid and j <= hi:
+            if a[i] <= a[j]:
+                aux[k] = a[i]; i += 1
+            else:
+                aux[k] = a[j]; j += 1
+            k += 1
+        while i <= mid: aux[k] = a[i]; i += 1; k += 1
+        while j <= hi: aux[k] = a[j]; j += 1; k += 1
+        for t in range(lo, hi + 1):
+            a[t] = aux[t]
+    sort(0, len(a) - 1)`
+    },
+    curves:{best:'nlogn',avg:'nlogn',worst:'nlogn'}
+  },
+  Quick: {
+    explain: "Quick Sort is a sorting algorithm that divides the array into two partitions around a pivot: elements ≤ pivot go left, elements > pivot go right. This procedure runs recursively on the two partitions, and so on. With reasonably balanced partitions, it achieves O(n log n) time and excels in practice due to tight inner loops and good cache behavior.<br><br> Its caveat is the worst case O(n²) when partitions are very unbalanced (e.g., always picking a poor pivot). Variants use randomization or median-of-three to avoid that. Standard forms are not stable and use O(log n) stack space on average.",
+  bullets: [
+    "Average and best case O(n log n); worst case O(n²) with bad pivots.",
+    "Partitioning is in-place; typical extra space is O(log n) for recursion.",
+    "Usually fastest in practice on arrays; not stable.",
+    "Randomized or median-of-three pivoting mitigates worst case."
+  ],
+    complexity:{best:'O(n log n)',avg:'O(n log n)',worst:'O(n²)',space:'O(log n)',stable:'No'},
+    code:{
+cpp:`int partition(std::vector<int>& a, int lo, int hi) {
+    int p = a[hi], i = lo;
+    for (int j = lo; j < hi; ++j)
+        if (a[j] <= p) { std::swap(a[i++], a[j]); }
+    std::swap(a[i], a[hi]);
+    return i;
+}
+void quick(std::vector<int>& a, int lo, int hi) {
+    if (lo < hi) {
+        int p = partition(a, lo, hi);
+        quick(a, lo, p - 1);
+        quick(a, p + 1, hi);
+    }
+}`,
+java:`static int partition(int[] a, int lo, int hi) {
+    int p = a[hi], i = lo;
+    for (int j = lo; j < hi; j++)
+        if (a[j] <= p) {
+            int t = a[i]; a[i] = a[j]; a[j] = t; i++;
+        }
+    int t = a[i]; a[i] = a[hi]; a[hi] = t;
+    return i;
+}
+static void quick(int[] a, int lo, int hi) {
+    if (lo < hi) {
+        int p = partition(a, lo, hi);
+        quick(a, lo, p - 1);
+        quick(a, p + 1, hi);
+    }
+}`,
+py:`def quick(a, lo, hi):
+    def part(a, lo, hi):
+        p = a[hi]; i = lo
+        for j in range(lo, hi):
+            if a[j] <= p:
+                a[i], a[j] = a[j], a[i]
+                i += 1
+        a[i], a[hi] = a[hi], a[i]
+        return i
+    if lo < hi:
+        p = part(a, lo, hi)
+        quick(a, lo, p - 1)
+        quick(a, p + 1, hi)`
+    },
+    curves:{best:'nlogn',avg:'nlogn',worst:'n2'}
+  },
+  Heap: {
+    explain: "Heap Sort is a sorting algorithm that uses the <a href=binaryheaps.html>heap</a> data structure. It first creates a max-heap (the largest element at the root), then repeats: swap the root with the last element of the heap and <b>heapify</b> the reduced heap. This yields a deterministic <b>O(n log n)</b> running time and uses only <b>O(1)</b> extra space.<br><br>It’s a solid worst-case performer, but its constant factors and cache behavior are typically worse than quicksort. Standard heap sort is <b>not stable</b>.",
+  bullets: [
+    "Build-heap in O(n); each extract-max in O(log n).",
+    "Deterministic O(n log n) in all cases; in-place (O(1) space).",
+    "Not stable; generally slower in practice than tuned quicksort.",
+    "Good when worst-case guarantees and O(1) space are required."
+  ],
+    complexity:{best:'O(n log n)',avg:'O(n log n)',worst:'O(n log n)',space:'O(1)',stable:'No'},
+    code:{
+cpp:`void heapify(std::vector<int>& a, int n, int i) {
+    int m = i, l = 2*i + 1, r = 2*i + 2;
+    if (l < n && a[l] > a[m]) m = l;
+    if (r < n && a[r] > a[m]) m = r;
+    if (m != i) { std::swap(a[i], a[m]); heapify(a, n, m); }
+}
+void heap_sort(std::vector<int>& a) {
+    int n = (int)a.size();
+    for (int i = n/2 - 1; i >= 0; --i) heapify(a, n, i);
+    for (int i = n - 1; i > 0; --i) { std::swap(a[0], a[i]); heapify(a, i, 0); }
+}`,
+java:`static void heapify(int[] a, int n, int i) {
+    int m = i, l = 2*i + 1, r = 2*i + 2;
+    if (l < n && a[l] > a[m]) m = l;
+    if (r < n && a[r] > a[m]) m = r;
+    if (m != i) {
+        int t = a[i]; a[i] = a[m]; a[m] = t;
+        heapify(a, n, m);
+    }
+}
+static void heapSort(int[] a) {
+    int n = a.length;
+    for (int i = n/2 - 1; i >= 0; i--) heapify(a, n, i);
+    for (int i = n - 1; i > 0; i--) {
+        int t = a[0]; a[0] = a[i]; a[i] = t;
+        heapify(a, i, 0);
+    }
+}`,
+py:`def heapify(a, n, i):
+    m = i
+    l = 2*i + 1
+    r = 2*i + 2
+    if l < n and a[l] > a[m]: m = l
+    if r < n and a[r] > a[m]: m = r
+    if m != i:
+        a[i], a[m] = a[m], a[i]
+        heapify(a, n, m)
+
+def heap_sort(a):
+    n = len(a)
+    for i in range(n//2 - 1, -1, -1):
+        heapify(a, n, i)
+    for i in range(n - 1, 0, -1):
+        a[0], a[i] = a[i], a[0]
+        heapify(a, i, 0)`
+    },
+    curves:{best:'nlogn',avg:'nlogn',worst:'nlogn'}
+  },
+  Shell: {
+explain: "Shell Sort generalizes insertion sort by allowing gapped insertion: it begins with a large gap between compared elements and progressively reduces the gap, finishing with a standard insertion sort when the gap reaches 1. One common and effective gap sequence is the Knuth sequence (..., 121, 40, 13, 4, 1), defined by the recurrence x = 3h + 1. This sequence provides strong practical performance, though its exact time complexity is an open question and depends on the choice of gaps. <br><br>It's in-place and often much faster than quadratic sorts on random data, but it’s not stable and lacks a tight, general worst-case bound better than O(n²) for most simple gap choices.",  bullets: [
+    "Complexity depends on gaps; Knuth gaps are a good default.",
+    "Empirically ~O(n^1.3) average; worst-case O(n²).",
+    "Final gap = 1 gives an insertion pass that finishes the sort.",
+    "In-place (O(1) space), not stable; good middle-ground between O(n²) and O(n log n)."
+  ],
+    complexity:{best:'O(n log n) (depends)',avg:'~O(n^1.3) (depends)',worst:'O(n²)',space:'O(1)',stable:'No'},
+    code:{
+cpp:`void shell(std::vector<int>& a) {
+    int n = (int)a.size();
+    int h = 1;
+    while (h < n/3) h = 3*h + 1;
+    while (h >= 1) {
+        for (int i = h; i < n; ++i) {
+            int v = a[i], j = i;
+            while (j >= h && a[j - h] > v) {
+                a[j] = a[j - h];
+                j -= h;
+            }
+            a[j] = v;
+        }
+        h /= 3;
+    }
+}`,
+java:`static void shell(int[] a) {
+    int n = a.length, h = 1;
+    while (h < n/3) h = 3*h + 1;
+    while (h >= 1) {
+        for (int i = h; i < n; i++) {
+            int v = a[i], j = i;
+            while (j >= h && a[j - h] > v) {
+                a[j] = a[j - h];
+                j -= h;
+            }
+            a[j] = v;
+        }
+        h /= 3;
+    }
+}`,
+py:`def shell(a):
+    n = len(a); h = 1
+    while h < n // 3:
+        h = 3*h + 1
+    while h >= 1:
+        for i in range(h, n):
+            v = a[i]; j = i
+            while j >= h and a[j - h] > v:
+                a[j] = a[j - h]
+                j -= h
+            a[j] = v
+        h //= 3`
+    },
+    curves:{best:'nlogn',avg:'n1_3',worst:'n2'}
+  },
+};
+function mapX_linear(n, w, maxN){
+  const x0 = 40, x1 = w - 10;
+  const t = (n - 1) / (maxN - 1);
+  return x0 + t * (x1 - x0);
+}
+function mapY_linear(v, h, maxY){
+  const yTop = 10, yBottom = h - 48;
+  const t = v / maxY;
+  return yBottom - t * (yBottom - yTop);
+}
+
+function niceStep(range, targetTicks){
+  const raw = range / Math.max(1, targetTicks);
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const scaled = raw / pow;
+  const step = (scaled >= 5) ? 5*pow : (scaled >= 2) ? 2*pow : 1*pow;
+  return step;
+}
+
+function drawAxesLinear(ctx, w, h, maxN, maxY){
+  ctx.clearRect(0,0,w,h);
+
+  ctx.strokeStyle='rgba(255,255,255,.25)';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(40,10);
+  ctx.lineTo(40,h-48); 
+  ctx.lineTo(w-10,h-48);
+  ctx.stroke();
+
+  ctx.fillStyle='rgba(255,255,255,.6)';
+  ctx.font='12px Inter';
+  ctx.textAlign='center';
+
+  const xTicks = 5;
+  for(let i=0;i<=xTicks;i++){
+    const n = Math.round(1 + i*(maxN-1)/xTicks);
+    const px = mapX_linear(n, w, maxN);
+    ctx.fillText(String(n), px, h-28);
+    ctx.beginPath(); ctx.moveTo(px, h-48); ctx.lineTo(px, h-52); ctx.stroke();
+  }
+
+  ctx.textAlign='right';
+  const yRange = maxY;
+  const yStep = niceStep(yRange, 4);
+  for(let y=0; y<=maxY+1e-9; y+=yStep){
+    const py = mapY_linear(y, h, maxY);
+    const label = (y >= 1e6) ? (y/1e6)+'e6'
+                : (y >= 1e3) ? (y/1e3)+'e3'
+                : String(Math.round(y));
+    ctx.fillText(label, 36, py+4);
+    ctx.beginPath();
+    ctx.moveTo(40,py); ctx.lineTo(w-10,py);
+    ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.25)';
+  }
+}
+
+const curveFns = {
+  const: n => 1,
+  log:   n => Math.log2(Math.max(2,n)),
+  n:     n => n,
+  nlogn: n => n*Math.log2(Math.max(2,n)),
+  n2:    n => n*n,
+  n1_3:  n => Math.pow(n,1.3)
+};
+
+function curvesFor(algo){
+  const cur = CONTENT[algo].curves;
+  const names = ['Best','Avg','Worst'];
+  const ids = [cur.best, cur.avg, cur.worst];
+  const list=[];
+  for(let k=0;k<ids.length;k++){
+    const id = ids[k];
+    if(!id) continue; 
+    const fn = curveFns[id.replace(/[^a-z0-9_]/gi,'')] || curveFns.n;
+    list.push({ name:names[k], fn });
+  }
+  return list;
+}
+
+function drawLegend(ctx, w, h, items, colors){
+  const baseY = h - 18; 
+  ctx.font='12px Inter';
+  ctx.textAlign='left';
+  let x = 46;
+  items.forEach((it,idx)=>{
+    const col = colors[idx%colors.length];
+    ctx.strokeStyle = col; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(x, baseY-6); ctx.lineTo(x+22, baseY-6); ctx.stroke();
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x+11, baseY-6, 2.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.fillText(it.name, x+28, baseY-4);
+    x += 28 + ctx.measureText(it.name).width + 18;
+  });
+}
+
+function drawBigOFor(algo){
+  const c = $('#bigOChart');
+  const ctx = c.getContext('2d');
+  const w = c.clientWidth, h = c.clientHeight;
+  c.width = w*2; c.height = h*2; ctx.setTransform(2,0,0,2,0,0);
+
+  const maxN = 2000;
+
+  const curves = curvesFor(algo);
+  const cols = [css('--accent-3'), css('--accent-2'), css('--accent-4')];
+
+  let maxY = 0;
+  const samples = 100;
+  for(let i=0;i<samples;i++){
+    const n = 1 + Math.round(i*(maxN-1)/(samples-1));
+    curves.forEach(cv => { maxY = Math.max(maxY, cv.fn(n)); });
+  }
+  if(!isFinite(maxY) || maxY<=0) maxY = 1;
+  maxY *= 1.08; 
+
+  drawAxesLinear(ctx, w, h, maxN, maxY);
+
+  ctx.lineWidth = 2;
+  curves.forEach((cv, idx)=>{
+    ctx.strokeStyle = cols[idx%cols.length];
+    ctx.beginPath();
+    for(let i=0;i<samples;i++){
+      const n = 1 + Math.round(i*(maxN-1)/(samples-1));
+      const x = mapX_linear(n, w, maxN);
+      const y = mapY_linear(cv.fn(n), h, maxY);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = cols[idx%cols.length];
+    for(let i=0;i<samples;i+=12){
+      const n = 1 + Math.round(i*(maxN-1)/(samples-1));
+      ctx.beginPath();
+      ctx.arc(mapX_linear(n,w,maxN), mapY_linear(cv.fn(n),h,maxY), 2.4, 0, Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  drawLegend(ctx, w, h, curves, cols);
+}
+
+
+let activeLang='cpp';
+function renderCode(algo,lang){ const block=$('#codeBlock'); block.className='language-'+(lang==='py'?'python':lang); block.textContent=CONTENT[algo].code[lang]; }
+function setContent(algo){
+  $('#sectionTitle').textContent='About: '+algo+' Sort';
+  const C=CONTENT[algo];
+  $('#explain').innerHTML=`<div style="margin:.4rem 0">${C.explain}</div><ul style="margin:.4rem 0 .2rem 1.1rem;opacity:.9">${(C.bullets||[]).map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  const c=C.complexity; const tbody=$('#complexRows');
+  tbody.innerHTML=`<tr><td>Best</td><td>${c.best}</td><td rowspan=3>${c.space||'-'}</td><td rowspan=3>${c.stable||'-'}</td></tr><tr><td>Average</td><td>${c.avg}</td></tr><tr><td>Worst</td><td>${c.worst}</td></tr>`;
+  activeLang='cpp';
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelector('.tab[data-lang="cpp"]').classList.add('active');
+  renderCode(algo, activeLang);
+  drawBigOFor(algo);
+}
+
+const sel=$('#algoSelect'); const btn=$('#algoBtn');
+btn.addEventListener('click',e=>{ e.stopPropagation(); sel.classList.toggle('open'); });
+sel.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',e=>{
+  e.stopPropagation();
+  state.algo=o.textContent.trim();
+  btn.textContent=state.algo+' ▾';
+  sel.classList.remove('open');
+  setContent(state.algo);
+  resetArray(); miniReset();
+}));
+document.addEventListener('click',()=> sel.classList.remove('open'));
+
+function bindTabs(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      activeLang = t.dataset.lang;
+      renderCode(state.algo, activeLang);
+    });
+  });
+}
+
+$('#n').addEventListener('change', e=>{ state.N=clamp(+e.target.value||128,5,10000); $('#n').value=state.N; resetArray(); miniReset(); });
+$('#speed').addEventListener('input', ()=>{});
+$('#shuffle').addEventListener('click', ()=>{ resetArray(); miniReset(); });
+$('#play').addEventListener('click', ()=>{ if(state.playing) pause(); else play(); });
+$('#pause').addEventListener('click', pause);
+$('#miniShuffle').addEventListener('click', miniReset);
+$('#miniPlay').addEventListener('click', ()=>{ if(state.mini.playing) miniPause(); else miniPlay(); });
+$('#miniPause').addEventListener('click', miniPause);
+$('#miniSpeed').addEventListener('input', e=>{ const v=+e.target.value; state.mini.animDur=clamp(900 - v*0.7, 150, 1000); document.documentElement.style.setProperty('--dur',(state.mini.animDur/1000)+'s'); });
+
+function init(){ resizeCanvas(); setContent(state.algo); resetArray(); miniReset(); bindTabs(); }
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

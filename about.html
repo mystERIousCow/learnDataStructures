@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./favicon.ico?v=2" sizes="any" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=2">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+  <link rel="manifest" href="./site.webmanifest?v=2">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About · learnDataStructures</title>
+<link rel="canonical" href="https://learndatastructures.org/about.html" />
+<meta name="description" content="About learnDataStructures was created by Eric Liu to make data structures approachable with interactive simulations, clear explanations, and practical references." />
+
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content="learnDataStructures" />
+<meta property="og:title" content="About · learnDataStructures" />
+<meta property="og:description" content="Hi! I’m Eric Liu. I built learnDataStructures to share interactive visualizations and notes that make data structures click." />
+<meta property="og:url" content="https://learndatastructures.org/about.html" />
+<meta property="og:image" content="https://learndatastructures.org/eric.jpg" />
+<meta property="og:image:alt" content="Portrait of Eric Liu" />
+<meta property="profile:first_name" content="Eric" />
+<meta property="profile:last_name" content="Liu" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="About · learnDataStructures" />
+<meta name="twitter:description" content="learnDataStructures is a student-built resource with interactive simulations and concise explanations of core data structures." />
+<meta name="twitter:image" content="https://learndatastructures.org/eric.jpg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About · learnDataStructures",
+  "url": "https://learndatastructures.org/about.html",
+  "mainEntity": {
+    "@type": "Person",
+    "name": "Eric Liu",
+    "image": "https://learndatastructures.org/eric.jpg",
+    "sameAs": [
+      "https://github.com/mystERIousCow",
+      "https://www.linkedin.com/in/eric-cliu"
+    ],
+    "affiliation": {
+      "@type": "CollegeOrUniversity",
+      "name": "California Polytechnic State University, San Luis Obispo"
+    }
+  }
+}
+</script>
+
+  <style>
+    
+    :root{
+      --bg:#0d1220; --pane:#121a31; --pane2:#0f1730; --ink:#f0f4ff; --muted:#a8b2c9;
+      --accent:#6ec3ff; --accent2:#8fffda; --danger:#ff7a7a; --line:#223059; --stroke:#223059;
+      --pulse:#ffd166;
+    }
+    .aboutHead{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+  .avatar{
+    width:110px; height:110px; border-radius:50%; object-fit:cover;
+    border:1px solid var(--stroke); background:var(--pane2);
+    box-shadow: 0 10px 24px rgba(0,0,0,.28);
+  }
+  @media (max-width: 540px){ .avatar{ width:84px; height:84px; } }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #173063 0%, transparent 60%),
+        url("bg.jpg") center / cover no-repeat fixed,
+        var(--bg);
+      color:var(--ink);
+      font: 15px/1.45 system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+    }
+
+    .topbar{
+      display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+      padding:14px 18px; border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+    }
+    .topbar h1{font-size:18px; margin:0; font-weight:650;}
+    .topbar .home{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      border:1px solid var(--stroke); color:#dbe7ff; background:#0f2237;
+    }
+    .topbar .home:hover{border-color:#3a5d99}
+    .badge{font-size:12px; color:var(--muted)}
+    .spacer{flex:1}
+
+    .social{display:flex; gap:8px}
+    .iconBtn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:34px; height:34px; border-radius:8px;
+      border:1px solid var(--stroke); background:#0f2237; color:#dbe7ff;
+      text-decoration:none;
+    }
+    .iconBtn:hover{border-color:#3a5d99}
+    .icon{width:18px; height:18px; display:block; fill:currentColor}
+
+    .edu-wrap{max-width:1200px; margin:14px auto; padding:0 14px}
+    .edu-card{
+      background:var(--pane);
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+    .edu-card .hd{
+      display:flex; align-items:center; gap:8px; padding:10px 12px;
+      border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .edu-card .bd{padding:16px}
+    .edu h2{margin:0; color:#d9e6ff}
+    .edu h3{margin:14px 0 8px; color:#bcd4ff; font-size:16px}
+    .edu p{margin:0 0 10px 0; color:#e6eeff}
+    .tiny{font-size:12px; color:var(--muted)}
+    .btn{background:#0f2237; color:#e9f2ff; border:1px solid var(--stroke); padding:6px 10px; border-radius:8px; cursor:pointer; font:inherit}
+    .btn:hover{border-color:#3a5d99}
+
+    .formFrameWrap{position:relative; width:100%}
+    .formFrame{
+      width:100%; height:820px; border:0; background:var(--pane2);
+      border-top:1px solid var(--stroke); border-bottom:1px solid var(--stroke);
+    }
+
+    pre{
+      margin:0; padding:12px;
+      background:var(--pane2); color:var(--ink);
+      border:1px solid var(--stroke); border-radius:8px; overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+    }
+    .badgePill{padding:2px 6px;border-radius:8px;border:1px solid var(--stroke);background:#0f1732;font-size:11px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home" href="/">← Home</a>
+    <h1>learnDataStructures</h1>
+    <span class="badge">About</span>
+    <div class="spacer"></div>
+    <nav class="social" aria-label="Social links">
+      <a class="iconBtn" href="https://github.com/mystERIousCow" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <!-- GitHub icon -->
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.69c-2.78.6-3.37-1.19-3.37-1.19-.46-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.02 1.59 1.02 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/>
+        </svg>
+      </a>
+      <a class="iconBtn" href="https://www.linkedin.com/in/eric-cliu" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <!-- LinkedIn icon -->
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.5 8.5h4V23h-4V8.5zM8 8.5h3.8v2h.05c.53-1 1.84-2.05 3.78-2.05 4.04 0 4.79 2.66 4.79 6.12V23h-4v-5.9c0-1.41-.03-3.22-1.96-3.22-1.96 0-2.26 1.53-2.26 3.11V23H8V8.5z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+
+  <section class="edu-card edu">
+  <div class="hd"><h2>About</h2></div>
+  <div class="bd">
+    <div class="aboutHead">
+      <img class="avatar"
+           src="eric.jpg"
+           alt="Eric Liu"
+           width="110" height="110"
+           loading="lazy" decoding="async">
+      <p style="margin:0">
+        Hi! My name is Eric Liu, and I’m an incoming freshman at Cal Poly SLO (starting Fall '25), where I’ll be majoring in Computer Engineering (CPE).
+      </p>
+    </div>
+<br>
+    <p>I created <strong>learnDataStructures</strong> as a place to document my own learning and share resources with others exploring this subject. When I first took a Data Structures course in high school, I was constantly overwhelmed and struggled to make sense of the material. But over time, the concepts began to click, and I can confidently say that Data Structures was the most valuable and rewarding class I have taken.</p>
+    <p>I believe that we understand only as much as we can teach, and by explaining concepts to others, we also strengthen our own knowledge. My goal with this site is to make data structures more approachable through interactive simulations and clear explanations.</p>
+    <p>Thank you for visiting. Whether you are using this as an article, reference, or a last-minute study guide, I hope you found this resource useful.</p>
+  </div>
+</section>
+
+    <section class="edu-card edu">
+    <div class="bd">
+        <p>While you're here, feel free to check out my socials (top right).</p>
+        <p>If you catch any errors, have questions, or just want to leave a comment, please use the link below. All feedback is appreciated =)</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScU4e_qI69YdwIcMz6TgScKN0Cy3k5opzWgDpgfqtEb_oBs6A/viewform?usp=header">Feedback Form</a>
+
+
+    </div>
+</section>
+
+  </div>
+
+
+</body>
+</html>
